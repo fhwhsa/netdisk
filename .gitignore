@@ -1,0 +1,8 @@
+/client/*.o
+/client/moc*
+/client/qrc*
+/client/*.user
+/client/.qmake.stash
+/client/client
+/server/server
+/server/.vscode
