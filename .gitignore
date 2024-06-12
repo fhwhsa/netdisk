@@ -6,3 +6,5 @@
 /client/client
 /server/server
 /server/.vscode
+/server/test.cpp
+/server/test

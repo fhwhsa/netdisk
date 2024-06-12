@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 
-DataUnit* DataUnit::make_dataunit(uint dataType, uint dataLen, const char *data, char *name)
+DataUnit* DataUnit::make_dataunit(DataType dataType, uint dataLen, const char *data, char *name)
 {
     // 判断数据类型是否合法
-    if (dataType >= DATA_TYPE_NUM)
+    if (dataType >= DataType::DATA_TYPE_NUM)
         return nullptr;
     if (nullptr != name && sizeof(name) >= 64)
         return nullptr;
@@ -27,11 +27,7 @@ DataUnit* DataUnit::make_dataunit(uint dataType, uint dataLen, const char *data,
 
     memset(dunit->fileName, 0, sizeof(dunit->fileName));
     if (nullptr != nullptr)
-        memcpy(dunit->fileName, name, sizeof(name));
+        memcpy(dunit->fileName, name, (size_t)sizeof(name));
 
     return dunit;
 }
-
-int DataUnit::DATA_TYPE_TEXT = 0;
-int DataUnit::DATA_TYPE_LOGIN = 1;
-int DataUnit::DATA_TYPE_NUM = 2;

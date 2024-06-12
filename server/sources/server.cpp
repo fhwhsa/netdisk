@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <event.h>
 #include <event2/listener.h>
+#include "mysql.h"
 
 #define IPADDR "127.0.0.1"
 #define PORT 9999
@@ -45,6 +46,8 @@ int main()
     addr.sin_family = AF_INET;
     addr.sin_port = htons(PORT);
     addr.sin_addr.s_addr = inet_addr(IPADDR);
+
+    // 开启端口复用，释放连接监听器会关闭底层套接字
     struct evconnlistener *listener = evconnlistener_new_bind(ebase, listener_cb, ebase,
         LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&addr, sizeof(addr));
     if (!listener)
@@ -80,13 +83,16 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
     struct sockaddr_in* saddr = (struct sockaddr_in*)addr;
     Printf("The new conneciton %s:%d\n", inet_ntoa(saddr->sin_addr), ntohs(saddr->sin_port));
     
-
-    struct bufferevent* bev = bufferevent_socket_new(ebase, fd, BEV_OPT_CLOSE_ON_FREE | EV_PERSIST);
+    // 释放 bufferevent 时关闭底层传输端口。这将关闭底层套接字,释放底层 bufferevent 等。
+    struct bufferevent* bev = bufferevent_socket_new(ebase, fd, BEV_OPT_CLOSE_ON_FREE);
     if (!bev)
     {
         fprintf(stderr, "Error create bufferevent!\n");
         return ;
     }
+
+    // 设置读取地位
+    bufferevent_setwatermark(bev, EV_READ, sizeof(struct DataUnit), 0);
 
     bufferevent_setcb(bev, read_cb, NULL, event_cb, NULL);
     bufferevent_enable(bev, EV_READ | EV_WRITE);
