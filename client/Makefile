@@ -52,12 +52,12 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = dataUnit.cpp \
-		main.cpp \
+SOURCES       = main.cpp \
+		msgUnit.cpp \
 		widget.cpp qrc_res.cpp \
 		moc_widget.cpp
-OBJECTS       = dataUnit.o \
-		main.o \
+OBJECTS       = main.o \
+		msgUnit.o \
 		widget.o \
 		qrc_res.o \
 		moc_widget.o
@@ -289,9 +289,9 @@ DIST          = /opt/Qt/6.2.3/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt/6.2.3/gcc_64/mkspecs/features/exceptions.prf \
 		/opt/Qt/6.2.3/gcc_64/mkspecs/features/yacc.prf \
 		/opt/Qt/6.2.3/gcc_64/mkspecs/features/lex.prf \
-		client.pro dataUnit.h \
-		widget.h dataUnit.cpp \
-		main.cpp \
+		client.pro msgUnit.h \
+		widget.h main.cpp \
+		msgUnit.cpp \
 		widget.cpp
 QMAKE_TARGET  = client
 DESTDIR       = 
@@ -789,8 +789,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents res.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt/6.2.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents dataUnit.h widget.h $(DISTDIR)/
-	$(COPY_FILE) --parents dataUnit.cpp main.cpp widget.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents msgUnit.h widget.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp msgUnit.cpp widget.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents widget.ui $(DISTDIR)/
 
 
@@ -991,9 +991,6 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 
 ####### Compile
 
-dataUnit.o: dataUnit.cpp dataUnit.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dataUnit.o dataUnit.cpp
-
 main.o: main.cpp widget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qwidget.h \
@@ -1150,6 +1147,9 @@ main.o: main.cpp widget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qguiapplication_platform.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
+msgUnit.o: msgUnit.cpp msgUnit.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o msgUnit.o msgUnit.cpp
+
 widget.o: widget.cpp widget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qwidget.h \
@@ -1284,6 +1284,7 @@ widget.o: widget.cpp widget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
+		msgUnit.h \
 		ui_widget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QVariant \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QApplication \
@@ -1326,7 +1327,10 @@ widget.o: widget.cpp widget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QSettings \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qsettings.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QHostAddress
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QHostAddress \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QMessageBox \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qmessagebox.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o widget.o widget.cpp
 
 qrc_res.o: qrc_res.cpp 

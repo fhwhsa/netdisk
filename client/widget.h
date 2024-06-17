@@ -47,7 +47,14 @@ private:
 
 
 private slots:
-    void send();
+    /**
+     * @brief 登陆
+     */
+    void login();
 
+    /**
+     * @brief 注册
+     */
+    void regist();
 };
 #endif // WIDGET_H

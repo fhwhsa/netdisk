@@ -1,11 +1,13 @@
 #include "widget.h"
-#include "dataUnit.h"
+#include "msgUnit.h"
 #include "ui_widget.h"
 
 #include <QSettings>
 #include <QDebug>
 #include <QHostAddress>
 #include <QMessageBox>
+#include <string>
+#include <string.h>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -38,7 +40,8 @@ void Widget::init()
 
 void Widget::iniSignalSlots()
 {
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(send()));
+    connect(ui->btnRegist, SIGNAL(clicked()), this, SLOT(regist()));
+    connect(ui->btnLogin, SIGNAL(clicked()), this, SLOT(login()));
 }
 
 void Widget::loadconfig()
@@ -58,19 +61,42 @@ bool Widget::connectServer()
     return socket->waitForConnected();
 }
 
-void Widget::send()
+void Widget::login()
 {
-    QString str = ui->lineEdit->text();
-    if (str.isEmpty())
-        QMessageBox::warning(this, "warn", "null");
-    else
-    {
-        DataUnit* dunit = DataUnit::make_dataunit(DataUnit::DATA_TYPE_TEXT, str.size(), str.toStdString().c_str());
-        socket->write((char*)dunit, dunit->totalLen);
-        free(dunit);
-        dunit = NULL;
-        qDebug() << "write to server";
-    }
+    QString name = ui->userName->text();
+    QString passwd = ui->passwd->text();
+
+    QString msg = QString("name:%1\r\npasswd:%2\r\n").arg(name).arg(passwd);
+    std::string sstr = msg.toStdString();
+    const char* cstr = sstr.c_str();
+    size_t num = strlen(cstr);
+    MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_REQUEST, num, cstr);
+    socket->write((char*)munit, munit->totalLen);
+    free(munit);
+    munit = nullptr;
 }
+
+void Widget::regist()
+{
+
+}
+
+//void Widget::send()
+//{
+//    QString str = ui->lineEdit->text();
+//    if (str.isEmpty())
+//        QMessageBox::warning(this, "warn", "null");
+//    else
+//    {
+//        std::string sstr = str.toStdString();
+//        const char* cstr = sstr.c_str();
+//        size_t num = strlen(cstr);
+//        MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_REQUEST, num, cstr);
+//        socket->write((char*)munit, munit->totalLen);
+//        free(munit);
+//        munit = NULL;
+////        qDebug() << "write to server";
+//    }
+//}
 
 
