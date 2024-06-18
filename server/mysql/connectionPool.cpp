@@ -4,7 +4,7 @@
 #include <fstream>
 #include <thread>
 #include <stdexcept>
-#include <stdio.h>
+// #include <iostream>
 
 std::atomic<int> stopFlag;
 
@@ -47,6 +47,7 @@ std::shared_ptr<_MysqlConn> ConnectionPool::getConnection()
         std::lock_guard<std::mutex> locker(cqmutex);
         conn->initLastIdlePoint();
         connQueue.push(conn);
+        // std::cout << "recycle" << std::endl;
     });
     connQueue.pop();
     

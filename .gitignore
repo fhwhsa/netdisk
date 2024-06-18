@@ -4,7 +4,6 @@
 /client/*.user
 /client/.qmake.stash
 /client/client
-/server/server
 /server/.vscode
-/server/test.cpp
-/server/test
+/server/run
+/server/drun

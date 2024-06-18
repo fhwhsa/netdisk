@@ -14,7 +14,7 @@ enum MsgType {
     MSG_TYPE_LOGIN_RESPOND      /*登陆响应*/
 };
 
-const unsigned int msgTypeNum = 4;
+constexpr unsigned int msgTypeNum = 4;
 
 struct MsgUnit
 {

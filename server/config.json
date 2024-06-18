@@ -1,0 +1,11 @@
+{
+    "ip": "127.0.0.1",
+    "port": 3306,
+    "userName": "root",
+    "passwd": "123456",
+    "dbName": "netdisk",
+    "minConnSize": 1,
+    "maxConnSize": 2,
+    "maxIdleTime": 5000,
+    "maxWaitTime": 5000
+}

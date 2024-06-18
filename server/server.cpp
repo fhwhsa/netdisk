@@ -2,39 +2,18 @@
  * 服务器
 */
 
+#include "server.h"
 #include "wrap/wrap.h"
 #include "msg/msgUnit.h"
-#include "mysql/mysqlConn.h"
+#include "msg/msgParsing.h"
 
 #include <stdlib.h>
 #include <signal.h>
 #include <event.h>
 #include <event2/listener.h>
+#include <iostream>
 
-#define IPADDR "127.0.0.1"
-#define PORT 9999
-
-/**
- * 描述：监听套接字回调函数
-*/
-void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
-
-/**
- * 描述：连接读回调
-*/
-void read_cb(struct bufferevent *, void *);
-
-/**
- * 描述：连接事件回调
-*/
-void event_cb(struct bufferevent *, short, void *);
-
-/**
- * 描述：信号SIGINT监听回调函数
-*/
-void sigint_cb(evutil_socket_t, short, void *);
-
-int main()
+int run(std::string host, uint port)
 {
     struct event_base *ebase = event_base_new();
     if (!ebase)
@@ -45,8 +24,8 @@ int main()
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(PORT);
-    addr.sin_addr.s_addr = inet_addr(IPADDR);
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = inet_addr(host.c_str());
 
     // 开启端口复用，释放连接监听器会关闭底层套接字
     struct evconnlistener *listener = evconnlistener_new_bind(ebase, listener_cb, ebase,
@@ -101,26 +80,24 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
 
 void read_cb(struct bufferevent *bev, void *ctx)
 {
-    Printf("read\n");
+    // Printf("read\n");
 
     int res = 0;
 
     // 读取总大小
     uint totalLen;
     res = bufferevent_read(bev, &totalLen, sizeof(uint)); 
-    Printf("%d:%d\n", totalLen, res);
-
     MsgUnit* munit = (MsgUnit*)malloc(totalLen);
     munit->totalLen = totalLen;
-
     res = bufferevent_read(bev, &munit->msgType, sizeof(uint));
-    Printf("%d:%d\n", munit->msgType, res);
-
     res = bufferevent_read(bev, &munit->msgLen, sizeof(uint));
-    Printf("%d:%d\n", munit->msgLen, res);
-
     res = bufferevent_read(bev, munit->msg, munit->msgLen);
-    Printf("%s:%d\n", (char*)munit->msg, res);
+
+    MsgUnit* respond = MsgParsing::parsing(munit);
+    // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
+    //         << (char*)respond->msg << std::endl;
+    bufferevent_write(bev, (char*)respond, respond->totalLen);
+    // std::cout << "write" << std::endl;
 }
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)
@@ -144,5 +121,3 @@ void sigint_cb(evutil_socket_t sig, short events, void *arg)
 
 	event_base_loopexit(base, &delay);
 }
-
-
