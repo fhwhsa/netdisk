@@ -2,6 +2,7 @@
 #include "ui_folderpage.h"
 
 #include <QString>
+#include <QDebug>
 
 FolderPage::FolderPage(QWidget *parent) :
     QWidget(parent),
@@ -12,5 +13,6 @@ FolderPage::FolderPage(QWidget *parent) :
 
 FolderPage::~FolderPage()
 {
+//    qDebug() << "folderpage delete";
     delete ui;
 }

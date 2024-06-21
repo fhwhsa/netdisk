@@ -8,6 +8,8 @@
 #include <QWidget>
 #include <QHash>
 #include <QToolButton>
+#include <QTcpSocket>
+#include <QString>
 
 namespace Ui {
 class MainPage;
@@ -18,7 +20,7 @@ class MainPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit MainPage(QWidget *parent = nullptr);
+    explicit MainPage(QString _userId, QTcpSocket* _socket, QWidget *parent = nullptr);
     ~MainPage();
 
 private:
@@ -41,12 +43,18 @@ private:
     TransmitPage* transmitPage;
     FriendPage* friendPage;
 
+    QTcpSocket* socket;
+    QString userId;
+
 private slots:
     void clickTbfolder();
     void clickTbtransmit();
     void clickTbfriend();
     void clickTblogout();
     void clickTbsetting();
+
+signals:
+    void mainPageClosed();
 };
 
 #endif // MAINPAGE_H

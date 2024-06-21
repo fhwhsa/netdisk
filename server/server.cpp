@@ -81,7 +81,7 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
 
     my_bev* mbev = new my_bev();
     mbev->bev = bev;
-    mbev->loginId = -1;
+    mbev->loginId = "";
 
     bufferevent_set_timeouts(bev, &connSustainTime, nullptr);
     bufferevent_setcb(bev, read_cb, NULL, event_cb, mbev);
@@ -108,23 +108,25 @@ void read_cb(struct bufferevent *bev, void *ctx)
     //         << (char*)respond->msg << std::endl;
 
     if (nullptr != respond)
+    {
+        if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
+            mbev->loginId = MsgParsing::getRow(respond, 1).substr(3);
         bufferevent_write(bev, (char*)respond, respond->totalLen);
+    }
     // std::cout << "write" << std::endl;
 }
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)
 {
-    if (what & BEV_EVENT_TIMEOUT)
+    if (what & BEV_EVENT_EOF || what & BEV_EVENT_TIMEOUT)
     {
         my_bev* mbev = (my_bev*)ctx;
-        if (-1 != mbev->loginId)
+        if ("" != mbev->loginId)
             IDatabase::logout(mbev->loginId);
-        Printf("Connection timeout\n");
-        bufferevent_free(bev);
-    }
-    else if (what & BEV_EVENT_EOF)
-    {
-        Printf("Connection closed\n");
+        if (what & BEV_EVENT_EOF)
+            Printf("Connection closed\n");
+        else 
+            Printf("Connection timeout\n");
         bufferevent_free(bev);
     }
     else if (what & BEV_EVENT_ERROR)
@@ -137,7 +139,7 @@ void sigint_cb(evutil_socket_t sig, short events, void *arg)
 	struct event_base *base = (event_base*)arg;
 	struct timeval delay = { 2, 0 };
 
-	printf("Caught an interrupt signal; exiting cleanly in two seconds.\n");
+	printf("Caught an interrupt signal; exiting...\n");
 
 	event_base_loopexit(base, &delay);
 }

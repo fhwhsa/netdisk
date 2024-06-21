@@ -32,13 +32,14 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
     // cout << email << " " << passwd << "\n" << flush;
     
     MsgUnit* respond = nullptr;
+    int id;
     string info;
     string content;
     // 身份验证成功
-    if (IDatabase::authentication(email, passwd, info))
+    if (-1 != (id = IDatabase::authentication(email, passwd, info)))
     {
         // cout << info << endl;
-        content = ("success\r\ninfo:" + info + "\r\n");
+        content = ("success\r\nid:" + to_string(id) + "\r\ninfo:" + info + "\r\n");
     }
 
     else 
@@ -52,15 +53,36 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
     return respond;
 }
 
+bool MsgParsing::logoutHandler(const MsgUnit *munit)
+{
+    using namespace std;
+    do 
+    {
+        string str = getRow(munit, 0);
+        if (str.size() <= 3)
+            break; 
+        if (IDatabase::logout(str.substr(3)))
+            break;
+        return true;
+    } while (0);
+    return false;
+}
+
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
 {
+    // std::cout << (char*)munit->msg << std::endl;
     switch (munit->msgType)
     {
     // 登陆请求
     case MsgType::MSG_TYPE_LOGIN_REQUEST:
         return loginRespond(munit);
 
-    
+    // 退出登陆请求
+    case MsgType::MSG_TYPE_LOGOUT_REQUEST:
+    {
+        logoutHandler(munit);
+        return nullptr;
+    }
 
     // 未知请求
     default:
@@ -68,4 +90,18 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     }
 
     return nullptr;
+}
+
+std::string MsgParsing::getRow(const MsgUnit *munit, int index)
+{
+    using namespace std;
+    vector<string> res = split_string(std::string((char*)munit->msg), "\r\n");
+    if (index < res.size())
+        return res[index];
+    return "";
+}
+
+std::vector<std::string> MsgParsing::getAllRows(const MsgUnit *munit)
+{
+    return split_string(std::string((char*)munit->msg), "\r\n");
 }

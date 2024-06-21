@@ -1,6 +1,8 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
+#include "mainpage.h"
+
 #include <QWidget>
 #include <QString>
 #include <QTcpSocket>
@@ -23,6 +25,7 @@ private:
     QString ip; ///< 服务器ip地址
     QString port; ///< 服务器端口
     QTcpSocket *socket; ///< 套接字
+    MainPage *mainPage;
 
     /**
      * @brief 初始化
@@ -56,6 +59,7 @@ private slots:
      * @brief 注册
      */
     void regist();
+
 };
 
 #endif // LOGIN_H

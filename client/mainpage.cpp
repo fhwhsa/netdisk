@@ -1,25 +1,34 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
+#include "msgUnit.h"
+#include "msggenerate.h"
 
-#include <QString>
 #include <QDebug>
 #include <QPair>
 #include <QIcon>
 #include <QStackedWidget>
+#include <QMessageBox>
 
-MainPage::MainPage(QWidget *parent) :
+MainPage::MainPage(QString _userId, QTcpSocket* _socket, QWidget *parent) :
+    userId(_userId),
+    socket(_socket),
     QWidget(parent),
     ui(new Ui::MainPage)
 {
     ui->setupUi(this);
-
+//    qDebug() << userId;
     init();
     iniSignalSlots();
 }
 
 MainPage::~MainPage()
 {
+    qDebug() << "mainpage delete";
     delete ui;
+
+    delete folderPage;
+    delete transmitPage;
+    delete friendPage;
 }
 
 void MainPage::init()
@@ -68,10 +77,10 @@ void MainPage::clickTbfolder()
     if (currSelectedBtn == ui->tb_folder)
         return;
 
+    // 设置按钮样式
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).second);
     currSelectedBtn = ui->tb_folder;
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).first);
-
     ui->funcPanel->setCurrentWidget(folderPage);
 }
 
@@ -80,10 +89,10 @@ void MainPage::clickTbtransmit()
     if (currSelectedBtn == ui->tb_transmit)
         return;
 
+    // 设置按钮样式
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).second);
     currSelectedBtn = ui->tb_transmit;
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).first);
-
     ui->funcPanel->setCurrentWidget(transmitPage);
 }
 
@@ -92,16 +101,21 @@ void MainPage::clickTbfriend()
     if (currSelectedBtn == ui->tb_friend)
         return;
 
+    // 设置按钮样式
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).second);
     currSelectedBtn = ui->tb_friend;
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).first);
-
     ui->funcPanel->setCurrentWidget(friendPage);
 }
 
 void MainPage::clickTblogout()
 {
-
+    if (QMessageBox::No == QMessageBox::question(this, " ", "退出登陆？", QMessageBox::Yes | QMessageBox::No))
+        return;
+    MsgUnit* munit = MsgGenerate::generateLogoutRequest(this->userId);
+//    qDebug() << (char*)munit->msg;
+    socket->write((char*)munit, munit->totalLen);
+    emit mainPageClosed();
 }
 
 void MainPage::clickTbsetting()

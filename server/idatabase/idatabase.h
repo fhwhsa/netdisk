@@ -16,10 +16,10 @@ public:
      *      email       登陆邮箱
      *      passwd      密码
      * 返回值：
-     *      成功        true
-     *      失败        false
+     *      成功        登陆用户的id
+     *      失败        -1
      */
-    static bool authentication(std::string email, std::string passwd, std::string& handleInfo);
+    static int authentication(std::string email, std::string passwd, std::string& handleInfo);
 
     /**
      * 描述：用户注销
@@ -29,7 +29,7 @@ public:
      *      成功     true
      *      失败     false
      */
-    static bool logout(int id);
+    static bool logout(std::string id);
 
 private:
     IDatabase();

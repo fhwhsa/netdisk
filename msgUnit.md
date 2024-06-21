@@ -8,5 +8,12 @@
     passwd:{}\r\n
     ```
 2. 登陆响应
-    * 成功  `success\r\ninfo:{}\r\n` 
+    * 成功  `success\r\nid:{}\r\ninfo:{}\r\n` 
     * 失败  `failure\r\ninfo:{}\r\n`
+
+
+### 注销
+1. 注销请求
+	```
+	id:{}\r\n	
+	```

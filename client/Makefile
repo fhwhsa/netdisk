@@ -58,6 +58,7 @@ SOURCES       = folderpage.cpp \
 		main.cpp \
 		mainpage.cpp \
 		msgUnit.cpp \
+		msggenerate.cpp \
 		transmitpage.cpp qrc_res.cpp \
 		moc_folderpage.cpp \
 		moc_friendpage.cpp \
@@ -70,6 +71,7 @@ OBJECTS       = folderpage.o \
 		main.o \
 		mainpage.o \
 		msgUnit.o \
+		msggenerate.o \
 		transmitpage.o \
 		qrc_res.o \
 		moc_folderpage.o \
@@ -310,12 +312,14 @@ DIST          = /opt/Qt/6.2.3/gcc_64/mkspecs/features/spec_pre.prf \
 		login.h \
 		mainpage.h \
 		msgUnit.h \
+		msggenerate.h \
 		transmitpage.h folderpage.cpp \
 		friendpage.cpp \
 		login.cpp \
 		main.cpp \
 		mainpage.cpp \
 		msgUnit.cpp \
+		msggenerate.cpp \
 		transmitpage.cpp
 QMAKE_TARGET  = client
 DESTDIR       = 
@@ -813,8 +817,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents res.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt/6.2.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents folderpage.h friendpage.h login.h mainpage.h msgUnit.h transmitpage.h $(DISTDIR)/
-	$(COPY_FILE) --parents folderpage.cpp friendpage.cpp login.cpp main.cpp mainpage.cpp msgUnit.cpp transmitpage.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents folderpage.h friendpage.h login.h mainpage.h msgUnit.h msggenerate.h transmitpage.h $(DISTDIR)/
+	$(COPY_FILE) --parents folderpage.cpp friendpage.cpp login.cpp main.cpp mainpage.cpp msgUnit.cpp msggenerate.cpp transmitpage.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents folderpage.ui friendpage.ui login.ui mainpage.ui transmitpage.ui $(DISTDIR)/
 
 
@@ -1128,6 +1132,8 @@ moc_friendpage.cpp: friendpage.h \
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include friendpage.h -o moc_friendpage.cpp
 
 moc_login.cpp: login.h \
+		mainpage.h \
+		folderpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -1254,13 +1260,20 @@ moc_login.cpp: login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QSizeF \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QTransform \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qnativeinterface.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
+		transmitpage.h \
+		friendpage.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QHash \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QToolButton \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtoolbutton.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QTcpSocket \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetworkglobal.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		moc_predefs.h \
 		/opt/Qt/6.2.3/gcc_64/libexec/moc
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include login.h -o moc_login.cpp
@@ -1400,6 +1413,13 @@ moc_mainpage.cpp: mainpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtoolbutton.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QTcpSocket \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtcpsocket.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetworkglobal.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		moc_predefs.h \
 		/opt/Qt/6.2.3/gcc_64/libexec/moc
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include mainpage.h -o moc_mainpage.cpp
@@ -1886,6 +1906,8 @@ friendpage.o: friendpage.cpp friendpage.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o friendpage.o friendpage.cpp
 
 login.o: login.cpp login.h \
+		mainpage.h \
+		folderpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -2012,13 +2034,20 @@ login.o: login.cpp login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QSizeF \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QTransform \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qnativeinterface.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
+		transmitpage.h \
+		friendpage.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QHash \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QToolButton \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtoolbutton.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QTcpSocket \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetworkglobal.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		ui_login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QVariant \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QApplication \
@@ -2060,11 +2089,10 @@ login.o: login.cpp login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextoption.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QPushButton \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qpushbutton.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QSpacerItem \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QVBoxLayout \
 		msgUnit.h \
+		msggenerate.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QSettings \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qsettings.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug \
@@ -2080,6 +2108,8 @@ login.o: login.cpp login.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o login.o login.cpp
 
 main.o: main.cpp login.h \
+		mainpage.h \
+		folderpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -2206,15 +2236,6 @@ main.o: main.cpp login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QSizeF \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QTransform \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qnativeinterface.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QTcpSocket \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtcpsocket.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetworkglobal.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
-		mainpage.h \
-		folderpage.h \
 		transmitpage.h \
 		friendpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QHash \
@@ -2222,6 +2243,13 @@ main.o: main.cpp login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtoolbutton.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QTcpSocket \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtcpsocket.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetworkglobal.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QApplication \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qapplication.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qcoreapplication.h \
@@ -2379,6 +2407,13 @@ mainpage.o: mainpage.cpp mainpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtoolbutton.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QTcpSocket \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtcpsocket.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetworkglobal.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qtnetwork-config.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qabstractsocket.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/qhostaddress.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		ui_mainpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QVariant \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QIcon \
@@ -2418,13 +2453,57 @@ mainpage.o: mainpage.cpp mainpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QStackedWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qstackedwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QVBoxLayout \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPair
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainpage.o mainpage.cpp
 
 msgUnit.o: msgUnit.cpp msgUnit.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o msgUnit.o msgUnit.cpp
+
+msggenerate.o: msggenerate.cpp msggenerate.h \
+		msgUnit.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtcore-config.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qversiontagging.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qstringview.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtmetamacros.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qarraydatapointer.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qarraydataops.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbytearrayview.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qstringliteral.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qstringalgorithms.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qanystringview.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qutf8stringview.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qstringtokenizer.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qstringbuilder.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o msggenerate.o msggenerate.cpp
 
 transmitpage.o: transmitpage.cpp transmitpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QWidget \
