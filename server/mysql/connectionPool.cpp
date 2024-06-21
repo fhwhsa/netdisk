@@ -4,7 +4,6 @@
 #include <fstream>
 #include <thread>
 #include <stdexcept>
-// #include <iostream>
 
 std::atomic<int> stopFlag;
 

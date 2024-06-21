@@ -2,4 +2,15 @@
     <qresource prefix="/config">
         <file>res/config.ini</file>
     </qresource>
+    <qresource prefix="/img">
+        <file>res/img/transmit_unselected.png</file>
+        <file>res/img/transmit_selected.png</file>
+        <file>res/img/setting.png</file>
+        <file>res/img/logout.png</file>
+        <file>res/img/icon.png</file>
+        <file>res/img/friend_unselected.png</file>
+        <file>res/img/friend_selected.png</file>
+        <file>res/img/folder_unselected.png</file>
+        <file>res/img/folder_selected.png</file>
+    </qresource>
 </RCC>

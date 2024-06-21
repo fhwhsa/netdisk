@@ -1,28 +1,26 @@
-#include "widget.h"
+#include "login.h"
+#include "ui_login.h"
 #include "msgUnit.h"
-#include "ui_widget.h"
 
 #include <QSettings>
 #include <QDebug>
 #include <QHostAddress>
 #include <QMessageBox>
-#include <string>
-#include <string.h>
 #include <QEventLoop>
 #include <QTimer>
 #include <QByteArray>
 #include <string.h>
 
-Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
+Login::Login(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Login)
 {
     ui->setupUi(this);
     init();
     iniSignalSlots();
 }
 
-Widget::~Widget()
+Login::~Login()
 {
     delete ui;
 
@@ -33,39 +31,38 @@ Widget::~Widget()
     }
 }
 
-void Widget::init()
+void Login::init()
 {
     loadconfig();
     if (connectServer())
         qDebug() << "Connected!";
     else
-        qDebug() << "Failed to connect server!";    
+        qDebug() << "Failed to connect server!";
 }
 
-void Widget::iniSignalSlots()
+void Login::iniSignalSlots()
 {
     connect(ui->btnRegist, SIGNAL(clicked()), this, SLOT(regist()));
     connect(ui->btnLogin, SIGNAL(clicked()), this, SLOT(login()));
 }
 
-void Widget::loadconfig()
+void Login::loadconfig()
 {
     QSettings ini = QSettings(":/config/res/config.ini", QSettings::IniFormat);
     ini.beginGroup("ADDRESS");
     ip = ini.value("IPADDR").toString();
     port = ini.value("PORT").toString();
-//    qDebug() << ip << port;
     ini.endGroup();
 }
 
-bool Widget::connectServer()
+bool Login::connectServer()
 {
     socket = new QTcpSocket(this);
     socket->connectToHost(QHostAddress(ip), port.toUInt());
     return socket->waitForConnected();
 }
 
-void Widget::login()
+void Login::login()
 {
     QString email = ui->userName->text();
     QString passwd = ui->passwd->text();
@@ -107,19 +104,18 @@ void Widget::login()
     if (isGetRespond)
     {
         QString respond = QString((char*)munit->msg);
-        if (respond == "success\r\n")   // 登陆逻辑
+        qDebug() << respond;
+        if (respond.left(7) == "success")   // 登陆逻辑
         {
-            QMessageBox::information(this, "info", "login success!");
+            QMessageBox::information(this, "登陆", respond.mid(14));
         }
         else
         {
-            QMessageBox::critical(this, "Error", "请检查你的登陆邮箱和密码!");
+            QMessageBox::critical(this, "登陆", respond.mid(14));
         }
     }
 }
 
-void Widget::regist()
+void Login::regist()
 {
 }
-
-

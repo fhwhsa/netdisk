@@ -6,7 +6,7 @@
 #include <regex>
 #include <iostream>
 #include <string.h>
-#include <iostream>
+// #include <iostream>
 
 std::vector<std::string> MsgParsing::split_string(const std::string &str, std::string reg)
 {
@@ -32,21 +32,23 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
     // cout << email << " " << passwd << "\n" << flush;
     
     MsgUnit* respond = nullptr;
+    string info;
+    string content;
     // 身份验证成功
-    if (IDatabase::authentication(email, passwd))
+    if (IDatabase::authentication(email, passwd, info))
     {
-        // cout << "yes" << endl;
-        const char* content = "success\r\n";
-        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_RESPOND, strlen(content), content);
+        // cout << info << endl;
+        content = ("success\r\ninfo:" + info + "\r\n");
     }
 
     else 
     {
-        // cout << "no" << endl;
-        const char* content = "failure\r\n";
-        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_RESPOND, strlen(content), content);
+        // cout << info << endl;
+        content = "failure\r\ninfo:" + info + "\r\n";
     }
 
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_RESPOND, strlen(content.c_str()), content.c_str());
+    
     return respond;
 }
 
@@ -57,8 +59,10 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     // 登陆请求
     case MsgType::MSG_TYPE_LOGIN_REQUEST:
         return loginRespond(munit);
+
     
 
+    // 未知请求
     default:
         break;
     }

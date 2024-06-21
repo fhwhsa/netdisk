@@ -1,24 +1,24 @@
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef LOGIN_H
+#define LOGIN_H
 
 #include <QWidget>
 #include <QString>
 #include <QTcpSocket>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class Widget; }
-QT_END_NAMESPACE
+namespace Ui {
+class Login;
+}
 
-class Widget : public QWidget
+class Login : public QWidget
 {
     Q_OBJECT
 
 public:
-    Widget(QWidget *parent = nullptr);
-    ~Widget();
+    explicit Login(QWidget *parent = nullptr);
+    ~Login();
 
 private:
-    Ui::Widget *ui;
+    Ui::Login *ui;
 
     QString ip; ///< 服务器ip地址
     QString port; ///< 服务器端口
@@ -57,4 +57,5 @@ private slots:
      */
     void regist();
 };
-#endif // WIDGET_H
+
+#endif // LOGIN_H

@@ -19,7 +19,7 @@ public:
      *      成功        true
      *      失败        false
      */
-    static bool authentication(std::string email, std::string passwd);
+    static bool authentication(std::string email, std::string passwd, std::string& handleInfo);
 
 private:
     IDatabase();

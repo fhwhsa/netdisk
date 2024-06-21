@@ -1,11 +1,13 @@
-#include "widget.h"
+#include "login.h"
+#include "mainpage.h"
+#include "folderpage.h"
 
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Widget w;
-    w.show();
+    MainPage m;
+    m.show();
     return a.exec();
 }
