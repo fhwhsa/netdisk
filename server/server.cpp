@@ -6,6 +6,7 @@
 #include "wrap/wrap.h"
 #include "msg/msgUnit.h"
 #include "msg/msgParsing.h"
+#include "idatabase/idatabase.h"
 
 #include <stdlib.h>
 #include <signal.h>
@@ -13,8 +14,12 @@
 #include <event2/listener.h>
 #include <iostream>
 
-int run(std::string host, uint port)
+struct timeval connSustainTime;
+
+int run(std::string host, uint port, struct timeval _connSustainTime)
 {
+    connSustainTime = _connSustainTime;
+
     struct event_base *ebase = event_base_new();
     if (!ebase)
     {
@@ -74,15 +79,20 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
     // 设置读取水位
     bufferevent_setwatermark(bev, EV_READ, sizeof(struct MsgUnit), 0);
 
-    bufferevent_setcb(bev, read_cb, NULL, event_cb, NULL);
+    my_bev* mbev = new my_bev();
+    mbev->bev = bev;
+    mbev->loginId = -1;
+
+    bufferevent_set_timeouts(bev, &connSustainTime, nullptr);
+    bufferevent_setcb(bev, read_cb, NULL, event_cb, mbev);
     bufferevent_enable(bev, EV_READ | EV_WRITE);
 }
 
 void read_cb(struct bufferevent *bev, void *ctx)
 {
     // Printf("read\n");
-
     int res = 0;
+    my_bev* mbev = (my_bev*)ctx;
 
     // 读取总大小
     uint totalLen;
@@ -104,7 +114,15 @@ void read_cb(struct bufferevent *bev, void *ctx)
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)
 {
-    if (what & BEV_EVENT_EOF)
+    if (what & BEV_EVENT_TIMEOUT)
+    {
+        my_bev* mbev = (my_bev*)ctx;
+        if (-1 != mbev->loginId)
+            IDatabase::logout(mbev->loginId);
+        Printf("Connection timeout\n");
+        bufferevent_free(bev);
+    }
+    else if (what & BEV_EVENT_EOF)
     {
         Printf("Connection closed\n");
         bufferevent_free(bev);

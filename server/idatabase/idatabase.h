@@ -21,6 +21,16 @@ public:
      */
     static bool authentication(std::string email, std::string passwd, std::string& handleInfo);
 
+    /**
+     * 描述：用户注销
+     * 参数：
+     *      id      用户id
+     * 返回值：
+     *      成功     true
+     *      失败     false
+     */
+    static bool logout(int id);
+
 private:
     IDatabase();
     IDatabase(const IDatabase& obj);

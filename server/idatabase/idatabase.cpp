@@ -31,11 +31,25 @@ bool IDatabase::authentication(std::string email, std::string passwd, std::strin
             break;
         }
         
+        // 更改用户在线状态
+        sql = "update user set status=1 where id=" + ptr.get()->value(0) + ";";
+        if (!ptr.get()->update(sql))
+        {
+            handleInfo = "服务器错误！";
+            break;
+        }
+
         handleInfo = "验证通过！";
-        // sql = "update user set status=1 where id=" + ptr.get()->value(0) + ";";
-        // ptr.get()->update(sql);
         return true;
     } while (0);
 
     return false;    
+}
+
+bool IDatabase::logout(int id)
+{
+    using namespace std;
+    string sql("update user set status=1 where id=" + to_string(id) + ";");
+    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    return pool->getConnection().get()->update(sql);
 }
