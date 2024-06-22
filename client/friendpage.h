@@ -17,6 +17,16 @@ public:
 
 private:
     Ui::FriendPage *ui;
+
+    void init();
+    void iniSignalSlots();
+
+private slots:
+    void clickTbNewFriend();
+    void clickTbSearch();
+    void clickTbClear();
+    void clickTbSend();
+
 };
 
 #endif // FRIENDPAGE_H
