@@ -852,6 +852,7 @@ qrc_res.cpp: res.qrc \
 		res/img/friend_unselected.png \
 		res/img/transmit_selected.png \
 		res/img/folder_selected.png \
+		res/img/userInfo.png \
 		res/img/folder_unselected.png \
 		res/img/transmit_unselected.png \
 		res/img/icon.png \
@@ -1746,7 +1747,8 @@ folderpage.o: folderpage.cpp folderpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpicture.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextdocument.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o folderpage.o folderpage.cpp
 
 friendpage.o: friendpage.cpp friendpage.h \
@@ -1898,11 +1900,56 @@ friendpage.o: friendpage.cpp friendpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qinputmethod.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qlocale.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qguiapplication_platform.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QGroupBox \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgroupbox.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qframe.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QHBoxLayout \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qboxlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgridlayout.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QLabel \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlabel.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpicture.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextdocument.h
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextdocument.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QLineEdit \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlineedit.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextcursor.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextformat.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpen.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextoption.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QListWidget \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlistwidget.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlistview.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qstyleoption.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qvalidator.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qregularexpression.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qicon.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qslider.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractslider.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qstyle.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtabbar.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qrubberband.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QPlainTextEdit \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qplaintextedit.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtextedit.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qglyphrun.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qrawfont.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtGui/qfontdatabase.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QSpacerItem \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QToolButton \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtoolbutton.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QVBoxLayout
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o friendpage.o friendpage.cpp
 
 login.o: login.cpp login.h \
@@ -2104,7 +2151,8 @@ login.o: login.cpp login.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QTimer \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QByteArray
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QByteArray \
+		/opt/Qt/6.2.3/gcc_64/include/QtNetwork/QAbstractSocket
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o login.o login.cpp
 
 main.o: main.cpp login.h \
@@ -2453,8 +2501,13 @@ mainpage.o: mainpage.cpp mainpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QStackedWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qstackedwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QVBoxLayout \
+		msgUnit.h \
+		msggenerate.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPair
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPair \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QMessageBox \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qmessagebox.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainpage.o mainpage.cpp
 
 msgUnit.o: msgUnit.cpp msgUnit.h

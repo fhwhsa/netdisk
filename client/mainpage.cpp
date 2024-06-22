@@ -9,8 +9,9 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 
-MainPage::MainPage(QString _userId, QTcpSocket* _socket, QWidget *parent) :
+MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWidget *parent) :
     userId(_userId),
+    userEmail(_userEmail),
     socket(_socket),
     QWidget(parent),
     ui(new Ui::MainPage)
@@ -42,6 +43,7 @@ void MainPage::init()
     ui->tb_friend->setStyleSheet(style);
     ui->tb_logout->setStyleSheet(style);
     ui->tb_setting->setStyleSheet(style);
+    ui->tb_userInfo->setStyleSheet(style);
 
     // 左菜单三个工具按钮的（选中/未选中）图标
     btnIcon.insert(ui->tb_folder, QPair(QIcon(":/img/res/img/folder_selected.png"), QIcon(":/img/res/img/folder_unselected.png")));
@@ -70,6 +72,7 @@ void MainPage::iniSignalSlots()
     connect(ui->tb_friend, &QToolButton::clicked, this, &MainPage::clickTbfriend);
     connect(ui->tb_logout, &QToolButton::clicked, this, &MainPage::clickTblogout);
     connect(ui->tb_setting, &QToolButton::clicked, this, &MainPage::clickTbsetting);
+    connect(ui->tb_userInfo, &QToolButton::clicked, this, &MainPage::clickTbUserInfo);
 }
 
 void MainPage::clickTbfolder()
@@ -121,4 +124,9 @@ void MainPage::clickTblogout()
 void MainPage::clickTbsetting()
 {
 
+}
+
+void MainPage::clickTbUserInfo()
+{
+    QMessageBox::information(this, "账号信息", QString("id:%1\nemail:%2").arg(userId).arg(userEmail));
 }

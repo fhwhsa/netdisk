@@ -58,7 +58,9 @@ public:
             FriendPage->setObjectName(QString::fromUtf8("FriendPage"));
         FriendPage->resize(1023, 597);
         horizontalLayout_4 = new QHBoxLayout(FriendPage);
+        horizontalLayout_4->setSpacing(0);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         friendsList = new QGroupBox(FriendPage);

@@ -88,6 +88,26 @@
            </spacer>
           </item>
           <item>
+           <widget class="QToolButton" name="tb_userInfo">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="res.qrc">
+              <normaloff>:/img/res/img/userInfo.png</normaloff>:/img/res/img/userInfo.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="tb_setting">
             <property name="cursor">
              <cursorShape>PointingHandCursor</cursorShape>
@@ -327,6 +347,9 @@
        </item>
        <item>
         <widget class="QStackedWidget" name="funcPanel">
+         <property name="lineWidth">
+          <number>1</number>
+         </property>
          <widget class="QWidget" name="page"/>
          <widget class="QWidget" name="page_2"/>
         </widget>

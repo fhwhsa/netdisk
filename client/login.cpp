@@ -12,6 +12,7 @@
 #include <QByteArray>
 #include <QSize>
 #include <string.h>
+#include <QAbstractSocket>
 
 Login::Login(QWidget *parent) :
     QWidget(parent),
@@ -37,15 +38,10 @@ Login::~Login()
     }
 }
 
-void Login::init()
+bool Login::init()
 {
     this->setMinimumSize(QSize(1100, 700));
-
     loadconfig();
-    if (connectServer())
-        qDebug() << "Connected!";
-    else
-        qDebug() << "Failed to connect server!";
 }
 
 void Login::iniSignalSlots()
@@ -70,8 +66,32 @@ bool Login::connectServer()
     return socket->waitForConnected();
 }
 
+bool Login::tryConnect()
+{
+    bool flag = false;
+    do
+    {
+        flag = false;
+        if (connectServer())
+        {
+            qDebug() << "Connected!";
+            return true;
+        }
+        else
+        {
+            qDebug() << socket->errorString();
+            if (QMessageBox::Yes == QMessageBox::question(this, " ", socket->errorString() + QString("\nretry?"), QMessageBox::Yes | QMessageBox::No))
+                flag = true;
+            else
+                return false;
+        }
+    } while (flag);
+}
+
 void Login::login()
 {
+    if (nullptr == socket && !tryConnect())
+        return;
     QString email = ui->userName->text();
     QString passwd = ui->passwd->text();
 
@@ -107,7 +127,15 @@ void Login::login()
     connect(&timer, &QTimer::timeout, [&loop, &connection, this](){
         disconnect(connection);
         loop.quit();
-        QMessageBox::critical(this, "登陆", "Timeout!");
+        QMessageBox::critical(this, "登陆", "Timeout! " + socket->errorString());
+//        qDebug() << socket->state();
+
+        // 断线重连机制
+        if (QAbstractSocket::UnconnectedState == socket->state())
+        {
+            delete socket;
+            socket = nullptr;
+        }
     });
     timer.start(3000); // 设置超时时间为3s
     loop.exec(); // 开启事件循环，等待socket可读信号或者超时信号触发
@@ -119,7 +147,7 @@ void Login::login()
         if (respond.left(7) == "success")
         {
             QString userId = respond.split("\r\n")[1].mid(3);
-            mainPage = new MainPage(userId, socket);
+            mainPage = new MainPage(userId, email, socket);
             connect(mainPage, &MainPage::mainPageClosed, [this, &connection](){
                 delete mainPage;
                 mainPage = nullptr;

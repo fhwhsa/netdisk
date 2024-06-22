@@ -20,7 +20,7 @@ class MainPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit MainPage(QString _userId, QTcpSocket* _socket, QWidget *parent = nullptr);
+    explicit MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWidget *parent = nullptr);
     ~MainPage();
 
 private:
@@ -45,6 +45,7 @@ private:
 
     QTcpSocket* socket;
     QString userId;
+    QString userEmail;
 
 private slots:
     void clickTbfolder();
@@ -52,6 +53,7 @@ private slots:
     void clickTbfriend();
     void clickTblogout();
     void clickTbsetting();
+    void clickTbUserInfo();
 
 signals:
     void mainPageClosed();

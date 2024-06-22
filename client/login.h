@@ -29,8 +29,9 @@ private:
 
     /**
      * @brief 初始化
+     * @return true表示初始化成功
      */
-    void init();
+    bool init();
 
     /**
      * @brief 初始化信号绑定
@@ -47,6 +48,8 @@ private:
      * @return true表示连接成功
      */
     bool connectServer();
+
+    bool tryConnect();
 
 
 private slots:

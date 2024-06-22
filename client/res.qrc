@@ -12,5 +12,6 @@
         <file>res/img/friend_selected.png</file>
         <file>res/img/folder_unselected.png</file>
         <file>res/img/folder_selected.png</file>
+        <file>res/img/userInfo.png</file>
     </qresource>
 </RCC>

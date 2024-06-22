@@ -34,6 +34,7 @@ public:
     QSpacerItem *horizontalSpacer;
     QLabel *icon;
     QSpacerItem *horizontalSpacer_2;
+    QToolButton *tb_userInfo;
     QToolButton *tb_setting;
     QSpacerItem *horizontalSpacer_3;
     QHBoxLayout *horizontalLayout_3;
@@ -91,12 +92,22 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer_2);
 
+        tb_userInfo = new QToolButton(topMenu);
+        tb_userInfo->setObjectName(QString::fromUtf8("tb_userInfo"));
+        tb_userInfo->setCursor(QCursor(Qt::PointingHandCursor));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/img/res/img/userInfo.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_userInfo->setIcon(icon1);
+        tb_userInfo->setIconSize(QSize(25, 25));
+
+        horizontalLayout->addWidget(tb_userInfo);
+
         tb_setting = new QToolButton(topMenu);
         tb_setting->setObjectName(QString::fromUtf8("tb_setting"));
         tb_setting->setCursor(QCursor(Qt::PointingHandCursor));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/img/res/img/setting.png"), QSize(), QIcon::Normal, QIcon::On);
-        tb_setting->setIcon(icon1);
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/img/res/img/setting.png"), QSize(), QIcon::Normal, QIcon::On);
+        tb_setting->setIcon(icon2);
         tb_setting->setIconSize(QSize(25, 25));
 
         horizontalLayout->addWidget(tb_setting);
@@ -134,9 +145,9 @@ public:
         tb_folder->setObjectName(QString::fromUtf8("tb_folder"));
         tb_folder->setCursor(QCursor(Qt::PointingHandCursor));
         tb_folder->setAutoFillBackground(false);
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/img/res/img/folder_unselected.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_folder->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/img/res/img/folder_unselected.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_folder->setIcon(icon3);
         tb_folder->setIconSize(QSize(30, 30));
 
         verticalLayout->addWidget(tb_folder);
@@ -148,9 +159,9 @@ public:
         tb_transmit = new QToolButton(leftMunu);
         tb_transmit->setObjectName(QString::fromUtf8("tb_transmit"));
         tb_transmit->setCursor(QCursor(Qt::PointingHandCursor));
-        QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/img/res/img/transmit_unselected.png"), QSize(), QIcon::Normal, QIcon::On);
-        tb_transmit->setIcon(icon3);
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/img/res/img/transmit_unselected.png"), QSize(), QIcon::Normal, QIcon::On);
+        tb_transmit->setIcon(icon4);
         tb_transmit->setIconSize(QSize(30, 30));
 
         verticalLayout->addWidget(tb_transmit);
@@ -162,9 +173,9 @@ public:
         tb_friend = new QToolButton(leftMunu);
         tb_friend->setObjectName(QString::fromUtf8("tb_friend"));
         tb_friend->setCursor(QCursor(Qt::PointingHandCursor));
-        QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/img/res/img/friend_unselected.png"), QSize(), QIcon::Normal, QIcon::On);
-        tb_friend->setIcon(icon4);
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/img/res/img/friend_unselected.png"), QSize(), QIcon::Normal, QIcon::On);
+        tb_friend->setIcon(icon5);
         tb_friend->setIconSize(QSize(30, 30));
 
         verticalLayout->addWidget(tb_friend);
@@ -176,9 +187,9 @@ public:
         tb_logout = new QToolButton(leftMunu);
         tb_logout->setObjectName(QString::fromUtf8("tb_logout"));
         tb_logout->setCursor(QCursor(Qt::PointingHandCursor));
-        QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/img/res/img/logout.png"), QSize(), QIcon::Normal, QIcon::On);
-        tb_logout->setIcon(icon5);
+        QIcon icon6;
+        icon6.addFile(QString::fromUtf8(":/img/res/img/logout.png"), QSize(), QIcon::Normal, QIcon::On);
+        tb_logout->setIcon(icon6);
         tb_logout->setIconSize(QSize(30, 30));
 
         verticalLayout->addWidget(tb_logout);
@@ -195,6 +206,7 @@ public:
 
         funcPanel = new QStackedWidget(MainPage);
         funcPanel->setObjectName(QString::fromUtf8("funcPanel"));
+        funcPanel->setLineWidth(1);
         page = new QWidget();
         page->setObjectName(QString::fromUtf8("page"));
         funcPanel->addWidget(page);
@@ -221,6 +233,7 @@ public:
         MainPage->setWindowTitle(QCoreApplication::translate("MainPage", "Form", nullptr));
         topMenu->setTitle(QString());
         icon->setText(QString());
+        tb_userInfo->setText(QCoreApplication::translate("MainPage", "...", nullptr));
         tb_setting->setText(QCoreApplication::translate("MainPage", "...", nullptr));
         leftMunu->setTitle(QString());
         tb_folder->setText(QString());
