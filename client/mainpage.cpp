@@ -1,7 +1,7 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
 #include "msgUnit.h"
-#include "msggenerate.h"
+#include "msgtools.h"
 
 #include <QDebug>
 #include <QPair>
@@ -124,7 +124,7 @@ void MainPage::clickTblogout()
 {
     if (QMessageBox::No == QMessageBox::question(this, " ", "退出登陆？", QMessageBox::Yes | QMessageBox::No))
         return;
-    MsgUnit* munit = MsgGenerate::generateLogoutRequest(this->userId);
+    MsgUnit* munit = MsgTools::generateLogoutRequest(this->userId);
     socket->write((char*)munit, munit->totalLen);
     emit mainPageClosed();
 }
@@ -166,6 +166,7 @@ void MainPage::recvMsg()
     if (buffer.size() >= waitSize)
     {
         tmp = buffer.first(waitSize);
+        buffer.remove(0, waitSize);
         memcpy((char*)revMunit + 4, tmp.constData(), waitSize);
         waitSize = 0;
         std::shared_ptr<MsgUnit> sptr(revMunit);

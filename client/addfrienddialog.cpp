@@ -2,6 +2,7 @@
 #include "ui_addfrienddialog.h"
 #include "bubbletips.h"
 #include "friendpage.h"
+#include "msgtools.h"
 
 #include <QString>
 #include <QMessageBox>
@@ -41,6 +42,7 @@ void AddFriendDialog::init()
                                  "margin-top: 20px;"
                                  "}");
     ui->resultBox->hide();
+    ui->errorBox->hide();
 
     QPoint pPos = parent->pos();
     this->move(pPos.rx() + parent->width() / 2 - this->width() / 2, pPos.ry() + parent->height() / 2 - this->height() / 2);
@@ -58,7 +60,32 @@ void AddFriendDialog::iniSignalSlots()
         }
         emit _searchUser(text);
     });
-    connect(parent, &FriendPage::respondSearch, [](std::shared_ptr<MsgUnit> sptr){
-        qDebug() << (char*)sptr->msg;
+    connect(parent, &FriendPage::respondSearch, [this](std::shared_ptr<MsgUnit> sptr){
+        ui->errorBox->hide();
+        ui->resultBox->hide();
+        QString msg = (char*)sptr->msg;
+        qDebug() << msg;
+        if (msg.first(7) == "success")
+        {
+            QString email = MsgTools::getRow(sptr.get(), 1);
+            if ("" == email)
+            {
+                ui->errInfo->setText("数据传输损坏");
+                ui->errorBox->show();
+            }
+            else
+            {
+                ui->targetEmail->setText(email.mid(6));
+                ui->resultBox->show();
+            }
+        }
+        else
+        {
+            QString info = MsgTools::getRow(sptr.get(), 1);
+            if ("" == info)
+                info = "数据传输损坏";
+            ui->errInfo->setText(info);
+            ui->errorBox->show();
+        }
     });
 }

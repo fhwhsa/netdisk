@@ -1,13 +1,13 @@
-#include "msggenerate.h"
+#include "msgtools.h"
 
 #include <string>
 
-MsgGenerate::MsgGenerate()
+MsgTools::MsgTools()
 {
 
 }
 
-MsgUnit *MsgGenerate::generateLoginRequest(QString email, QString passwd)
+MsgUnit *MsgTools::generateLoginRequest(QString email, QString passwd)
 {
     QString str = QString("email:%1\r\npasswd:%2\r\n").arg(email).arg(passwd);
     std::string sstr = str.toStdString();
@@ -17,7 +17,7 @@ MsgUnit *MsgGenerate::generateLoginRequest(QString email, QString passwd)
     return munit;
 }
 
-MsgUnit *MsgGenerate::generateLogoutRequest(QString userId)
+MsgUnit *MsgTools::generateLogoutRequest(QString userId)
 {
     QString str = QString("id:%1\r\n").arg(userId);
     std::string sstr = str.toStdString();
@@ -27,7 +27,7 @@ MsgUnit *MsgGenerate::generateLogoutRequest(QString userId)
     return munit;
 }
 
-MsgUnit *MsgGenerate::generateSearchUserRequest(QString key)
+MsgUnit *MsgTools::generateSearchUserRequest(QString key)
 {
     QString str = QString("key:%1\r\n").arg(key);
     std::string sstr = str.toStdString();
@@ -36,3 +36,18 @@ MsgUnit *MsgGenerate::generateSearchUserRequest(QString key)
     MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_SEARCHUSER_REQUEST, num, cstr);
     return munit;
 }
+
+QString MsgTools::getRow(const MsgUnit *munit, int index)
+{
+    QStringList strList = QString((char*)munit->msg).split("\r\n");
+    if (index >= strList.size() - 1)
+        return "";
+    return strList[index];
+}
+
+QStringList MsgTools::getAllRows(const MsgUnit *munit)
+{
+    return QString((char*)munit->msg).split("\r\n");
+}
+
+

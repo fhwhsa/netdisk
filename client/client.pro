@@ -17,7 +17,7 @@ SOURCES += \
     main.cpp \
     mainpage.cpp \
     msgUnit.cpp \
-    msggenerate.cpp \
+    msgtools.cpp \
     transmitpage.cpp
 
 HEADERS += \
@@ -28,7 +28,7 @@ HEADERS += \
     login.h \
     mainpage.h \
     msgUnit.h \
-    msggenerate.h \
+    msgtools.h \
     transmitpage.h
 
 FORMS += \

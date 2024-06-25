@@ -1,7 +1,7 @@
 #include "login.h"
 #include "ui_login.h"
 #include "msgUnit.h"
-#include "msggenerate.h"
+#include "msgtools.h"
 
 #include <QSettings>
 #include <QDebug>
@@ -102,7 +102,7 @@ void Login::login()
     }
 
     // 发送登陆请求
-    MsgUnit* munit = MsgGenerate::generateLoginRequest(email, passwd);
+    MsgUnit* munit = MsgTools::generateLoginRequest(email, passwd);
     socket->write((char*)munit, munit->totalLen);
     free(munit);
     munit = nullptr;

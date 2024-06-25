@@ -4,6 +4,8 @@
 
 #include <memory>
 #include <iostream>
+#include <algorithm>
+#include <cctype>
 
 int IDatabase::authentication(std::string email, std::string passwd, std::string& handleInfo)
 {
@@ -97,7 +99,12 @@ std::string IDatabase::searchUser(std::string key, std::string &handleInfo)
     using namespace std;
 
     string sql("select email from user where id='" + key + "' or email='" + key + "';");
-    cout << sql << endl;
+    if (all_of(key.begin(), key.end(), ::isdigit))
+        sql = string("select email from user where id = " + key + ";");
+    else 
+        sql = string("select email from user where email = '" + key + "';");
+
+    // cout << sql << endl;
     ConnectionPool* pool = ConnectionPool::getConnectionPool();
     do
     {
