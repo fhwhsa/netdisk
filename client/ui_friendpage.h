@@ -10,6 +10,7 @@
 #define UI_FRIENDPAGE_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -40,11 +41,11 @@ public:
     QGroupBox *chatBox;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_3;
-    QLabel *label;
-    QPlainTextEdit *plainTextEdit;
+    QLabel *sessionName;
+    QPlainTextEdit *chatContent;
     QGroupBox *groupBox_2;
     QLabel *label_2;
-    QPlainTextEdit *plainTextEdit_2;
+    QPlainTextEdit *inputBox;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer;
     QToolButton *tb_clear;
@@ -87,6 +88,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(tb_newFriend->sizePolicy().hasHeightForWidth());
         tb_newFriend->setSizePolicy(sizePolicy1);
+        tb_newFriend->setCursor(QCursor(Qt::PointingHandCursor));
 
         verticalLayout->addWidget(tb_newFriend);
 
@@ -99,6 +101,10 @@ public:
 
         tb_search = new QToolButton(friendsList);
         tb_search->setObjectName(QString::fromUtf8("tb_search"));
+        tb_search->setCursor(QCursor(Qt::PointingHandCursor));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/img/res/img/search.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_search->setIcon(icon);
 
         horizontalLayout->addWidget(tb_search);
 
@@ -122,16 +128,16 @@ public:
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-        label = new QLabel(chatBox);
-        label->setObjectName(QString::fromUtf8("label"));
+        sessionName = new QLabel(chatBox);
+        sessionName->setObjectName(QString::fromUtf8("sessionName"));
 
-        verticalLayout_3->addWidget(label);
+        verticalLayout_3->addWidget(sessionName);
 
-        plainTextEdit = new QPlainTextEdit(chatBox);
-        plainTextEdit->setObjectName(QString::fromUtf8("plainTextEdit"));
-        plainTextEdit->setReadOnly(true);
+        chatContent = new QPlainTextEdit(chatBox);
+        chatContent->setObjectName(QString::fromUtf8("chatContent"));
+        chatContent->setReadOnly(true);
 
-        verticalLayout_3->addWidget(plainTextEdit);
+        verticalLayout_3->addWidget(chatContent);
 
         groupBox_2 = new QGroupBox(chatBox);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
@@ -141,17 +147,17 @@ public:
 
         verticalLayout_3->addWidget(groupBox_2);
 
-        plainTextEdit_2 = new QPlainTextEdit(chatBox);
-        plainTextEdit_2->setObjectName(QString::fromUtf8("plainTextEdit_2"));
+        inputBox = new QPlainTextEdit(chatBox);
+        inputBox->setObjectName(QString::fromUtf8("inputBox"));
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(plainTextEdit_2->sizePolicy().hasHeightForWidth());
-        plainTextEdit_2->setSizePolicy(sizePolicy2);
-        plainTextEdit_2->setMinimumSize(QSize(0, 120));
-        plainTextEdit_2->setMaximumSize(QSize(16777215, 120));
+        sizePolicy2.setHeightForWidth(inputBox->sizePolicy().hasHeightForWidth());
+        inputBox->setSizePolicy(sizePolicy2);
+        inputBox->setMinimumSize(QSize(0, 120));
+        inputBox->setMaximumSize(QSize(16777215, 120));
 
-        verticalLayout_3->addWidget(plainTextEdit_2);
+        verticalLayout_3->addWidget(inputBox);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -161,11 +167,13 @@ public:
 
         tb_clear = new QToolButton(chatBox);
         tb_clear->setObjectName(QString::fromUtf8("tb_clear"));
+        tb_clear->setCursor(QCursor(Qt::PointingHandCursor));
 
         horizontalLayout_2->addWidget(tb_clear);
 
         tb_send = new QToolButton(chatBox);
         tb_send->setObjectName(QString::fromUtf8("tb_send"));
+        tb_send->setCursor(QCursor(Qt::PointingHandCursor));
 
         horizontalLayout_2->addWidget(tb_send);
 
@@ -202,11 +210,11 @@ public:
         tb_newFriend->setText(QCoreApplication::translate("FriendPage", "\346\226\260\345\245\275\345\217\213", nullptr));
         tb_search->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
         chatBox->setTitle(QString());
-        label->setText(QCoreApplication::translate("FriendPage", "TextLabel", nullptr));
+        sessionName->setText(QCoreApplication::translate("FriendPage", "TextLabel", nullptr));
         groupBox_2->setTitle(QString());
         label_2->setText(QCoreApplication::translate("FriendPage", "\345\267\245\345\205\267\346\240\217", nullptr));
-        tb_clear->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
-        tb_send->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
+        tb_clear->setText(QCoreApplication::translate("FriendPage", "\346\270\205\347\251\272", nullptr));
+        tb_send->setText(QCoreApplication::translate("FriendPage", "\345\217\221\351\200\201", nullptr));
         welcomeBox->setTitle(QString());
         label_3->setText(QCoreApplication::translate("FriendPage", "\344\275\240\345\245\275", nullptr));
     } // retranslateUi

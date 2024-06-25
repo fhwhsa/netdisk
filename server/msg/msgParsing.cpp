@@ -26,6 +26,8 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
     string msg((char*)munit->msg);
     vector<string> tokens = split_string(msg, "\r\n");
 
+    if (tokens.size() < 2)
+        return nullptr;
     string email = tokens[0].substr(6);
     string passwd = tokens[1].substr(7);
 
@@ -68,6 +70,31 @@ bool MsgParsing::logoutHandler(const MsgUnit *munit)
     return false;
 }
 
+MsgUnit *MsgParsing::searchUserRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    string key = getRow(munit, 0);
+    if ("" == key || key.length() <= 4)
+        return nullptr;
+    key = key.substr(4);
+    
+    string info;
+    string email = IDatabase::searchUser(key, info);
+    string content;
+    if ("" == email)
+    {
+        content = "failure\r\ninfo:" + info + "\r\n";
+    }
+    else 
+    {   
+        content = "success\r\nemail:" + email + "\r\ninfo:" + info + "\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_SEARCHUSER_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
 {
     // std::cout << (char*)munit->msg << std::endl;
@@ -82,6 +109,12 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     {
         logoutHandler(munit);
         return nullptr;
+    }
+
+    // 查找用户请求
+    case MsgType::MSG_TYPE_SEARCHUSER_REQUEST:
+    {
+        return searchUserRespond(munit);
     }
 
     // 未知请求

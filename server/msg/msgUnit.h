@@ -8,14 +8,16 @@
 typedef unsigned int uint;
 
 enum MsgType {
-    MSG_TYPE_REGIST_REQUEST,    /*注册请求*/
-    MSG_TYPE_REGIST_RESPOND,    /*注册响应*/
-    MSG_TYPE_LOGIN_REQUEST,     /*登陆请求*/
-    MSG_TYPE_LOGIN_RESPOND,     /*登陆响应*/
-    MSG_TYPE_LOGOUT_REQUEST     /*退出登陆请求*/
+    MSG_TYPE_REGIST_REQUEST,        /*注册请求*/
+    MSG_TYPE_REGIST_RESPOND,        /*注册响应*/
+    MSG_TYPE_LOGIN_REQUEST,         /*登陆请求*/
+    MSG_TYPE_LOGIN_RESPOND,         /*登陆响应*/
+    MSG_TYPE_LOGOUT_REQUEST,        /*退出登陆请求*/
+    MSG_TYPE_SEARCHUSER_REQUEST,    /*查找用户请求*/
+    MSG_TYPE_SEARCHUSER_RESPOND     /*查找用户响应*/
 };
 
-constexpr unsigned int msgTypeNum = 5;
+constexpr unsigned int msgTypeNum = 7;
 
 struct MsgUnit
 {

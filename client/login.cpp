@@ -128,7 +128,7 @@ void Login::login()
         disconnect(connection);
         loop.quit();
         QMessageBox::critical(this, "登陆", "Timeout! " + socket->errorString());
-//        qDebug() << socket->state();
+        qDebug() << socket->state();
 
         // 断线重连机制
         if (QAbstractSocket::UnconnectedState == socket->state())
@@ -158,6 +158,9 @@ void Login::login()
         }
         else
             QMessageBox::critical(this, "登陆", respond.mid(14));
+
+        free(munit);
+        munit = nullptr;
     }
 }
 

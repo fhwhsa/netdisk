@@ -104,8 +104,8 @@ void read_cb(struct bufferevent *bev, void *ctx)
     res = bufferevent_read(bev, munit->msg, munit->msgLen);
 
     MsgUnit* respond = MsgParsing::parsing(munit);
-    // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
-    //         << (char*)respond->msg << std::endl;
+    std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
+            << (char*)respond->msg << std::endl;
 
     if (nullptr != respond)
     {

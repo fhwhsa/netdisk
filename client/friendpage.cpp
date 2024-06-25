@@ -1,5 +1,7 @@
 #include "friendpage.h"
 #include "ui_friendpage.h"
+#include "addfrienddialog.h"
+#include "msggenerate.h"
 
 FriendPage::FriendPage(QWidget *parent) :
     QWidget(parent),
@@ -33,7 +35,13 @@ void FriendPage::iniSignalSlots()
 
 void FriendPage::clickTbNewFriend()
 {
-
+    AddFriendDialog *afd = new AddFriendDialog(this);
+    connect(afd, &AddFriendDialog::_searchUser, [this](QString key){
+        emit _sendMsg(MsgGenerate::generateSearchUserRequest(key));
+    });
+    afd->exec();
+    delete afd;
+    afd = nullptr;
 }
 
 void FriendPage::clickTbSearch()
@@ -43,10 +51,17 @@ void FriendPage::clickTbSearch()
 
 void FriendPage::clickTbClear()
 {
-
+    ui->inputBox->clear();
 }
 
 void FriendPage::clickTbSend()
 {
 
+}
+
+void FriendPage::getMsg(std::shared_ptr<MsgUnit> sptr)
+{
+    qDebug() << "friendpage getmsg";
+    if (MsgType::MSG_TYPE_SEARCHUSER_RESPOND == sptr->msgType)
+        emit respondSearch(sptr);
 }

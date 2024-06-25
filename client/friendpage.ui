@@ -86,6 +86,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="text">
              <string>新好友</string>
             </property>
@@ -98,8 +101,15 @@
             </item>
             <item>
              <widget class="QToolButton" name="tb_search">
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
               <property name="text">
                <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="res.qrc">
+                <normaloff>:/img/res/img/search.png</normaloff>:/img/res/img/search.png</iconset>
               </property>
              </widget>
             </item>
@@ -122,14 +132,14 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="sessionName">
             <property name="text">
              <string>TextLabel</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit">
+           <widget class="QPlainTextEdit" name="chatContent">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -156,7 +166,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_2">
+           <widget class="QPlainTextEdit" name="inputBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -194,15 +204,21 @@
             </item>
             <item>
              <widget class="QToolButton" name="tb_clear">
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
               <property name="text">
-               <string>...</string>
+               <string>清空</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QToolButton" name="tb_send">
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
               <property name="text">
-               <string>...</string>
+               <string>发送</string>
               </property>
              </widget>
             </item>
@@ -237,6 +253,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>

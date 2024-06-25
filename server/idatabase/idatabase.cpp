@@ -13,13 +13,13 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
     do
     {
         shared_ptr<MysqlConn> ptr = pool->getConnection();
-        if (nullptr == ptr || !ptr.get()->query(sql))
+        if (nullptr == ptr || !ptr->query(sql))
         {
             handleInfo = "服务器错误！";
             break;
         }
 
-        if (!ptr.get()->next())
+        if (!ptr->next())
         {
             handleInfo = "用户不存在！";
             break;
@@ -27,7 +27,7 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         
         try
         {
-            if (passwd != ptr.get()->value(2))
+            if (passwd != ptr->value(2))
             {
                 handleInfo = "密码错误！";
                 break;
@@ -43,22 +43,24 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         string id;
         try
         {
-            id = ptr.get()->value(0);
+            id = ptr->value(0);
         }
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
+            break;
         }
 
         string status;
         // 获取用户在线状态
         try
         {
-            status = ptr.get()->value(4);
+            status = ptr->value(4);
         }
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
+            break;
         }
         
         if ("1" == status)
@@ -69,7 +71,7 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         
         // 更改用户在线状态
         sql = "update user set status=1 where id=" + id + ";";
-        if (!ptr.get()->update(sql))
+        if (!ptr->update(sql))
         {
             handleInfo = "服务器错误！";
             break;
@@ -87,5 +89,45 @@ bool IDatabase::logout(std::string id)
     using namespace std;
     string sql("update user set status=0 where id=" + id + ";");
     ConnectionPool* pool = ConnectionPool::getConnectionPool();
-    return pool->getConnection().get()->update(sql);
+    return pool->getConnection()->update(sql);
+}
+
+std::string IDatabase::searchUser(std::string key, std::string &handleInfo)
+{
+    using namespace std;
+
+    string sql("select email from user where id='" + key + "' or email='" + key + "';");
+    cout << sql << endl;
+    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    do
+    {
+        shared_ptr<MysqlConn> ptr = pool->getConnection();
+        if (nullptr == ptr || !ptr->query(sql))
+        {
+            handleInfo = "服务器错误！";
+            break;
+        }
+
+        if (!ptr->next())
+        {
+            handleInfo = "用户不存在！";
+            break;
+        }
+
+        // 获取用户邮箱
+        string email;
+        try
+        {
+            email = ptr->value(0);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        handleInfo = "查找成功";
+
+        return email;
+    } while (0);
+
+    return "";
 }

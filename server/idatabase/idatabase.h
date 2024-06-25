@@ -15,6 +15,7 @@ public:
      * 参数：
      *      email       登陆邮箱
      *      passwd      密码
+     *      handleInfo  处理信息
      * 返回值：
      *      成功        登陆用户的id
      *      失败        -1
@@ -30,6 +31,17 @@ public:
      *      失败     false
      */
     static bool logout(std::string id);
+
+    /**
+     * 描述：查找用户
+     * 参数：
+     *      key         查找关键字
+     *      handleInfo  处理信息
+     * 返回值：
+     *      成功         查找用户的邮箱
+     *      失败         空字符串
+     */
+    static std::string searchUser(std::string key, std::string& handleInfo);
 
 private:
     IDatabase();

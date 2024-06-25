@@ -26,3 +26,13 @@ MsgUnit *MsgGenerate::generateLogoutRequest(QString userId)
     MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGOUT_REQUEST, num, cstr);
     return munit;
 }
+
+MsgUnit *MsgGenerate::generateSearchUserRequest(QString key)
+{
+    QString str = QString("key:%1\r\n").arg(key);
+    std::string sstr = str.toStdString();
+    const char* cstr = sstr.c_str();
+    size_t num = strlen(cstr);
+    MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_SEARCHUSER_REQUEST, num, cstr);
+    return munit;
+}

@@ -10,6 +10,10 @@
 #include <QToolButton>
 #include <QTcpSocket>
 #include <QString>
+#include <QByteArray>
+#include <memory>
+
+typedef unsigned int uint;
 
 namespace Ui {
 class MainPage;
@@ -47,6 +51,10 @@ private:
     QString userId;
     QString userEmail;
 
+    QByteArray buffer;      // 存储socket读到的数据
+    uint waitSize;          // 等待字节数
+    MsgUnit* revMunit;
+
 private slots:
     void clickTbfolder();
     void clickTbtransmit();
@@ -55,8 +63,26 @@ private slots:
     void clickTbsetting();
     void clickTbUserInfo();
 
+    /**
+     * @brief 发送数据给服务器
+     * @param munit 要发送的数据单元
+     */
+    void sendMsg(MsgUnit* munit);
+
+    /**
+     * @brief 接收服务器数据处理函数
+     * @param munit
+     */
+    void recvMsg();
+
 signals:
     void mainPageClosed();
+
+    /**
+     * @brief 由子功能页接收，并判断该数据单元是否是其所需
+     * @param munit
+     */
+    void newMunit(std::shared_ptr<MsgUnit> munit);
 };
 
 #endif // MAINPAGE_H

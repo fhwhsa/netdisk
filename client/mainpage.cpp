@@ -8,6 +8,7 @@
 #include <QIcon>
 #include <QStackedWidget>
 #include <QMessageBox>
+#include <string.h>
 
 MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWidget *parent) :
     userId(_userId),
@@ -63,6 +64,8 @@ void MainPage::init()
     currSelectedBtn = ui->tb_folder;
     ui->tb_folder->setIcon(btnIcon.value(currSelectedBtn).first);
     ui->funcPanel->setCurrentWidget(folderPage);
+
+    revMunit = nullptr;
 }
 
 void MainPage::iniSignalSlots()
@@ -73,6 +76,12 @@ void MainPage::iniSignalSlots()
     connect(ui->tb_logout, &QToolButton::clicked, this, &MainPage::clickTblogout);
     connect(ui->tb_setting, &QToolButton::clicked, this, &MainPage::clickTbsetting);
     connect(ui->tb_userInfo, &QToolButton::clicked, this, &MainPage::clickTbUserInfo);
+
+    connect(friendPage, &FriendPage::_sendMsg, this, &MainPage::sendMsg);
+
+    connect(this, &MainPage::newMunit, friendPage, &FriendPage::getMsg);
+
+    connect(socket, &QTcpSocket::readyRead, this, &MainPage::recvMsg);
 }
 
 void MainPage::clickTbfolder()
@@ -116,7 +125,6 @@ void MainPage::clickTblogout()
     if (QMessageBox::No == QMessageBox::question(this, " ", "退出登陆？", QMessageBox::Yes | QMessageBox::No))
         return;
     MsgUnit* munit = MsgGenerate::generateLogoutRequest(this->userId);
-//    qDebug() << (char*)munit->msg;
     socket->write((char*)munit, munit->totalLen);
     emit mainPageClosed();
 }
@@ -130,3 +138,39 @@ void MainPage::clickTbUserInfo()
 {
     QMessageBox::information(this, "账号信息", QString("id:%1\nemail:%2").arg(userId).arg(userEmail));
 }
+
+void MainPage::sendMsg(MsgUnit *munit)
+{
+//    qDebug() << (char*)munit->msg;
+//    qDebug() << munit->msgType;
+    socket->write((char*)munit, munit->totalLen);
+    delete munit;
+    munit = nullptr;
+}
+
+void MainPage::recvMsg()
+{
+    if (nullptr == revMunit && socket->bytesAvailable() >= 4)
+    {
+        QByteArray ba = socket->read(4);
+        uint size;
+        memcpy(&size, ba.constData(), 4);
+        revMunit = (MsgUnit*)malloc(size);
+        revMunit->totalLen = size;
+        waitSize = size - 4;
+    }
+
+    QByteArray tmp = socket->readAll();
+    buffer.append(tmp);
+    tmp.clear();
+    if (buffer.size() >= waitSize)
+    {
+        tmp = buffer.first(waitSize);
+        memcpy((char*)revMunit + 4, tmp.constData(), waitSize);
+        waitSize = 0;
+        std::shared_ptr<MsgUnit> sptr(revMunit);
+        emit newMunit(sptr);
+        revMunit = nullptr;
+    }
+}
+

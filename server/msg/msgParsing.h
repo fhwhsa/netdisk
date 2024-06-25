@@ -32,6 +32,12 @@ private:
      */
     static bool logoutHandler(const MsgUnit* munit);
 
+    /**
+     * 描述：查找用户
+     * 返回值：返回查找用户响应
+     */
+    static MsgUnit* searchUserRespond(const MsgUnit* munit);
+
 public:
     /**
      * 描述：解析消息体，并返回对应的响应

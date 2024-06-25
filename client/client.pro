@@ -9,6 +9,8 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    addfrienddialog.cpp \
+    bubbletips.cpp \
     folderpage.cpp \
     friendpage.cpp \
     login.cpp \
@@ -19,6 +21,8 @@ SOURCES += \
     transmitpage.cpp
 
 HEADERS += \
+    addfrienddialog.h \
+    bubbletips.h \
     folderpage.h \
     friendpage.h \
     login.h \
@@ -28,6 +32,7 @@ HEADERS += \
     transmitpage.h
 
 FORMS += \
+    addfrienddialog.ui \
     folderpage.ui \
     friendpage.ui \
     login.ui \

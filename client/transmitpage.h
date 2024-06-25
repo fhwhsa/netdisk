@@ -1,6 +1,8 @@
 #ifndef TRANSMITPAGE_H
 #define TRANSMITPAGE_H
 
+#include "msgUnit.h"
+
 #include <QWidget>
 
 namespace Ui {
@@ -17,6 +19,9 @@ public:
 
 private:
     Ui::TransmitPage *ui;
+
+signals:
+
 };
 
 #endif // TRANSMITPAGE_H

@@ -1,6 +1,8 @@
 #ifndef FOLDERPAGE_H
 #define FOLDERPAGE_H
 
+#include "msgUnit.h"
+
 #include <QWidget>
 
 namespace Ui {
@@ -17,6 +19,9 @@ public:
 
 private:
     Ui::FolderPage *ui;
+
+signals:
+
 };
 
 #endif // FOLDERPAGE_H
