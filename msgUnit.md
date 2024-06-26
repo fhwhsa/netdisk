@@ -26,3 +26,15 @@
 2. 查找用户响应
     * 有该用户 `success\r\nemail:{}\r\ninfo:{}\r\n` 
     * 没有该用户或出错 `failure\r\ninfo:{}\r\n`
+
+### 好友申请
+1. 添加好友请求
+    ```
+    from:{}\r\n
+    to:{}\r\n
+    ```
+
+2. 添加好友响应
+    * 成功添加请求：`success\r\ninfo:{}\r\n`
+    * 重复的请求：`conflict\r\ninfo:{}\r\n`
+    * 失败：`failure\r\ninfo:{}\r\n`

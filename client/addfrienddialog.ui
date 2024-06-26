@@ -86,7 +86,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="targetKey">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -163,7 +163,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>70</height>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -195,7 +195,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="targetEmail">
+           <widget class="QLabel" name="resultEmail">
             <property name="text">
              <string>账号邮箱</string>
             </property>
@@ -250,13 +250,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>70</height>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>70</height>
+         <height>50</height>
         </size>
        </property>
        <property name="title">

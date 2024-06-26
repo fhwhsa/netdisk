@@ -37,6 +37,16 @@ MsgUnit *MsgTools::generateSearchUserRequest(QString key)
     return munit;
 }
 
+MsgUnit *MsgTools::generateAddFriendRequest(QString from, QString to)
+{
+    QString str = QString("from:%1\r\nto:%2\r\n").arg(from).arg(to);
+    std::string sstr = str.toStdString();
+    const char* cstr = sstr.c_str();
+    size_t num = strlen(cstr);
+    MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_ADDFRIEND_REQUEST, num, cstr);
+    return munit;
+}
+
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {
     QStringList strList = QString((char*)munit->msg).split("\r\n");

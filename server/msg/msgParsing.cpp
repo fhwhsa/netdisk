@@ -95,6 +95,36 @@ MsgUnit *MsgParsing::searchUserRespond(const MsgUnit *munit)
     return respond;
 }
 
+MsgUnit *MsgParsing::addFriendRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    vector<string> msg = getAllRows(munit);
+    if (msg.size() < 2 || msg[0].length() <= 5 || msg[1].length() <= 3)
+        return nullptr;
+
+    string from = msg[0].substr(5);
+    string to = msg[1].substr(3);
+    string info;
+    string content;
+    int res = IDatabase::addFriendApplication(from, to, info);
+    if (1 == res)
+    {
+        content = "success\r\ninfo:" + info + "\r\n";
+    }
+    else if (0 == res)
+    {
+        content = "conflict\r\ninfo:" + info + "\r\n";
+    }
+    else 
+    {
+        content = "failure\r\ninfo:" + info + "\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_ADDFRIEND_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
 {
     // std::cout << (char*)munit->msg << std::endl;
@@ -113,9 +143,11 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
 
     // 查找用户请求
     case MsgType::MSG_TYPE_SEARCHUSER_REQUEST:
-    {
         return searchUserRespond(munit);
-    }
+
+    // 添加好友请求
+    case MsgType::MSG_TYPE_ADDFRIEND_REQUEST:
+        return addFriendRespond(munit);
 
     // 未知请求
     default:

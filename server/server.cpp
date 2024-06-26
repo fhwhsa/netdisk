@@ -56,6 +56,7 @@ int run(std::string host, uint port, struct timeval _connSustainTime)
     event_base_dispatch(ebase);
 
     evconnlistener_free(listener);
+    event_free(signalev);
     event_base_free(ebase);
 
     return 0;
@@ -104,16 +105,21 @@ void read_cb(struct bufferevent *bev, void *ctx)
     res = bufferevent_read(bev, munit->msg, munit->msgLen);
 
     MsgUnit* respond = MsgParsing::parsing(munit);
-    std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
-            << (char*)respond->msg << std::endl;
-
     if (nullptr != respond)
     {
+        std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
+                << (char*)respond->msg << std::endl;
+                
         if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
             mbev->loginId = MsgParsing::getRow(respond, 1).substr(3);
         bufferevent_write(bev, (char*)respond, respond->totalLen);
+
+        delete respond;
+        respond = nullptr;
     }
     // std::cout << "write" << std::endl;
+    delete munit;
+    munit = nullptr;
 }
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)
@@ -138,8 +144,7 @@ void sigint_cb(evutil_socket_t sig, short events, void *arg)
 {
 	struct event_base *base = (event_base*)arg;
 	struct timeval delay = { 2, 0 };
-
 	printf("Caught an interrupt signal; exiting...\n");
-
 	event_base_loopexit(base, &delay);
+    IDatabase::serverOffline();
 }

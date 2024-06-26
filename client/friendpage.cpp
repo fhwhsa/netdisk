@@ -3,7 +3,9 @@
 #include "addfrienddialog.h"
 #include "msgtools.h"
 
-FriendPage::FriendPage(QWidget *parent) :
+FriendPage::FriendPage(QString _userId, QString _userEmail, QWidget *parent) :
+    userId(_userId),
+    userEmail(_userEmail),
     QWidget(parent),
     ui(new Ui::FriendPage)
 {
@@ -35,11 +37,16 @@ void FriendPage::iniSignalSlots()
 
 void FriendPage::clickTbNewFriend()
 {
-    AddFriendDialog *afd = new AddFriendDialog(this);
-    connect(afd, &AddFriendDialog::_searchUser, [this](QString key){
+    AddFriendDialog *afd = new AddFriendDialog(userId, userEmail, this);
+    QMetaObject::Connection conn1 = connect(afd, &AddFriendDialog::_searchUser, [this](QString key){
         emit _sendMsg(MsgTools::generateSearchUserRequest(key));
     });
+    QMetaObject::Connection conn2 = connect(afd, &AddFriendDialog::_addFriend, [this](QString to){
+        emit _sendMsg(MsgTools::generateAddFriendRequest(userEmail, to));
+    });
     afd->exec();
+    disconnect(conn1);
+    disconnect(conn2);
     delete afd;
     afd = nullptr;
 }
@@ -64,4 +71,6 @@ void FriendPage::getMsg(std::shared_ptr<MsgUnit> sptr)
     qDebug() << "friendpage getmsg";
     if (MsgType::MSG_TYPE_SEARCHUSER_RESPOND == sptr->msgType)
         emit respondSearch(sptr);
+    else if (MsgType::MSG_TYPE_ADDFRIEND_RESPOND == sptr->msgType)
+        emit respondAddFriend(sptr);
 }

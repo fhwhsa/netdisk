@@ -2,6 +2,7 @@
 #include "ui_mainpage.h"
 #include "msgUnit.h"
 #include "msgtools.h"
+#include "bubbletips.h"
 
 #include <QDebug>
 #include <QPair>
@@ -52,9 +53,9 @@ void MainPage::init()
     btnIcon.insert(ui->tb_friend, QPair(QIcon(":/img/res/img/friend_selected.png"), QIcon(":/img/res/img/friend_unselected.png")));
 
     // 创建功能页对象
-    folderPage = new FolderPage();
-    transmitPage = new TransmitPage();
-    friendPage = new FriendPage();
+    folderPage = new FolderPage(this);
+    transmitPage = new TransmitPage(this);
+    friendPage = new FriendPage(userId, userEmail, this);
     ui->funcPanel->addWidget(folderPage);
     ui->funcPanel->setCurrentWidget(folderPage);
     ui->funcPanel->addWidget(transmitPage);
@@ -143,7 +144,10 @@ void MainPage::sendMsg(MsgUnit *munit)
 {
 //    qDebug() << (char*)munit->msg;
 //    qDebug() << munit->msgType;
-    socket->write((char*)munit, munit->totalLen);
+
+    if (-1 == socket->write((char*)munit, munit->totalLen))
+        BubbleTips::showBubbleTips(socket->errorString(), 3);
+
     delete munit;
     munit = nullptr;
 }

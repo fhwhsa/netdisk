@@ -10,6 +10,12 @@
 class IDatabase
 {
 public:
+
+    /**
+     * 描述：服务器下线处理，将所有用户的在线状态改为不在线
+     */
+    static void serverOffline();
+
     /**
      * 描述：用户身份验证
      * 参数：
@@ -42,6 +48,19 @@ public:
      *      失败         空字符串
      */
     static std::string searchUser(std::string key, std::string& handleInfo);
+
+    /**
+     * 描述：添加好友申请记录
+     * 参数：
+     *      from    申请人邮箱
+     *      to      目标用户邮箱
+     *      handleInfo  处理信息
+     * 返回值：
+     *      成功            1
+     *      重复的添加       0
+     *      失败            -1
+     */
+    static int addFriendApplication(std::string from, std::string to, std::string& handleinfo);
 
 private:
     IDatabase();

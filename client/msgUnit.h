@@ -14,10 +14,13 @@ enum MsgType {
     MSG_TYPE_LOGIN_RESPOND,         /*登陆响应*/
     MSG_TYPE_LOGOUT_REQUEST,        /*退出登陆请求*/
     MSG_TYPE_SEARCHUSER_REQUEST,    /*查找用户请求*/
-    MSG_TYPE_SEARCHUSER_RESPOND     /*查找用户响应*/
+    MSG_TYPE_SEARCHUSER_RESPOND,    /*查找用户响应*/
+    MSG_TYPE_ADDFRIEND_REQUEST,     /*添加好友请求*/
+    MSG_TYPE_ADDFRIEND_RESPOND      /*添加好友响应*/
 };
 
-constexpr unsigned int msgTypeNum = 7;
+constexpr unsigned int msgTypeNum = 9;
+
 struct MsgUnit
 {
     uint totalLen;         // 消息单元大小

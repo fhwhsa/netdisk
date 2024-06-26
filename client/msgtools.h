@@ -35,6 +35,14 @@ public:
     static MsgUnit* generateSearchUserRequest(QString key);
 
     /**
+     * @brief 生成添加好友请求
+     * @param from 申请人邮箱
+     * @param to 目标好友邮箱
+     * @return
+     */
+    static MsgUnit *generateAddFriendRequest(QString from, QString to);
+
+    /**
      * @brief 获取munit消息内容中第index行内容，index从0开始
      * @param munit 要获取信息的消息单元
      * @param index 第几行

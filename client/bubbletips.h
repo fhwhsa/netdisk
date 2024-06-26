@@ -11,7 +11,12 @@
 class BubbleTips : public QWidget
 {
     Q_OBJECT
+
 public:
+    static void showBubbleTips(QString showStr, int sec = 1, QWidget *parent = nullptr);
+    ~BubbleTips();
+
+private:
     explicit BubbleTips(QString showStr, int sec = 1, QWidget *parent = nullptr);
 
 protected:
@@ -19,6 +24,8 @@ protected:
 
 private:
     void InitLayout();//初始化窗体的布局和部件
+    QTimer *closeTimer;
+    QTimer *singleShotTimer;
     QHBoxLayout *hBoxlayout;//布局显示控件布局
     QLabel *mText;//用于显示文字的控件
     QString showStr;//显示的字符串

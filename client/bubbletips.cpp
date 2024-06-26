@@ -4,6 +4,25 @@
 #include <QPainter>
 #include <QRectF>
 #include <QPoint>
+#include <QDebug>
+
+void BubbleTips::showBubbleTips(QString showStr, int sec, QWidget *parent)
+{
+    BubbleTips *tips = new BubbleTips(showStr, sec, parent);
+    tips->show();
+    return;
+}
+
+BubbleTips::~BubbleTips()
+{
+    singleShotTimer->stop();
+    closeTimer->stop();
+
+    if (nullptr != closeTimer)
+        delete closeTimer;
+    if (nullptr != singleShotTimer)
+        delete singleShotTimer;
+}
 
 BubbleTips::BubbleTips(QString showStr, int sec, QWidget *parent): QWidget(parent),
     opacityValue(0.9),
@@ -11,7 +30,7 @@ BubbleTips::BubbleTips(QString showStr, int sec, QWidget *parent): QWidget(paren
     frameColor(QColor(255,255,255)),
     frameSize(2),
     showTime(sec * 1000),
-    closeTime(100),
+    closeTime(50),
     closeSpeed(0.1),
     hBoxlayout(new QHBoxLayout(this)),
     mText(new QLabel(showStr, this))
@@ -23,19 +42,22 @@ BubbleTips::BubbleTips(QString showStr, int sec, QWidget *parent): QWidget(paren
     hBoxlayout->addWidget(mText);
     InitLayout();
 
-    QPoint pPos = parent->pos();
-    this->move(pPos.rx() + parent->width() / 2 - this->width() / 2, pPos.ry() + parent->height() / 2 - this->height() / 2);
+    if (nullptr != parent)
+    {
+        QPoint pPos = parent->pos();
+        this->move(pPos.rx() + parent->width() / 2 - this->width() / 2, pPos.ry() + parent->height() / 2 - this->height() / 2);
+    }
 }
 
 void BubbleTips::InitLayout()
 {
     this->setWindowOpacity(opacityValue);
 
-    QTimer *mtimer = new QTimer(this);
-    mtimer->setTimerType(Qt::PreciseTimer);
-    connect(mtimer,&QTimer::timeout,this,[=](){
+    closeTimer = new QTimer(this);
+    closeTimer->setTimerType(Qt::PreciseTimer);
+    connect(closeTimer,&QTimer::timeout,this,[=](){
         if(opacityValue<=0){
-            mtimer->stop();
+            closeTimer->stop();
             this->close();
             return;
         }
@@ -43,7 +65,12 @@ void BubbleTips::InitLayout()
         this->setWindowOpacity(opacityValue);
     });
 
-    QTimer::singleShot(showTime,[=](){mtimer->start(closeTime);});//执行延时自动关闭
+    //执行延时自动关闭
+    singleShotTimer = new QTimer(this);
+    connect(singleShotTimer, &QTimer::timeout, this, [=](){
+        closeTimer->start(closeTime);
+    });
+    singleShotTimer->start(showTime);
 }
 
 void BubbleTips::paintEvent(QPaintEvent *event)

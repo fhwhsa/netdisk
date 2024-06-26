@@ -7,7 +7,17 @@
 #include <algorithm>
 #include <cctype>
 
-int IDatabase::authentication(std::string email, std::string passwd, std::string& handleInfo)
+void IDatabase::serverOffline()
+{
+    using namespace std;
+    string sql("update user set status =0;");
+    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    shared_ptr<MysqlConn> ptr = pool->getConnection(); 
+    if (nullptr != ptr)
+        ptr->update(sql);
+}
+
+int IDatabase::authentication(std::string email, std::string passwd, std::string &handleInfo)
 {
     using namespace std;
     string sql("select * from user where email='" + email + "';");
@@ -137,4 +147,42 @@ std::string IDatabase::searchUser(std::string key, std::string &handleInfo)
     } while (0);
 
     return "";
+}
+
+int IDatabase::addFriendApplication(std::string from, std::string to, std::string &handleinfo)
+{
+    using namespace std;
+
+    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    string sql_1("select uemail from friendApplication where uemail = '" + from + "' and temail = '" + to + "';");
+    string sql_2("select uemail from friendApplication where uemail = '" + to + "' and temail = '" + from + "';");
+    string sql_3("insert into friendApplication (uemail, temail, status) values ('" + from + "', '" + to + "', 0);");
+    do
+    {
+        shared_ptr<MysqlConn> ptr = pool->getConnection();
+        if (nullptr == ptr || !ptr->query(sql_1))
+            break;
+        if (ptr->next())
+        {
+            handleinfo = "重复的请求";
+            return 0;
+        }
+
+        if (!ptr->query(sql_2))
+            break;
+        if (ptr->next())
+        {
+            handleinfo = "对方已提出申请";
+            return 0;
+        }
+
+        if (ptr->update(sql_3))
+            return 1;
+        else 
+            break;
+
+    } while (0);
+
+    handleinfo = "服务器错误！";
+    return -1;
 }

@@ -38,6 +38,12 @@ private:
      */
     static MsgUnit* searchUserRespond(const MsgUnit* munit);
 
+    /**
+     * 描述：添加好友
+     * 返回值：返回添加好友响应
+     */
+    static MsgUnit* addFriendRespond(const MsgUnit* munit);
+
 public:
     /**
      * 描述：解析消息体，并返回对应的响应

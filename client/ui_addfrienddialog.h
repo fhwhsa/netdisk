@@ -32,14 +32,14 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QHBoxLayout *horizontalLayout;
     QLabel *label;
-    QLineEdit *lineEdit;
+    QLineEdit *targetKey;
     QFrame *line;
     QToolButton *tb_search;
     QGroupBox *resultBox;
     QHBoxLayout *horizontalLayout_5;
     QHBoxLayout *horizontalLayout_4;
     QSpacerItem *horizontalSpacer;
-    QLabel *targetEmail;
+    QLabel *resultEmail;
     QFrame *line_2;
     QToolButton *tb_add;
     QSpacerItem *horizontalSpacer_2;
@@ -86,13 +86,13 @@ public:
 
         horizontalLayout->addWidget(label);
 
-        lineEdit = new QLineEdit(inputBox);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
-        lineEdit->setMinimumSize(QSize(0, 25));
-        lineEdit->setMaximumSize(QSize(16777215, 25));
-        lineEdit->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        targetKey = new QLineEdit(inputBox);
+        targetKey->setObjectName(QString::fromUtf8("targetKey"));
+        targetKey->setMinimumSize(QSize(0, 25));
+        targetKey->setMaximumSize(QSize(16777215, 25));
+        targetKey->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        horizontalLayout->addWidget(lineEdit);
+        horizontalLayout->addWidget(targetKey);
 
         line = new QFrame(inputBox);
         line->setObjectName(QString::fromUtf8("line"));
@@ -123,7 +123,7 @@ public:
         resultBox->setObjectName(QString::fromUtf8("resultBox"));
         sizePolicy.setHeightForWidth(resultBox->sizePolicy().hasHeightForWidth());
         resultBox->setSizePolicy(sizePolicy);
-        resultBox->setMinimumSize(QSize(0, 70));
+        resultBox->setMinimumSize(QSize(0, 50));
         resultBox->setMaximumSize(QSize(16777215, 70));
         horizontalLayout_5 = new QHBoxLayout(resultBox);
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
@@ -133,10 +133,10 @@ public:
 
         horizontalLayout_4->addItem(horizontalSpacer);
 
-        targetEmail = new QLabel(resultBox);
-        targetEmail->setObjectName(QString::fromUtf8("targetEmail"));
+        resultEmail = new QLabel(resultBox);
+        resultEmail->setObjectName(QString::fromUtf8("resultEmail"));
 
-        horizontalLayout_4->addWidget(targetEmail);
+        horizontalLayout_4->addWidget(resultEmail);
 
         line_2 = new QFrame(resultBox);
         line_2->setObjectName(QString::fromUtf8("line_2"));
@@ -165,8 +165,8 @@ public:
         errorBox->setObjectName(QString::fromUtf8("errorBox"));
         sizePolicy.setHeightForWidth(errorBox->sizePolicy().hasHeightForWidth());
         errorBox->setSizePolicy(sizePolicy);
-        errorBox->setMinimumSize(QSize(0, 70));
-        errorBox->setMaximumSize(QSize(16777215, 70));
+        errorBox->setMinimumSize(QSize(0, 50));
+        errorBox->setMaximumSize(QSize(16777215, 50));
         horizontalLayout_3 = new QHBoxLayout(errorBox);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         errInfo = new QLabel(errorBox);
@@ -199,10 +199,10 @@ public:
         AddFriendDialog->setWindowTitle(QCoreApplication::translate("AddFriendDialog", "Dialog", nullptr));
         inputBox->setTitle(QCoreApplication::translate("AddFriendDialog", "\350\276\223\345\205\245\350\264\246\345\217\267\351\202\256\347\256\261/id", nullptr));
         label->setText(QString());
-        lineEdit->setPlaceholderText(QCoreApplication::translate("AddFriendDialog", "\350\264\246\345\217\267\351\202\256\347\256\261/id", nullptr));
+        targetKey->setPlaceholderText(QCoreApplication::translate("AddFriendDialog", "\350\264\246\345\217\267\351\202\256\347\256\261/id", nullptr));
         tb_search->setText(QCoreApplication::translate("AddFriendDialog", "\346\220\234\347\264\242", nullptr));
         resultBox->setTitle(QString());
-        targetEmail->setText(QCoreApplication::translate("AddFriendDialog", "\350\264\246\345\217\267\351\202\256\347\256\261", nullptr));
+        resultEmail->setText(QCoreApplication::translate("AddFriendDialog", "\350\264\246\345\217\267\351\202\256\347\256\261", nullptr));
         tb_add->setText(QCoreApplication::translate("AddFriendDialog", "\346\267\273\345\212\240\345\245\275\345\217\213", nullptr));
         errorBox->setTitle(QString());
         errInfo->setText(QCoreApplication::translate("AddFriendDialog", "info", nullptr));

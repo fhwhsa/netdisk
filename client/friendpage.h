@@ -5,6 +5,7 @@
 
 #include <QWidget>
 #include <memory>
+#include <QString>
 
 namespace Ui {
 class FriendPage;
@@ -15,11 +16,15 @@ class FriendPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit FriendPage(QWidget *parent = nullptr);
+    explicit FriendPage(QString _userId, QString _userEmail, QWidget *parent = nullptr);
     ~FriendPage();
 
 private:
     Ui::FriendPage *ui;
+
+    QString userId;
+    QString userEmail;
+
     void init();
     void iniSignalSlots();
 
@@ -40,6 +45,7 @@ signals:
     void _sendMsg(MsgUnit* munit);
 
     void respondSearch(std::shared_ptr<MsgUnit> sptr);
+    void respondAddFriend(std::shared_ptr<MsgUnit> sptr);
 
 };
 
