@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -33,6 +34,9 @@ public:
     QGroupBox *friendsList;
     QVBoxLayout *verticalLayout_2;
     QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout_5;
+    QToolButton *tb_notification;
+    QFrame *line;
     QToolButton *tb_newFriend;
     QHBoxLayout *horizontalLayout;
     QLineEdit *searchLine;
@@ -57,7 +61,7 @@ public:
     {
         if (FriendPage->objectName().isEmpty())
             FriendPage->setObjectName(QString::fromUtf8("FriendPage"));
-        FriendPage->resize(1023, 597);
+        FriendPage->resize(934, 597);
         horizontalLayout_4 = new QHBoxLayout(FriendPage);
         horizontalLayout_4->setSpacing(0);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
@@ -76,21 +80,46 @@ public:
         friendsList->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         friendsList->setFlat(false);
         verticalLayout_2 = new QVBoxLayout(friendsList);
-        verticalLayout_2->setSpacing(2);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(2, 2, 2, 2);
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        tb_newFriend = new QToolButton(friendsList);
-        tb_newFriend->setObjectName(QString::fromUtf8("tb_newFriend"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        tb_notification = new QToolButton(friendsList);
+        tb_notification->setObjectName(QString::fromUtf8("tb_notification"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(tb_newFriend->sizePolicy().hasHeightForWidth());
-        tb_newFriend->setSizePolicy(sizePolicy1);
+        sizePolicy1.setHeightForWidth(tb_notification->sizePolicy().hasHeightForWidth());
+        tb_notification->setSizePolicy(sizePolicy1);
+        tb_notification->setMinimumSize(QSize(27, 27));
+        tb_notification->setCursor(QCursor(Qt::PointingHandCursor));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/img/res/img/notification.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_notification->setIcon(icon);
+
+        horizontalLayout_5->addWidget(tb_notification);
+
+        line = new QFrame(friendsList);
+        line->setObjectName(QString::fromUtf8("line"));
+        line->setFrameShape(QFrame::VLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        horizontalLayout_5->addWidget(line);
+
+        tb_newFriend = new QToolButton(friendsList);
+        tb_newFriend->setObjectName(QString::fromUtf8("tb_newFriend"));
+        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(tb_newFriend->sizePolicy().hasHeightForWidth());
+        tb_newFriend->setSizePolicy(sizePolicy2);
         tb_newFriend->setCursor(QCursor(Qt::PointingHandCursor));
 
-        verticalLayout->addWidget(tb_newFriend);
+        horizontalLayout_5->addWidget(tb_newFriend);
+
+
+        verticalLayout->addLayout(horizontalLayout_5);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -102,9 +131,9 @@ public:
         tb_search = new QToolButton(friendsList);
         tb_search->setObjectName(QString::fromUtf8("tb_search"));
         tb_search->setCursor(QCursor(Qt::PointingHandCursor));
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/img/res/img/search.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_search->setIcon(icon);
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/img/res/img/search.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_search->setIcon(icon1);
 
         horizontalLayout->addWidget(tb_search);
 
@@ -149,11 +178,11 @@ public:
 
         inputBox = new QPlainTextEdit(chatBox);
         inputBox->setObjectName(QString::fromUtf8("inputBox"));
-        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(inputBox->sizePolicy().hasHeightForWidth());
-        inputBox->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(inputBox->sizePolicy().hasHeightForWidth());
+        inputBox->setSizePolicy(sizePolicy3);
         inputBox->setMinimumSize(QSize(0, 120));
         inputBox->setMaximumSize(QSize(16777215, 120));
 
@@ -207,6 +236,7 @@ public:
     {
         FriendPage->setWindowTitle(QCoreApplication::translate("FriendPage", "Form", nullptr));
         friendsList->setTitle(QString());
+        tb_notification->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
         tb_newFriend->setText(QCoreApplication::translate("FriendPage", "\346\226\260\345\245\275\345\217\213", nullptr));
         tb_search->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
         chatBox->setTitle(QString());

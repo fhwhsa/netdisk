@@ -36,11 +36,18 @@ public:
 
     /**
      * @brief 生成添加好友请求
-     * @param from 申请人邮箱
-     * @param to 目标好友邮箱
+     * @param from 申请人id
+     * @param to 目标好友id
      * @return
      */
-    static MsgUnit *generateAddFriendRequest(QString from, QString to);
+    static MsgUnit* generateAddFriendRequest(QString from, QString to);
+
+    /**
+     * @brief 生成获取好友申请记录请求
+     * @param from 申请人id
+     * @return
+     */
+    static MsgUnit* generateGetFriendApplicationRequest(QString from);
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

@@ -11,6 +11,9 @@ namespace Ui {
 class Login;
 }
 
+/**
+ * @brief 登陆页面
+ */
 class Login : public QWidget
 {
     Q_OBJECT

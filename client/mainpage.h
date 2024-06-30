@@ -19,6 +19,9 @@ namespace Ui {
 class MainPage;
 }
 
+/**
+ * @brief 主界面，同时负责与服务器进行通信
+ */
 class MainPage : public QWidget
 {
     Q_OBJECT

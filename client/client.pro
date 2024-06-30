@@ -12,6 +12,7 @@ SOURCES += \
     addfrienddialog.cpp \
     bubbletips.cpp \
     folderpage.cpp \
+    friendapplicationlist.cpp \
     friendpage.cpp \
     login.cpp \
     main.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     addfrienddialog.h \
     bubbletips.h \
     folderpage.h \
+    friendapplicationlist.h \
     friendpage.h \
     login.h \
     mainpage.h \
@@ -34,6 +36,7 @@ HEADERS += \
 FORMS += \
     addfrienddialog.ui \
     folderpage.ui \
+    friendapplicationlist.ui \
     friendpage.ui \
     login.ui \
     mainpage.ui \

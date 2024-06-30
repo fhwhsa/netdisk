@@ -6,25 +6,29 @@
 #include <QPoint>
 #include <QDebug>
 
-void BubbleTips::showBubbleTips(QString showStr, int sec, QWidget *parent)
+void BubbleTips::showBubbleTips(QString showStr, int sec, QWidget *parent, bool flag)
 {
-    BubbleTips *tips = new BubbleTips(showStr, sec, parent);
+    BubbleTips *tips = new BubbleTips(showStr, sec, parent, flag);
+    tips->setAttribute(Qt::WA_DeleteOnClose);
     tips->show();
     return;
 }
 
 BubbleTips::~BubbleTips()
 {
-    singleShotTimer->stop();
-    closeTimer->stop();
-
     if (nullptr != closeTimer)
+    {
+        closeTimer->stop();
         delete closeTimer;
+    }
     if (nullptr != singleShotTimer)
+    {
+        singleShotTimer->stop();
         delete singleShotTimer;
+    }
 }
 
-BubbleTips::BubbleTips(QString showStr, int sec, QWidget *parent): QWidget(parent),
+BubbleTips::BubbleTips(QString showStr, int sec, QWidget *parent, bool flag): QWidget(parent),
     opacityValue(0.9),
     backgroundColor(QColor(255,255,255)),
     frameColor(QColor(255,255,255)),
@@ -38,21 +42,22 @@ BubbleTips::BubbleTips(QString showStr, int sec, QWidget *parent): QWidget(paren
     setWindowFlags(Qt::Window|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint|Qt::Tool|Qt::X11BypassWindowManagerHint);
     this->setAttribute(Qt::WA_TranslucentBackground); // 设置窗口部件的背景半透明
     this->setAttribute(Qt::WA_TransparentForMouseEvents, true);// 禁止鼠标事件
-    this->setAttribute(Qt::WA_DeleteOnClose);
+//    this->setAttribute(Qt::WA_DeleteOnClose); // 关闭时删除对象
     hBoxlayout->addWidget(mText);
-    InitLayout();
+    this->setWindowOpacity(opacityValue);
+    initTimer();
 
     if (nullptr != parent)
     {
         QPoint pPos = parent->pos();
         this->move(pPos.rx() + parent->width() / 2 - this->width() / 2, pPos.ry() + parent->height() / 2 - this->height() / 2);
     }
+    if (flag)
+        this->setWindowModality(Qt::WindowModal);
 }
 
-void BubbleTips::InitLayout()
+void BubbleTips::initTimer()
 {
-    this->setWindowOpacity(opacityValue);
-
     closeTimer = new QTimer(this);
     closeTimer->setTimerType(Qt::PreciseTimer);
     connect(closeTimer,&QTimer::timeout,this,[=](){

@@ -24,7 +24,7 @@
     key:{}\r\n
     ```
 2. 查找用户响应
-    * 有该用户 `success\r\nemail:{}\r\ninfo:{}\r\n` 
+    * 有该用户 `success\r\nid:{}\r\nemail:{}\r\ninfo:{}\r\n` 
     * 没有该用户或出错 `failure\r\ninfo:{}\r\n`
 
 ### 好友申请
@@ -37,4 +37,18 @@
 2. 添加好友响应
     * 成功添加请求：`success\r\ninfo:{}\r\n`
     * 重复的请求：`conflict\r\ninfo:{}\r\n`
+    * 失败：`failure\r\ninfo:{}\r\n`
+
+### 好友申请记录
+1. 获取好友申请记录请求
+    ```
+    from:{}\r\n
+    ```
+
+2. 获取好友申请记录响应
+    * 成功，状态码含义：-1->对方拒绝，0->等待对方通过验证，1->对方同意，2->好友申请
+    ```
+    {id}:{邮箱}:{状态码}\r\n
+    ...
+    ```
     * 失败：`failure\r\ninfo:{}\r\n`

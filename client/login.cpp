@@ -41,6 +41,7 @@ Login::~Login()
 bool Login::init()
 {
     this->setMinimumSize(QSize(1100, 700));
+    this->setWindowTitle(" ");
     loadconfig();
 }
 
@@ -109,8 +110,8 @@ void Login::login()
 
     // 等待响应
     bool isGetRespond = false;  // 是否得到响应的标志
-    QEventLoop loop;
-    QTimer timer;
+    QEventLoop loop(this);
+    QTimer timer(this);
     QMetaObject::Connection connection;
     connection = connect(socket, &QTcpSocket::readyRead, [&timer, &loop, &munit, &isGetRespond, &connection, this](){
         timer.stop();

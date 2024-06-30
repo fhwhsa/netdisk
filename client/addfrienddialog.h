@@ -10,12 +10,15 @@ namespace Ui {
 class AddFriendDialog;
 }
 
+/**
+ * @brief 添加好友对话框
+ */
 class AddFriendDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AddFriendDialog(QString _userId, QString _userEmail, FriendPage *_parent = nullptr);
+    explicit AddFriendDialog(QString _userId, QString _userEmail, FriendPage *_parent);
     ~AddFriendDialog();
 
 private:

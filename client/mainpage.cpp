@@ -27,16 +27,18 @@ MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWi
 MainPage::~MainPage()
 {
     qDebug() << "mainpage delete";
-    delete ui;
 
     delete folderPage;
     delete transmitPage;
     delete friendPage;
+
+    delete ui;
 }
 
 void MainPage::init()
 {
     this->setMinimumSize(1100, 700);
+    this->setWindowTitle(" ");
 
     // 设置按钮背景为透明
     QString style = "QToolButton { background-color: transparent; border: none; }";

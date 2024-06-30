@@ -24,7 +24,6 @@ AddFriendDialog::AddFriendDialog(QString _userId, QString _userEmail, FriendPage
 AddFriendDialog::~AddFriendDialog()
 {
     delete ui;
-    qDebug() << "addfriend delete";
 }
 
 void AddFriendDialog::init()
@@ -73,7 +72,8 @@ void AddFriendDialog::clickTbSearch()
 void AddFriendDialog::clickTbAdd()
 {
     QString target = ui->resultEmail->text();
-    if (target == userEmail)
+    target = target.left(target.indexOf(':'));
+    if (target == userId)
     {
         BubbleTips::showBubbleTips("不可以添加自己为好友", 2, this);
         return;
@@ -89,15 +89,16 @@ void AddFriendDialog::getSearchUserRespond(std::shared_ptr<MsgUnit> sptr)
     qDebug() << msg;
     if (msg.first(7) == "success")
     {
-        QString email = MsgTools::getRow(sptr.get(), 1);
-        if ("" == email)
+        QString id = MsgTools::getRow(sptr.get(), 1);
+        QString email = MsgTools::getRow(sptr.get(), 2);
+        if ("" == id || "" == email)
         {
             ui->errInfo->setText("数据传输损坏");
             ui->errorBox->show();
         }
         else
         {
-            ui->resultEmail->setText(email.mid(6));
+            ui->resultEmail->setText(QString("%1:%2").arg(id.mid(3)).arg(email.mid(6)));
             ui->resultBox->show();
         }
     }

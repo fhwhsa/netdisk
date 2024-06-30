@@ -8,27 +8,37 @@
 #include <QFont>
 #include <QHBoxLayout>
 
+/**
+ * @brief 气泡消息提示
+ */
 class BubbleTips : public QWidget
 {
     Q_OBJECT
 
 public:
-    static void showBubbleTips(QString showStr, int sec = 1, QWidget *parent = nullptr);
-    ~BubbleTips();
+    /**
+     * @brief 生成一个气泡消息
+     * @param showStr 消息内容
+     * @param sec 持续时间
+     * @param parent
+     * @param flag 是否设置为模态窗口
+     */
+    static void showBubbleTips(QString showStr, int sec = 1, QWidget *parent = nullptr, bool flag = false);
 
-private:
-    explicit BubbleTips(QString showStr, int sec = 1, QWidget *parent = nullptr);
+    explicit BubbleTips(QString showStr, int sec = 1, QWidget *parent = nullptr, bool flag = false);
+
+    ~BubbleTips();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    void InitLayout();//初始化窗体的布局和部件
+    void initTimer();//初始化窗体的布局和部件
     QTimer *closeTimer;
     QTimer *singleShotTimer;
-    QHBoxLayout *hBoxlayout;//布局显示控件布局
-    QLabel *mText;//用于显示文字的控件
-    QString showStr;//显示的字符串
+    QHBoxLayout *hBoxlayout;
+    QLabel *mText;
+    QString showStr;
 
     double opacityValue;//窗体初始化透明度
 
@@ -42,7 +52,6 @@ private:
     double  closeSpeed;//窗体消失的平滑度，大小0~1
 
 signals:
-
 };
 
 #endif // BUBBLETIPS_H

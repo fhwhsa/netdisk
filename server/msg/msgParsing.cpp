@@ -80,15 +80,15 @@ MsgUnit *MsgParsing::searchUserRespond(const MsgUnit *munit)
     key = key.substr(4);
     
     string info;
-    string email = IDatabase::searchUser(key, info);
+    pair<string, string> id_email = IDatabase::searchUser(key, info);
     string content;
-    if ("" == email)
+    if ("-1" == id_email.first)
     {
         content = "failure\r\ninfo:" + info + "\r\n";
     }
     else 
     {   
-        content = "success\r\nemail:" + email + "\r\ninfo:" + info + "\r\n";
+        content = "success\r\nid:" + id_email.first + "\r\nemail:" + id_email.second + "\r\ninfo:\r\n";
     }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_SEARCHUSER_RESPOND, strlen(content.c_str()), content.c_str());
@@ -105,23 +105,50 @@ MsgUnit *MsgParsing::addFriendRespond(const MsgUnit *munit)
 
     string from = msg[0].substr(5);
     string to = msg[1].substr(3);
-    string info;
-    string content;
+    string info, content;
     int res = IDatabase::addFriendApplication(from, to, info);
     if (1 == res)
     {
-        content = "success\r\ninfo:" + info + "\r\n";
+        content = "success\r\ninfo:\r\n";
     }
     else if (0 == res)
     {
         content = "conflict\r\ninfo:" + info + "\r\n";
+    }
+    else
+    {
+        content = "failure\r\ninfo:" + info + "\r\n";
+    }
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_ADDFRIEND_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
+MsgUnit *MsgParsing::getFriendApplicationListRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    string from = getRow(munit, 0);
+    if (from.size() <= 5)
+        return nullptr;
+    from = from.substr(5);
+    string info;
+    bool res;
+    vector<string> list = IDatabase::getFriendApplicationList(from, info, res);
+    string content = "";
+    if (!res)
+    {
+        content = "";
+        for (const string& str : list)
+        {
+            content.append(str + "\r\n");
+        }
     }
     else 
     {
         content = "failure\r\ninfo:" + info + "\r\n";
     }
 
-    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_ADDFRIEND_RESPOND, strlen(content.c_str()), content.c_str());
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_GETFRIENDAPPLICATIONLIST_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;
 }
 
@@ -148,6 +175,10 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     // 添加好友请求
     case MsgType::MSG_TYPE_ADDFRIEND_REQUEST:
         return addFriendRespond(munit);
+
+    // 获取好友申请记录请求
+    case MsgType::MSG_TYPE_GETFRIENDAPPLICATIONLIST_REQUEST:
+        return getFriendApplicationListRespond(munit);
 
     // 未知请求
     default:
