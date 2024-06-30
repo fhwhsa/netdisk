@@ -27,13 +27,13 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         shared_ptr<MysqlConn> ptr = pool->getConnection();
         if (nullptr == ptr || !ptr->query(sql))
         {
-            handleInfo = "服务器错误！";
+            handleInfo = "There was an error with the database interaction.";
             break;
         }
 
         if (!ptr->next())
         {
-            handleInfo = "用户不存在！";
+            handleInfo = "The user does not exist.";
             break;
         }
         
@@ -41,7 +41,7 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         {
             if (passwd != ptr->value(2))
             {
-                handleInfo = "密码错误！";
+                handleInfo = "Wrong password.";
                 break;
             }
         }
@@ -77,7 +77,7 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         
         if ("1" == status)
         {
-            handleInfo = "用户已在线";
+            handleInfo = "The user is online.";
             break;
         }
         
@@ -85,11 +85,11 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         sql = "update user set status=1 where id=" + id + ";";
         if (!ptr->update(sql))
         {
-            handleInfo = "服务器错误！";
+            handleInfo = "There was an error with the database interaction";
             break;
         }
 
-        handleInfo = "验证通过！";
+        handleInfo = "";
         return stoi(id);
     } while (0);
 
@@ -120,13 +120,13 @@ std::pair<std::string, std::string> IDatabase::searchUser(std::string key, std::
         shared_ptr<MysqlConn> ptr = pool->getConnection();
         if (nullptr == ptr || !ptr->query(sql))
         {
-            handleInfo = "服务器错误！";
+            handleInfo = "There was an error with the database interaction";
             break;
         }
 
         if (!ptr->next())
         {
-            handleInfo = "用户不存在！";
+            handleInfo = "The user does not exist.";
             break;
         }
 
@@ -168,7 +168,7 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
         break;
     else if (sptr->next())
     {
-        handleinfo = "对方已提出申请";
+        handleinfo = "The other person has initiated a friend request.";
         return 0;
     }
 
@@ -177,7 +177,7 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
         break;
     else if (sptr->next())
     {
-        handleinfo = "重复的申请";
+        handleinfo = "Duplicate friend requests.";
         return 0;
     }
 
@@ -189,7 +189,7 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
     
     } while (0);
     
-    handleinfo = "服务器错误";
+    handleinfo = "There was an error with the database interaction";
     return -1;
 }
 
@@ -205,15 +205,15 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
             break;
 
         vector<string> data;
-        // 查找好友申请
-        string sql = "select uid, email from friendApplication fa, user u where tid = " + from + " and fa.uid = u.id;";
+        // 查找好友申请（别的用户发起）
+        string sql = "select uid, email, fa.status from friendApplication fa, user u where tid = " + from + " and fa.uid = u.id;";
         cout << sql << endl;
         if (!sptr->query(sql))
             break;
         try
         {
             while (sptr->next())
-                data.emplace_back(sptr->value(0) + ":" + sptr->value(1) + ":2\r\n");
+                data.emplace_back(sptr->value(0) + ":" + sptr->value(1) + ":" + to_string(stoi(sptr->value(2)) + 3) + "\r\n");
         }
         catch(const std::exception& e)
         {
@@ -244,6 +244,30 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
     } while (0);
     
     res = false;
-    handleinfo = "服务器错误";
+    handleinfo = "There was an error with the database interaction";
     return {};
+}
+
+bool IDatabase::friendVerification(std::string from, std::string to, int flag, std::string& handleinfo)
+{
+    using namespace std;
+
+    string sql = "update friendApplication set status = " + to_string(flag) + " where uid = " + from + " and tid = " + to + ";";
+    cout << sql << endl;
+
+    // ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    // do
+    // {
+    //     shared_ptr<MysqlConn> sptr = pool->getConnection();
+    //     if (nullptr == sptr)
+    //         break;
+
+    //     if (!sptr->update(sql))    
+    //         break;
+
+    //     return true;
+    // } while (0);
+    
+    // handleinfo = "There was an error with the database interaction";
+    return false;
 }

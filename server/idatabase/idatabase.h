@@ -30,18 +30,26 @@ public:
     static std::pair<std::string, std::string> searchUser(std::string key, std::string& handleInfo);
 
     /// @brief 添加好友申请记录
-    /// @param from 申请人id
+    /// @param from 用户id
     /// @param to 目标用户id
     /// @param handleinfo 处理信息
     /// @return 成功返回1,冲突返回0,失败返回-1
     static int addFriendApplication(std::string from, std::string to, std::string& handleinfo);
 
     /// @brief 获取好友申请记录，包括自己发起和别人发起的
-    /// @param from 获取用户的id
+    /// @param from 用户id
     /// @param handleinfo 处理信息
     /// @param res 处理结果
     /// @return res为true时返回为所有记录的信息，否则为空容器
     static std::vector<std::string> getFriendApplicationList(std::string from, std::string& handleinfo, bool res);
+
+    /// @brief 同意/拒绝好友申请
+    /// @param from 发起好友请求的用户ID
+    /// @param to 接收好友请求的用户ID
+    /// @param flag 同意->1/拒绝->-1
+    /// @param handleinfo 处理信息
+    /// @return 成功返回true
+    static bool friendVerification(std::string from, std::string to, int flag, std::string& handleinfo);
 
 private:
     IDatabase();

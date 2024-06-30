@@ -7,10 +7,16 @@
 #include <QLabel>
 #include <QFrame>
 #include <QHBoxLayout>
+#include <QListWidgetItem>
 
 class CustomWidget : public QWidget {
 public:
-    CustomWidget(QString left, QString right, QWidget *parent = nullptr) : QWidget(parent) {
+    CustomWidget(QString left, QString right, QString id, QString flag, QWidget *parent = nullptr)
+        : QWidget(parent),
+        id(id),
+        flag(flag),
+        text(right)
+    {
         QLabel *leftLabel = new QLabel(left, this);
         QLabel *rightLabel = new QLabel(right, this);
         QFrame *separator = new QFrame(this);
@@ -26,6 +32,24 @@ public:
 
         setLayout(layout);
     }
+
+    QString getId()
+    {
+        return id;
+    }
+
+    QString getFlag()
+    {
+        return flag;
+    }
+
+    QString getText()
+    {
+        return text;
+    }
+
+private:
+    QString id, flag, text;
 };
 
 namespace Ui {
@@ -45,10 +69,12 @@ private:
 
     void init(QStringList _databaseRecord);
     void iniSignalSlots();
-    void addItem(QString left, QString right);
+    void addItem(QString left, QString right, QString id, QString flag);
+
+private slots:
+    void itemDoubleClicked(QListWidgetItem *item);
 
 signals:
-
 };
 
 #endif // FRIENDAPPLICATIONLIST_H

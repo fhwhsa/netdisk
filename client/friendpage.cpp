@@ -26,8 +26,6 @@ FriendPage::FriendPage(QString _userId, QString _userEmail, QWidget *parent) :
 FriendPage::~FriendPage()
 {
     delete ui;
-    qDebug() << "hello";
-    //SIGABRT
 }
 
 void FriendPage::init()
@@ -97,6 +95,11 @@ void FriendPage::clikcTbNotification()
         }
         FriendApplicationList* fal = new FriendApplicationList(MsgTools::getAllRows(sptr.get()), this);
         fal->exec();
+        if (nullptr != fal)
+        {
+            delete fal;
+            fal = nullptr;
+        }
     });
     connect(&timer, &QTimer::timeout, [&](){
         disconnect(conn);
