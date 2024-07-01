@@ -78,46 +78,18 @@ void FriendPage::clickTbSend()
 
 void FriendPage::clikcTbNotification()
 {
-    int timeout = 5;
-    BubbleTips* btips = nullptr;
-
-    QEventLoop loop;
-    QTimer timer;
-    QMetaObject::Connection conn;
-    conn = connect(this, &FriendPage::respondGetFriendApplication, [&](std::shared_ptr<MsgUnit> sptr){
-        disconnect(conn);
-        timer.stop();
-        loop.quit();
-        if (btips != nullptr)
-        {
-            delete btips;
-            btips = nullptr;
-        }
-        FriendApplicationList* fal = new FriendApplicationList(MsgTools::getAllRows(sptr.get()), this);
-        fal->exec();
-        if (nullptr != fal)
-        {
-            delete fal;
-            fal = nullptr;
-        }
+    FriendApplicationList *fal = new FriendApplicationList(this);
+    QMetaObject::Connection conn = connect(fal, &FriendApplicationList::getApplicaionList, [this](){
+        emit _sendMsg(MsgTools::generateGetFriendApplicationRequest(userId));
     });
-    connect(&timer, &QTimer::timeout, [&](){
-        disconnect(conn);
-        timer.stop();
-        loop.quit();
-        if (btips != nullptr)
-        {
-            delete btips;
-            btips = nullptr;
-        }
-        BubbleTips::showBubbleTips("timeout", 2, this);
-    });
-
-    btips = new BubbleTips("load...", timeout, this, true);
-    btips->show();
-    emit _sendMsg(MsgTools::generateGetFriendApplicationRequest(userId));
-    timer.start(timeout * 1000);
-    loop.exec();
+    fal->refreshManually();
+    fal->exec();
+    disconnect(conn);
+    if (nullptr != fal)
+    {
+        delete fal;
+        fal = nullptr;
+    }
 }
 
 void FriendPage::getMsg(std::shared_ptr<MsgUnit> sptr)

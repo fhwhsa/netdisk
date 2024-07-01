@@ -6,6 +6,19 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include <chrono>
+#include <iomanip>
+
+std::string IDatabase::getDateTime()
+{
+    using namespace std;
+    using namespace chrono;
+    auto now = system_clock::now();
+    time_t now_time_t = system_clock::to_time_t(now);
+    stringstream datetime_stream;
+    datetime_stream << put_time(localtime(&now_time_t), "%Y-%m-%d %H:%M:%S");
+    return datetime_stream.str();
+}
 
 void IDatabase::serverOffline()
 {
@@ -163,8 +176,12 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
 
     // 是否已经为好友，由客户端检查
 
+    string sql;
+
     // 检查对方是否已提出申请
-    if (!sptr->query(string("select uid from friendApplication where uid = '" + to + "' and tid = '" + from + "' and status = 0;")))
+    sql = "select * from friend where uid_1 = " + to + " and uid_2 = " + from + " and status = 1;";
+    cout << sql << endl;
+    if (!sptr->query(sql))
         break;
     else if (sptr->next())
     {
@@ -173,7 +190,9 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
     }
 
     // 检查是否为重复的申请
-    if (!sptr->query(string("select uid from friendApplication where uid = '" + from + "' and tid = '" + to + "' and status = 0;")))
+    sql = "select * from friend where uid_1 = " + from + " and uid_2 = " + to + " and status = 1;";
+    cout << sql << endl;
+    if (!sptr->query(sql))
         break;
     else if (sptr->next())
     {
@@ -182,7 +201,9 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
     }
 
     // 添加申请记录
-    if (!sptr->update(string("insert into friendApplication (uid, tid, status) values ('" + from + "', '" + to + "', 0);")))
+    sql = "insert into friend (uid_1, uid_2, status, lastUpdateTime) values (" + from + ", " + to + ", 1, '" + getDateTime() + "');";
+    cout << sql << endl;
+    if (!sptr->update(sql))
         break;
     else 
         return 1;
@@ -206,14 +227,17 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
 
         vector<string> data;
         // 查找好友申请（别的用户发起）
-        string sql = "select uid, email, fa.status from friendApplication fa, user u where tid = " + from + " and fa.uid = u.id;";
+        string sql = "select f.id, email, f.status, lastUpdateTime from friend f, user u where uid_2 = " + from + " and uid_1 = u.id and f.status != 0;";
         cout << sql << endl;
         if (!sptr->query(sql))
+        {
+            handleinfo = "There was an error with the database interaction";
             break;
+        }
         try
         {
             while (sptr->next())
-                data.emplace_back(sptr->value(0) + ":" + sptr->value(1) + ":" + to_string(stoi(sptr->value(2)) + 3) + "\r\n");
+                data.emplace_back(sptr->value(0) + "|" + sptr->value(1) + "|" + to_string(stoi(sptr->value(2)) + 2) + "|" + sptr->value(3) + "\r\n");
         }
         catch(const std::exception& e)
         {
@@ -223,14 +247,17 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         }
         
         // 查找自己发起的申请
-        sql = "select tid, email, fa.status from friendApplication fa, user u where uid = " + from + " and fa.tid = u.id;";
+        sql = "select f.id, email, f.status, lastUpdateTime from friend f, user u where uid_1 = " + from + " and uid_2 = u.id and f.status != 0;";
         cout << sql << endl;
         if (!sptr->query(sql))
+        {
+            handleinfo = "There was an error with the database interaction";
             break;
+        }
         try
         {
             while (sptr->next())
-                data.emplace_back(sptr->value(0) + ":" + sptr->value(1) + ":" + sptr->value(2) + "\r\n");
+                data.emplace_back(sptr->value(0) + "|" + sptr->value(1) + "|" + sptr->value(2) + "|" + sptr->value(3) + "\r\n");
         }
         catch(const std::exception& e)
         {
@@ -244,7 +271,6 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
     } while (0);
     
     res = false;
-    handleinfo = "There was an error with the database interaction";
     return {};
 }
 
@@ -252,22 +278,6 @@ bool IDatabase::friendVerification(std::string from, std::string to, int flag, s
 {
     using namespace std;
 
-    string sql = "update friendApplication set status = " + to_string(flag) + " where uid = " + from + " and tid = " + to + ";";
-    cout << sql << endl;
-
-    // ConnectionPool* pool = ConnectionPool::getConnectionPool();
-    // do
-    // {
-    //     shared_ptr<MysqlConn> sptr = pool->getConnection();
-    //     if (nullptr == sptr)
-    //         break;
-
-    //     if (!sptr->update(sql))    
-    //         break;
-
-    //     return true;
-    // } while (0);
     
-    // handleinfo = "There was an error with the database interaction";
     return false;
 }

@@ -1,18 +1,21 @@
 #include "friendapplicationlist.h"
 #include "ui_friendapplicationlist.h"
 #include "bubbletips.h"
+#include "msgtools.h"
+#include "friendpage.h"
+#include "itemwidget.h"
 
 #include <QMessageBox>
 #include <QDebug>
 
-FriendApplicationList::FriendApplicationList(QStringList databaseRecord, QWidget *parent) :
-    QDialog(parent),
+FriendApplicationList::FriendApplicationList(FriendPage* _parent) :
+    parent(_parent),
     ui(new Ui::FriendApplicationList)
 {
     ui->setupUi(this);
 
-    init(databaseRecord);
-    iniSignalSlots();
+    init();
+    iniSignalSlots();    
 }
 
 FriendApplicationList::~FriendApplicationList()
@@ -20,7 +23,12 @@ FriendApplicationList::~FriendApplicationList()
     delete ui;
 }
 
-void FriendApplicationList::init(QStringList _databaseRecord)
+void FriendApplicationList::refreshManually()
+{
+    emit getApplicaionList();
+}
+
+void FriendApplicationList::init()
 {
     this->setWindowTitle(" ");
     ui->applicationList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -29,55 +37,59 @@ void FriendApplicationList::init(QStringList _databaseRecord)
                                 "border-radius: 10px;"
                                 "margin-top: 20px;"
                                 "}");
-    for (const QString& str : _databaseRecord)
-    {
-        if ("" == str)
-            continue;
-        QString left = str.first(str.lastIndexOf(':'));
-        QString flag = str.mid(str.lastIndexOf(':') + 1);
-        QString right;
-        if ("0" == flag)
-            right = "请求添加对方为好友，等待验证";
-        else if ("1" == flag)
-            right = "请求添加对方为好友，已同意";
-        else if ("2" == flag)
-            right = "请求添加对方为好友，已拒绝";
-        else if ("3" == flag)
-            right = "对方请求加为好友，等待验证";
-        else if ("4" == flag)
-            right = "对方请求加为好友，已同意";
-        else if ("5" == flag)
-            right = "对方请求加为好友，已拒绝";
-        else
-            right = "error";
-
-        addItem(left, right, left.first(left.indexOf(':')), flag);
-    }
 }
 
 void FriendApplicationList::iniSignalSlots()
 {
     connect(ui->applicationList, &QListWidget::itemDoubleClicked, this, &FriendApplicationList::itemDoubleClicked);
+    connect(parent, &FriendPage::respondGetFriendApplication, this, &FriendApplicationList::flushList);
 }
 
-void FriendApplicationList::addItem(QString left, QString right, QString id, QString flag)
+void FriendApplicationList::addItem(QString lt, QString lb, QString r, QString id, QString flag)
 {
     QListWidgetItem* item = new QListWidgetItem(ui->applicationList);
-    CustomWidget* cw = new CustomWidget(left, right, id, flag);
-    ui->applicationList->setItemWidget(item, cw);
-    item->setSizeHint(cw->sizeHint());
+    ItemWIdget* iw = new ItemWIdget(lt, lb, r, id, flag);
+    ui->applicationList->setItemWidget(item, iw);
+    item->setSizeHint(iw->sizeHint());
 }
 
 void FriendApplicationList::itemDoubleClicked(QListWidgetItem *item)
 {
-    CustomWidget* cw = (CustomWidget*)ui->applicationList->itemWidget(item);
-    if ("3" == cw->getFlag())
+    ItemWIdget* iw = (ItemWIdget*)ui->applicationList->itemWidget(item);
+    if ("3" == iw->getFlag())
     {
-        if (QMessageBox::Yes ==  QMessageBox::question(this, " ", "同意请求？", QMessageBox::Yes | QMessageBox::No))
+        QMessageBox::StandardButton op = QMessageBox::question(this, " ", "同意请求？", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);;
+        if (QMessageBox::Yes == op)
             qDebug() << "yes";
-        else
+        else if (QMessageBox::No == op)
             qDebug() << "no";
+        else
+            qDebug() << "Cancel";
     }
-    else
-        BubbleTips::showBubbleTips(cw->getText(), 1, this);
+    else;
+}
+
+void FriendApplicationList::flushList(std::shared_ptr<MsgUnit> sptr)
+{
+    QStringList msg = MsgTools::getAllRows(sptr.get());
+    for (const QString& str : msg)
+    {
+        QStringList list = str.split('|');
+        if (4 != list.size())
+            continue;
+
+        QString lb, r;
+        QString flag = list[2];
+        if (flag <= "2")
+            lb = "请求添加对方为好友";
+        else
+            lb = "对方请求加为好友";
+
+        if ("1" == flag || "3" == flag)
+            r = "等待验证";
+        else
+            r = "已拒绝";
+
+        addItem(list[1], lb, r, list[0], flag);
+    }
 }

@@ -170,7 +170,7 @@ MsgUnit *MsgParsing::verifyFriendApplication(const MsgUnit *munit)
     to = to.substr(3);
 
     string info, content;
-    bool res = IDatabase::friendVerification(from, to, op == "accept" ? 1 : -1, info);
+    bool res = IDatabase::friendVerification(from, to, op == "accept" ? 1 : 2, info);
     if (res)
     {
         content = "success\r\ninfo:\r\n";

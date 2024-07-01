@@ -10,6 +10,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 #include <string.h>
+#include <QDateTime>
 
 MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWidget *parent) :
     userId(_userId),
@@ -156,6 +157,8 @@ void MainPage::sendMsg(MsgUnit *munit)
 
 void MainPage::recvMsg()
 {
+    QString now = QDateTime::currentDateTime().toString();
+    qDebug() << "main get" << now;
     if (nullptr == revMunit && socket->bytesAvailable() >= 4)
     {
         QByteArray ba = socket->read(4);
@@ -179,5 +182,6 @@ void MainPage::recvMsg()
         emit newMunit(sptr);
         revMunit = nullptr;
     }
+    qDebug() << "main end" << now;
 }
 

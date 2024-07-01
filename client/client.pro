@@ -14,6 +14,7 @@ SOURCES += \
     folderpage.cpp \
     friendapplicationlist.cpp \
     friendpage.cpp \
+    itemwidget.cpp \
     login.cpp \
     main.cpp \
     mainpage.cpp \
@@ -27,6 +28,7 @@ HEADERS += \
     folderpage.h \
     friendapplicationlist.h \
     friendpage.h \
+    itemwidget.h \
     login.h \
     mainpage.h \
     msgUnit.h \
@@ -38,6 +40,7 @@ FORMS += \
     folderpage.ui \
     friendapplicationlist.ui \
     friendpage.ui \
+    itemwidget.ui \
     login.ui \
     mainpage.ui \
     transmitpage.ui

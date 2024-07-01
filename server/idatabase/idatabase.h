@@ -8,6 +8,7 @@
 class IDatabase
 {
 public:
+
     /// @brief 服务器下线处理，将所有用户的在线状态改为不在线
     static void serverOffline();
     
@@ -55,6 +56,10 @@ private:
     IDatabase();
     IDatabase(const IDatabase& obj);
     IDatabase& operator=(const IDatabase& onj);
+
+    /// @brief 获取当前时间YYYY-mm-dd HH:MM:SS
+    /// @return 
+    static std::string getDateTime();
 };
 
 #endif
