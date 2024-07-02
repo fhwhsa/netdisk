@@ -228,7 +228,7 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         vector<string> data;
         // 查找好友申请（别的用户发起）
         string sql = "select f.id, email, f.status, lastUpdateTime from friend f, user u where uid_2 = " + from + " and uid_1 = u.id and f.status != 0;";
-        cout << sql << endl;
+        // cout << sql << endl;
         if (!sptr->query(sql))
         {
             handleinfo = "There was an error with the database interaction";
@@ -248,7 +248,7 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         
         // 查找自己发起的申请
         sql = "select f.id, email, f.status, lastUpdateTime from friend f, user u where uid_1 = " + from + " and uid_2 = u.id and f.status != 0;";
-        cout << sql << endl;
+        // cout << sql << endl;
         if (!sptr->query(sql))
         {
             handleinfo = "There was an error with the database interaction";
@@ -274,10 +274,30 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
     return {};
 }
 
-bool IDatabase::friendVerification(std::string from, std::string to, int flag, std::string& handleinfo)
+bool IDatabase::friendVerification(std::string regId, bool flag, std::string& handleinfo)
 {
     using namespace std;
 
-    
+    string status = flag ? "0" : "2";
+    string sql = "update friend set status =" + status + ", lastUpdateTime = '" + getDateTime() + "' where id = " + regId + ";";
+    // cout << sql << endl;
+    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    do
+    {
+        shared_ptr<MysqlConn> sptr = pool->getConnection();
+        if (nullptr == sptr)
+        {
+            handleinfo = "There was an error with the database interaction";
+            break;
+        }
+        
+        if (!sptr->update(sql))
+        {
+            handleinfo = "There was an error with the database interaction";
+            break;
+        }
+
+        return true;
+    } while (0);
     return false;
 }

@@ -79,12 +79,15 @@ void FriendPage::clickTbSend()
 void FriendPage::clikcTbNotification()
 {
     FriendApplicationList *fal = new FriendApplicationList(this);
-    QMetaObject::Connection conn = connect(fal, &FriendApplicationList::getApplicaionList, [this](){
+    QMetaObject::Connection conn1 = connect(fal, &FriendApplicationList::getApplicaionList, [this](){
         emit _sendMsg(MsgTools::generateGetFriendApplicationRequest(userId));
+    });
+    QMetaObject::Connection conn2 = connect(fal, &FriendApplicationList::verifyFriend, [this](QString regId, bool flag){
+        emit _sendMsg(MsgTools::generateVerifyFriendRequest(regId, flag));
     });
     fal->refreshManually();
     fal->exec();
-    disconnect(conn);
+    disconnect(conn1);
     if (nullptr != fal)
     {
         delete fal;

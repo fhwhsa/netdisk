@@ -45,12 +45,11 @@ public:
     static std::vector<std::string> getFriendApplicationList(std::string from, std::string& handleinfo, bool res);
 
     /// @brief 同意/拒绝好友申请
-    /// @param from 发起好友请求的用户ID
-    /// @param to 接收好友请求的用户ID
-    /// @param flag 同意->1/拒绝->-1
+    /// @param regId 好友申请记录id
+    /// @param flag 同意为true
     /// @param handleinfo 处理信息
     /// @return 成功返回true
-    static bool friendVerification(std::string from, std::string to, int flag, std::string& handleinfo);
+    static bool friendVerification(std::string regId, bool flag, std::string& handleinfo);
 
 private:
     IDatabase();

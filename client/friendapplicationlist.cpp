@@ -60,9 +60,15 @@ void FriendApplicationList::itemDoubleClicked(QListWidgetItem *item)
     {
         QMessageBox::StandardButton op = QMessageBox::question(this, " ", "同意请求？", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);;
         if (QMessageBox::Yes == op)
+        {
             qDebug() << "yes";
+            emit verifyFriend(iw->getId(), true);
+        }
         else if (QMessageBox::No == op)
+        {
             qDebug() << "no";
+            emit verifyFriend(iw->getId(), false);
+        }
         else
             qDebug() << "Cancel";
     }

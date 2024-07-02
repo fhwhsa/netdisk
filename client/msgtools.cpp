@@ -57,6 +57,16 @@ MsgUnit *MsgTools::generateGetFriendApplicationRequest(QString from)
     return munit;
 }
 
+MsgUnit *MsgTools::generateVerifyFriendRequest(QString regId, bool flag)
+{
+    QString str = QString("%1\r\n%2\r\n").arg(flag ? "accept" : "refuse").arg(regId);
+    std::string sstr = str.toStdString();
+    const char* cstr = sstr.c_str();
+    size_t num = strlen(cstr);
+    MsgUnit* munit = MsgUnit::make_dataunit(MsgType::MSG_TYPE_FRIENDVERIFICATION_REQUEST, num, cstr);
+    return munit;
+}
+
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {
     QStringList strList = QString((char*)munit->msg).split("\r\n");

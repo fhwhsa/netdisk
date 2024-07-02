@@ -157,20 +157,16 @@ MsgUnit *MsgParsing::verifyFriendApplication(const MsgUnit *munit)
     using namespace std;
 
     vector<string> msg = getAllRows(munit);
-    if (msg.size() < 3)
+    if (msg.size() < 2)
         return nullptr;
     
     string op = msg[0];
-    string from = msg[1];
-    string to = msg[2];
-    if ((op != "accept" && op != "refuse") || from.length() <= 5 || to.length() <= 3)
+    string id = msg[1];
+    if ((op != "accept" && op != "refuse"))
         return nullptr;
-    
-    from = from.substr(5);
-    to = to.substr(3);
 
     string info, content;
-    bool res = IDatabase::friendVerification(from, to, op == "accept" ? 1 : 2, info);
+    bool res = IDatabase::friendVerification(id, op == "accept", info);
     if (res)
     {
         content = "success\r\ninfo:\r\n";

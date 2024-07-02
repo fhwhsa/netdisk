@@ -72,7 +72,7 @@
 1. 同意/拒绝好友申请
     ```
     [accept/refuse]\r\n
-    {申请记录id}
+    {申请记录id}\r\n
     ```
 2. 响应
     * 成功 `success\r\ninfo:{}\r\n`

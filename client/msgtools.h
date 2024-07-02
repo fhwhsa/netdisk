@@ -50,6 +50,14 @@ public:
     static MsgUnit* generateGetFriendApplicationRequest(QString from);
 
     /**
+     * @brief 生成验证好友申请请求
+     * @param regId 好友申请记录id
+     * @param flag 同意/拒绝
+     * @return
+     */
+    static MsgUnit* generateVerifyFriendRequest(QString regId, bool flag);
+
+    /**
      * @brief 获取munit消息内容中第index行内容，index从0开始
      * @param munit 要获取信息的消息单元
      * @param index 第几行

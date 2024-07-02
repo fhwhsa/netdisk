@@ -42,6 +42,7 @@ private slots:
 
 signals:
     void getApplicaionList();
+    void verifyFriend(QString regId, bool flag);
 
 };
 
