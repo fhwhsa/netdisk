@@ -135,7 +135,7 @@ MsgUnit *MsgParsing::getFriendApplicationListRespond(const MsgUnit *munit)
     bool res;
     vector<string> list = IDatabase::getFriendApplicationList(from, info, res);
     string content = "";
-    if (!res)
+    if (res)
     {
         content = "";
         for (const string& str : list)
@@ -180,6 +180,35 @@ MsgUnit *MsgParsing::verifyFriendApplication(const MsgUnit *munit)
     return respond;
 }
 
+MsgUnit *MsgParsing::getFriendListRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    string from = getRow(munit, 0);
+    if (from.size() <= 5)
+        return nullptr;
+    from = from.substr(5);
+
+    bool res;
+    string content, info;
+    vector<string> resList = IDatabase::getFriendList(from, info, res);
+    if (res)
+    {
+        content = "";
+        for (const string& str : resList)
+        {
+            content.append(str + "\r\n");
+        }
+    }
+    else 
+    {
+        content = "failure\r\ninfo:" + info + "\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_GETFRIENDLIST_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
 {
     // std::cout << (char*)munit->msg << std::endl;
@@ -211,6 +240,9 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     // 验证好友请求
     case MsgType::MSG_TYPE_FRIENDVERIFICATION_REQUEST:
         return verifyFriendApplication(munit);
+
+    case MsgType::MSG_TYPE_GETFRIENDLIST_REQUEST:
+        return getFriendListRespond(munit);
 
     // 未知请求
     default:

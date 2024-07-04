@@ -5,7 +5,7 @@
     "passwd": "123456",
     "dbName": "netdisk",
     "minConnSize": 1,
-    "maxConnSize": 2,
+    "maxConnSize": 150,
     "maxIdleTime": 5000,
     "maxWaitTime": 5000
 }

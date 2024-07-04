@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <string.h>
 #include <QDateTime>
+#include <QPoint>
 
 MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWidget *parent) :
     userId(_userId),
@@ -122,6 +123,9 @@ void MainPage::clickTbfriend()
     currSelectedBtn = ui->tb_friend;
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).first);
     ui->funcPanel->setCurrentWidget(friendPage);
+
+    // 刷新好友列表
+    friendPage->refreshFriendListManually();
 }
 
 void MainPage::clickTblogout()
@@ -149,10 +153,13 @@ void MainPage::sendMsg(MsgUnit *munit)
 //    qDebug() << munit->msgType;
 
     if (-1 == socket->write((char*)munit, munit->totalLen))
-        BubbleTips::showBubbleTips(socket->errorString(), 3);
+        BubbleTips::showBubbleTips(socket->errorString(), 2, this);
 
-    delete munit;
-    munit = nullptr;
+    if (nullptr != munit)
+    {
+        delete munit;
+        munit = nullptr;
+    }
 }
 
 void MainPage::recvMsg()

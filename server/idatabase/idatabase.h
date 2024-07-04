@@ -41,8 +41,8 @@ public:
     /// @param from 用户id
     /// @param handleinfo 处理信息
     /// @param res 处理结果
-    /// @return res为true时返回为所有记录的信息，否则为空容器
-    static std::vector<std::string> getFriendApplicationList(std::string from, std::string& handleinfo, bool res);
+    /// @return res为true时表示执行成功，返回为所有记录的信息；否则为空容器
+    static std::vector<std::string> getFriendApplicationList(std::string from, std::string& handleinfo, bool& res);
 
     /// @brief 同意/拒绝好友申请
     /// @param regId 好友申请记录id
@@ -50,6 +50,13 @@ public:
     /// @param handleinfo 处理信息
     /// @return 成功返回true
     static bool friendVerification(std::string regId, bool flag, std::string& handleinfo);
+
+    /// @brief 获取好友列表
+    /// @param from 用户id
+    /// @param handleinfo 处理信息
+    /// @param res res为true时表示执行成功，返回为所有记录的信息；否则为空容器
+    /// @return 
+    static std::vector<std::string> getFriendList(std::string from, std::string& handleinfo, bool& res);
 
 private:
     IDatabase();

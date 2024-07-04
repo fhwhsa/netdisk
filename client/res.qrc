@@ -15,5 +15,6 @@
         <file>res/img/userInfo.png</file>
         <file>res/img/search.png</file>
         <file>res/img/notification.png</file>
+        <file>res/img/flush.png</file>
     </qresource>
 </RCC>

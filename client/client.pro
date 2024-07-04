@@ -10,37 +10,42 @@ CONFIG += c++17
 
 SOURCES += \
     addfrienddialog.cpp \
+    alistitemwidget.cpp \
     bubbletips.cpp \
+    flistitemwidget.cpp \
     folderpage.cpp \
     friendapplicationlist.cpp \
     friendpage.cpp \
-    itemwidget.cpp \
     login.cpp \
     main.cpp \
     mainpage.cpp \
     msgUnit.cpp \
     msgtools.cpp \
+    respondwatcher.cpp \
     transmitpage.cpp
 
 HEADERS += \
     addfrienddialog.h \
+    alistitemwidget.h \
     bubbletips.h \
+    flistitemwidget.h \
     folderpage.h \
     friendapplicationlist.h \
     friendpage.h \
-    itemwidget.h \
     login.h \
     mainpage.h \
     msgUnit.h \
     msgtools.h \
+    respondwatcher.h \
     transmitpage.h
 
 FORMS += \
     addfrienddialog.ui \
+    alistitemwidget.ui \
+    flistitemwidget.ui \
     folderpage.ui \
     friendapplicationlist.ui \
     friendpage.ui \
-    itemwidget.ui \
     login.ui \
     mainpage.ui \
     transmitpage.ui

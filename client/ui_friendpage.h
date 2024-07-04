@@ -31,7 +31,7 @@ class Ui_FriendPage
 public:
     QHBoxLayout *horizontalLayout_4;
     QHBoxLayout *horizontalLayout_3;
-    QGroupBox *friendsList;
+    QGroupBox *friendBox;
     QVBoxLayout *verticalLayout_2;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_5;
@@ -41,7 +41,8 @@ public:
     QHBoxLayout *horizontalLayout;
     QLineEdit *searchLine;
     QToolButton *tb_search;
-    QListWidget *listWidget;
+    QToolButton *tb_flushFriendList;
+    QListWidget *friendList;
     QGroupBox *chatBox;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_3;
@@ -68,24 +69,24 @@ public:
         horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        friendsList = new QGroupBox(FriendPage);
-        friendsList->setObjectName(QString::fromUtf8("friendsList"));
+        friendBox = new QGroupBox(FriendPage);
+        friendBox->setObjectName(QString::fromUtf8("friendBox"));
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(friendsList->sizePolicy().hasHeightForWidth());
-        friendsList->setSizePolicy(sizePolicy);
-        friendsList->setMinimumSize(QSize(280, 0));
-        friendsList->setMaximumSize(QSize(280, 16777215));
-        friendsList->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-        friendsList->setFlat(false);
-        verticalLayout_2 = new QVBoxLayout(friendsList);
+        sizePolicy.setHeightForWidth(friendBox->sizePolicy().hasHeightForWidth());
+        friendBox->setSizePolicy(sizePolicy);
+        friendBox->setMinimumSize(QSize(300, 0));
+        friendBox->setMaximumSize(QSize(300, 16777215));
+        friendBox->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        friendBox->setFlat(false);
+        verticalLayout_2 = new QVBoxLayout(friendBox);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
-        tb_notification = new QToolButton(friendsList);
+        tb_notification = new QToolButton(friendBox);
         tb_notification->setObjectName(QString::fromUtf8("tb_notification"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
@@ -100,14 +101,14 @@ public:
 
         horizontalLayout_5->addWidget(tb_notification);
 
-        line = new QFrame(friendsList);
+        line = new QFrame(friendBox);
         line->setObjectName(QString::fromUtf8("line"));
         line->setFrameShape(QFrame::VLine);
         line->setFrameShadow(QFrame::Sunken);
 
         horizontalLayout_5->addWidget(line);
 
-        tb_newFriend = new QToolButton(friendsList);
+        tb_newFriend = new QToolButton(friendBox);
         tb_newFriend->setObjectName(QString::fromUtf8("tb_newFriend"));
         QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy2.setHorizontalStretch(0);
@@ -123,12 +124,12 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        searchLine = new QLineEdit(friendsList);
+        searchLine = new QLineEdit(friendBox);
         searchLine->setObjectName(QString::fromUtf8("searchLine"));
 
         horizontalLayout->addWidget(searchLine);
 
-        tb_search = new QToolButton(friendsList);
+        tb_search = new QToolButton(friendBox);
         tb_search->setObjectName(QString::fromUtf8("tb_search"));
         tb_search->setCursor(QCursor(Qt::PointingHandCursor));
         QIcon icon1;
@@ -137,19 +138,28 @@ public:
 
         horizontalLayout->addWidget(tb_search);
 
+        tb_flushFriendList = new QToolButton(friendBox);
+        tb_flushFriendList->setObjectName(QString::fromUtf8("tb_flushFriendList"));
+        tb_flushFriendList->setCursor(QCursor(Qt::PointingHandCursor));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/img/res/img/flush.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_flushFriendList->setIcon(icon2);
+
+        horizontalLayout->addWidget(tb_flushFriendList);
+
 
         verticalLayout->addLayout(horizontalLayout);
 
-        listWidget = new QListWidget(friendsList);
-        listWidget->setObjectName(QString::fromUtf8("listWidget"));
+        friendList = new QListWidget(friendBox);
+        friendList->setObjectName(QString::fromUtf8("friendList"));
 
-        verticalLayout->addWidget(listWidget);
+        verticalLayout->addWidget(friendList);
 
 
         verticalLayout_2->addLayout(verticalLayout);
 
 
-        horizontalLayout_3->addWidget(friendsList);
+        horizontalLayout_3->addWidget(friendBox);
 
         chatBox = new QGroupBox(FriendPage);
         chatBox->setObjectName(QString::fromUtf8("chatBox"));
@@ -235,10 +245,11 @@ public:
     void retranslateUi(QWidget *FriendPage)
     {
         FriendPage->setWindowTitle(QCoreApplication::translate("FriendPage", "Form", nullptr));
-        friendsList->setTitle(QString());
+        friendBox->setTitle(QString());
         tb_notification->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
         tb_newFriend->setText(QCoreApplication::translate("FriendPage", "\346\226\260\345\245\275\345\217\213", nullptr));
         tb_search->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
+        tb_flushFriendList->setText(QCoreApplication::translate("FriendPage", "...", nullptr));
         chatBox->setTitle(QString());
         sessionName->setText(QCoreApplication::translate("FriendPage", "TextLabel", nullptr));
         groupBox_2->setTitle(QString());

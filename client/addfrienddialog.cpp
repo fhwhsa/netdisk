@@ -3,6 +3,7 @@
 #include "bubbletips.h"
 #include "friendpage.h"
 #include "msgtools.h"
+#include "respondwatcher.h"
 
 #include <QMessageBox>
 #include <QDebug>
@@ -47,14 +48,14 @@ void AddFriendDialog::init()
 
     QPoint pPos = parent->pos();
     this->move(pPos.rx() + parent->width() / 2 - this->width() / 2, pPos.ry() + parent->height() / 2 - this->height() / 2);
+
+    centerPos = this->pos() + QPoint(this->width() / 2, this->height() / 2);
 }
 
 void AddFriendDialog::iniSignalSlots()
 {
     connect(ui->tb_search, &QToolButton::clicked, this, &AddFriendDialog::clickTbSearch);
     connect(ui->tb_add, &QToolButton::clicked, this, &AddFriendDialog::clickTbAdd);
-    connect(parent, &FriendPage::respondSearch, this, &AddFriendDialog::getSearchUserRespond);
-    connect(parent, &FriendPage::respondAddFriend, this, &AddFriendDialog::getAddFriendRespond);
 }
 
 void AddFriendDialog::clickTbSearch()
@@ -65,7 +66,12 @@ void AddFriendDialog::clickTbSearch()
         BubbleTips::showBubbleTips("请输入搜索内容", 2, this);
         return;
     }
-    // 超时处理？
+
+    RespondWatcher::create(parent, SIGNAL(respondSearch(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 3, centerPos,
+                           [this](std::shared_ptr<MsgUnit> sptr){
+                               getSearchUserRespond(sptr);
+                           });
+
     emit _searchUser(text);
 }
 
@@ -78,6 +84,12 @@ void AddFriendDialog::clickTbAdd()
         BubbleTips::showBubbleTips("不可以添加自己为好友", 2, this);
         return;
     }
+
+    RespondWatcher::create(parent, SIGNAL(respondAddFriend(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 3, centerPos,
+                           [this](std::shared_ptr<MsgUnit> sptr){
+                                getAddFriendRespond(sptr);
+                           });
+
     emit _addFriend(target);
 }
 
@@ -133,6 +145,4 @@ void AddFriendDialog::getAddFriendRespond(std::shared_ptr<MsgUnit> sptr)
         BubbleTips::showBubbleTips("failure" + list[1], 3, this);
     }
     else ;
-
-    // 超时处理？
 }

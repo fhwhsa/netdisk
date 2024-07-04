@@ -11,6 +11,8 @@ class MsgTools
 private:
     MsgTools();
 
+    static MsgUnit* msgHandler(const QString& msg, MsgType type);
+
 public:
     /**
      * @brief 生成登陆请求
@@ -56,6 +58,13 @@ public:
      * @return
      */
     static MsgUnit* generateVerifyFriendRequest(QString regId, bool flag);
+
+    /**
+     * @brief 生成获取好友列表请求
+     * @param from 申请人id
+     * @return
+     */
+    static MsgUnit* generateGetFriendListRequest(QString from);
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

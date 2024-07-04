@@ -41,7 +41,7 @@ private:
     /// @return 返回添加好友响应消息
     static MsgUnit* addFriendRespond(const MsgUnit* munit);
 
-    /// @brief 处理获取好友申请记录
+    /// @brief 处理获取好友申请记录请求
     /// @param munit 通信消息
     /// @return 返回好友申请记录
     static MsgUnit* getFriendApplicationListRespond(const MsgUnit* munit);
@@ -50,6 +50,11 @@ private:
     /// @param munit 通信消息
     /// @return 返回处理响应
     static MsgUnit* verifyFriendApplication(const MsgUnit* munit);
+
+    /// @brief 处理获取好友列表请求
+    /// @param munit 通信消息
+    /// @return 返回对应用户的好友列表
+    static MsgUnit* getFriendListRespond(const MsgUnit* munit);
 
 public:
 

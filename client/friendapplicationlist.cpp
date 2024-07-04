@@ -3,7 +3,8 @@
 #include "bubbletips.h"
 #include "msgtools.h"
 #include "friendpage.h"
-#include "itemwidget.h"
+#include "alistitemwidget.h"
+#include "respondwatcher.h"
 
 #include <QMessageBox>
 #include <QDebug>
@@ -25,6 +26,10 @@ FriendApplicationList::~FriendApplicationList()
 
 void FriendApplicationList::refreshManually()
 {
+    RespondWatcher::create(parent, SIGNAL(respondGetFriendApplication(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 2, centerPos,
+        [this](std::shared_ptr<MsgUnit> sptr){
+            flushList(sptr);
+        });
     emit getApplicaionList();
 }
 
@@ -37,25 +42,27 @@ void FriendApplicationList::init()
                                 "border-radius: 10px;"
                                 "margin-top: 20px;"
                                 "}");
+
+    centerPos = this->pos() + QPoint(this->width() / 2, this->height() / 2);
 }
 
 void FriendApplicationList::iniSignalSlots()
 {
     connect(ui->applicationList, &QListWidget::itemDoubleClicked, this, &FriendApplicationList::itemDoubleClicked);
-    connect(parent, &FriendPage::respondGetFriendApplication, this, &FriendApplicationList::flushList);
+//    connect(parent, &FriendPage::respondGetFriendApplication, this, &FriendApplicationList::flushList);
 }
 
 void FriendApplicationList::addItem(QString lt, QString lb, QString r, QString id, QString flag)
 {
     QListWidgetItem* item = new QListWidgetItem(ui->applicationList);
-    ItemWIdget* iw = new ItemWIdget(lt, lb, r, id, flag);
+    AListItemWidget* iw = new AListItemWidget(lt, lb, r, id, flag, ui->applicationList);
     ui->applicationList->setItemWidget(item, iw);
     item->setSizeHint(iw->sizeHint());
 }
 
 void FriendApplicationList::itemDoubleClicked(QListWidgetItem *item)
 {
-    ItemWIdget* iw = (ItemWIdget*)ui->applicationList->itemWidget(item);
+    AListItemWidget* iw = (AListItemWidget*)ui->applicationList->itemWidget(item);
     if ("3" == iw->getFlag())
     {
         QMessageBox::StandardButton op = QMessageBox::question(this, " ", "同意请求？", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);;
@@ -68,15 +75,27 @@ void FriendApplicationList::itemDoubleClicked(QListWidgetItem *item)
         {
             qDebug() << "no";
             emit verifyFriend(iw->getId(), false);
+            emit getApplicaionList();
         }
         else
             qDebug() << "Cancel";
     }
-    else;
 }
 
 void FriendApplicationList::flushList(std::shared_ptr<MsgUnit> sptr)
 {
+    for (int i = ui->applicationList->count() - 1; ~i; --i)
+    {
+        QListWidgetItem* item = ui->applicationList->item(i);
+        AListItemWidget* iw = (AListItemWidget*)ui->applicationList->itemWidget(item);
+        if (nullptr != iw)
+        {
+            iw->deleteLater();
+            ui->applicationList->setItemWidget(item, nullptr);
+        }
+        ui->applicationList->takeItem(i);
+    }
+
     QStringList msg = MsgTools::getAllRows(sptr.get());
     for (const QString& str : msg)
     {

@@ -32,7 +32,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QGroupBox" name="friendsList">
+      <widget class="QGroupBox" name="friendBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -41,13 +41,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>280</width>
+         <width>300</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>280</width>
+         <width>300</width>
          <height>16777215</height>
         </size>
        </property>
@@ -135,10 +135,24 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QToolButton" name="tb_flushFriendList">
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="res.qrc">
+                <normaloff>:/img/res/img/flush.png</normaloff>:/img/res/img/flush.png</iconset>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget"/>
+           <widget class="QListWidget" name="friendList"/>
           </item>
          </layout>
         </item>

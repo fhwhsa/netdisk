@@ -4,10 +4,18 @@
 #include "msgtools.h"
 #include "friendapplicationlist.h"
 #include "bubbletips.h"
+#include "flistitemwidget.h"
+#include "alistitemwidget.h"
+#include "respondwatcher.h"
 
 #include <QEventLoop>
 #include <QTimer>
 #include <QStringList>
+#include <QtConcurrent/QtConcurrent>
+#include <functional>
+#include <QListWidgetItem>
+#include <QSize>
+#include <QPoint>
 
 FriendPage::FriendPage(QString _userId, QString _userEmail, QWidget *parent) :
     userId(_userId),
@@ -28,6 +36,11 @@ FriendPage::~FriendPage()
     delete ui;
 }
 
+void FriendPage::refreshFriendListManually()
+{
+    clickTbFlushFriendList();
+}
+
 void FriendPage::init()
 {
 
@@ -39,7 +52,42 @@ void FriendPage::iniSignalSlots()
     connect(ui->tb_search, &QToolButton::clicked, this, &FriendPage::clickTbSearch);
     connect(ui->tb_clear, &QToolButton::clicked, this, &FriendPage::clickTbClear);
     connect(ui->tb_send, &QToolButton::clicked, this, &FriendPage::clickTbSend);
-    connect(ui->tb_notification, &QToolButton::clicked, this, &FriendPage::clikcTbNotification);
+    connect(ui->tb_notification, &QToolButton::clicked, this, &FriendPage::clickTbNotification);
+    connect(ui->tb_flushFriendList, &QToolButton::clicked, this, &FriendPage::clickTbFlushFriendList);
+}
+
+void FriendPage::flushFriendList(std::shared_ptr<MsgUnit> sptr)
+{
+    QStringList list = MsgTools::getAllRows(sptr.get());
+
+    if (list.size() >= 2 && list[0] == "failure")
+    {
+        BubbleTips::showBubbleTips(list[1], 2, this);
+        return;
+    }
+
+    for (int i = ui->friendList->count() - 1; ~i; --i)
+    {
+        QListWidgetItem* item = ui->friendList->item(i);
+        FListItemWidget* iw = (FListItemWidget*)ui->friendList->itemWidget(item);
+        if (nullptr != iw)
+        {
+            iw->deleteLater();
+            ui->friendList->setItemWidget(item, nullptr);
+        }
+        ui->friendList->takeItem(i);
+    }
+
+    for (const QString& str : list)
+    {
+        if (1 != str.count('|'))
+            continue;
+        QStringList para = str.split('|');
+        QListWidgetItem* item = new QListWidgetItem(ui->friendList);
+        FListItemWidget* iw = new FListItemWidget(para[1], "", para[0], para[1], ui->friendList);
+        ui->friendList->setItemWidget(item, iw);
+        item->setSizeHint(QSize(ui->friendList->width() - 10, iw->height()));
+    }
 }
 
 void FriendPage::clickTbNewFriend()
@@ -76,7 +124,7 @@ void FriendPage::clickTbSend()
 
 }
 
-void FriendPage::clikcTbNotification()
+void FriendPage::clickTbNotification()
 {
     FriendApplicationList *fal = new FriendApplicationList(this);
     QMetaObject::Connection conn1 = connect(fal, &FriendApplicationList::getApplicaionList, [this](){
@@ -95,6 +143,16 @@ void FriendPage::clikcTbNotification()
     }
 }
 
+void FriendPage::clickTbFlushFriendList()
+{
+    RespondWatcher::create(this, SIGNAL(respondGetFriendList(std::shared_ptr<MsgUnit>)), "好友列表刷新超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+        [this](std::shared_ptr<MsgUnit> sptr){
+        flushFriendList(sptr);
+    });
+    emit _sendMsg(MsgTools::generateGetFriendListRequest(userId));
+}
+
 void FriendPage::getMsg(std::shared_ptr<MsgUnit> sptr)
 {
     qDebug() << "friendpage getmsg";
@@ -104,5 +162,8 @@ void FriendPage::getMsg(std::shared_ptr<MsgUnit> sptr)
         emit respondAddFriend(sptr);
     else if (MsgType::MSG_TYPE_GETFRIENDAPPLICATIONLIST_RESPOND == sptr->msgType)
         emit respondGetFriendApplication(sptr);
-
+    else if (MsgType::MSG_TYPE_FRIENDVERIFICATION_RESPOND == sptr->msgType)
+        emit respondVerify(sptr);
+    else if (MsgType::MSG_TYPE_GETFRIENDLIST_RESPOND == sptr->msgType)
+        emit respondGetFriendList(sptr);
 }

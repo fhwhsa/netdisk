@@ -5,6 +5,7 @@
 
 #include <QDialog>
 #include <QString>
+#include <QPoint>
 
 namespace Ui {
 class AddFriendDialog;
@@ -28,16 +29,19 @@ private:
 
     QString userId;
     QString userEmail;
+    QPoint centerPos; // 该窗口的中心位置
 
     void init();
 
     void iniSignalSlots();
 
+    void getSearchUserRespond(std::shared_ptr<MsgUnit> sptr);
+
+    void getAddFriendRespond(std::shared_ptr<MsgUnit> sptr);
+
 private slots:
     void clickTbSearch();
     void clickTbAdd();
-    void getSearchUserRespond(std::shared_ptr<MsgUnit> sptr);
-    void getAddFriendRespond(std::shared_ptr<MsgUnit> sptr);
 
 signals:
     void _searchUser(QString key);

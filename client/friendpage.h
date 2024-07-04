@@ -19,6 +19,8 @@ public:
     explicit FriendPage(QString _userId, QString _userEmail, QWidget *parent = nullptr);
     ~FriendPage();
 
+    void refreshFriendListManually();
+
 private:
     Ui::FriendPage *ui;
 
@@ -27,6 +29,7 @@ private:
 
     void init();
     void iniSignalSlots();
+    void flushFriendList(std::shared_ptr<MsgUnit> sptr);
 
 private slots:
     /*按钮槽函数*/
@@ -34,7 +37,8 @@ private slots:
     void clickTbSearch();
     void clickTbClear();
     void clickTbSend();
-    void clikcTbNotification();
+    void clickTbNotification();
+    void clickTbFlushFriendList();
 
 public slots:
     /**
@@ -50,10 +54,13 @@ signals:
      */
     void _sendMsg(MsgUnit* munit);
 
-    /*friendpage自己接收***********************************************************************************/
-    void respondGetFriendApplication(std::shared_ptr<MsgUnit> sptr);
+    void respondGetFriendList(std::shared_ptr<MsgUnit> sptr);
+
 
     /*friendpage从属类接收**********************************************************************************/
+
+    void respondGetFriendApplication(std::shared_ptr<MsgUnit> sptr);
+
     /**
      * @brief 查找用户的响应，通过信号对消息分发，需要此消息的类通过接收该信号得到消息内容
      * @param sptr
@@ -65,6 +72,12 @@ signals:
      * @param sptr
      */
     void respondAddFriend(std::shared_ptr<MsgUnit> sptr);
+
+    /**
+     * @brief 同意/拒绝好友申请的响应，通过信号对消息分发
+     * @param sptr
+     */
+    void respondVerify(std::shared_ptr<MsgUnit> sptr);
 
 };
 

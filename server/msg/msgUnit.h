@@ -29,10 +29,14 @@ enum MsgType {
     /// @brief 好友验证（同意/拒绝）请求
     MSG_TYPE_FRIENDVERIFICATION_REQUEST,
     /// @brief 好友验证响应
-    MSG_TYPE_FRIENDVERIFICATION_RESPOND
+    MSG_TYPE_FRIENDVERIFICATION_RESPOND,
+    /// @brief 获取好友列表请求
+    MSG_TYPE_GETFRIENDLIST_REQUEST,
+    /// @brief 获取好友列表响应
+    MSG_TYPE_GETFRIENDLIST_RESPOND
 };
 
-constexpr unsigned int msgTypeNum = 13;
+constexpr unsigned int msgTypeNum = 15;
 
 /// @brief 通信数据单元
 struct MsgUnit

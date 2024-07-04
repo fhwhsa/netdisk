@@ -8,10 +8,9 @@
 #include <QStringList>
 #include <QString>
 #include <QLabel>
-#include <QFrame>
-#include <QHBoxLayout>
 #include <QListWidgetItem>
 #include <memory>
+#include <QPoint>
 
 namespace Ui {
 class FriendApplicationList;
@@ -31,6 +30,7 @@ private:
     Ui::FriendApplicationList *ui;
 
     FriendPage* parent;
+    QPoint centerPos;
 
     void init();
     void iniSignalSlots();
@@ -41,7 +41,16 @@ private slots:
     void flushList(std::shared_ptr<MsgUnit> sptr);
 
 signals:
+    /**
+     * @brief 信号发送后向服务器发送一个获取好友申请列表的请求
+     */
     void getApplicaionList();
+
+    /**
+     * @brief 信号发送后向服务器发送一个好友验证请求
+     * @param regId 要处理的好友申请记录id
+     * @param flag true表示同意
+     */
     void verifyFriend(QString regId, bool flag);
 
 };
