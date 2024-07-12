@@ -33,10 +33,26 @@ enum MsgType {
     /// @brief 获取好友列表请求
     MSG_TYPE_GETFRIENDLIST_REQUEST,
     /// @brief 获取好友列表响应
-    MSG_TYPE_GETFRIENDLIST_RESPOND
+    MSG_TYPE_GETFRIENDLIST_RESPOND,
+    /// @brief 获取文件夹内容请求
+    MSG_TYPE_GETFOLDERCONTENT_REQUEST,
+    /// @brief 获取文件夹内容响应
+    MSG_TYPE_GETFOLDERCONTENT_RESPOND,
+    /// @brief 创建文件夹请求
+    MSG_TYPE_CREATERFOLDER_REQUEST,
+    /// @brief 创建文件夹响应
+    MSG_TYPE_CREATERFOLDER_RESPOND,
+    /// @brief 重命名文件/文件夹请求
+    MSG_TYPE_RENAMEFILEFOLDER_REQUEST,
+    /// @brief 重命名文件/文件夹响应
+    MSG_TYPE_RENAMEFILEFOLDER_RESPOND,
+    /// @brief 删除文件/文件夹请求
+    MSG_TYPE_DELETEFILEFOLDER_REQUEST,
+    /// @brief 删除文件/文件夹响应
+    MSG_TYPE_DELETEFILEFOLDER_RESPOND
 };
 
-constexpr unsigned int msgTypeNum = 15;
+constexpr unsigned int msgTypeNum = 23;
 
 /// @brief 通信数据单元
 struct MsgUnit

@@ -58,6 +58,30 @@ MsgUnit *MsgTools::generateGetFriendListRequest(QString from)
     return msgHandler(str, MsgType::MSG_TYPE_GETFRIENDLIST_REQUEST);
 }
 
+MsgUnit *MsgTools::generateGetFolderContentRequest(QString path)
+{
+    QString str = QString("path:%1\r\n").arg(path);
+    return msgHandler(str, MsgType::MSG_TYPE_GETFOLDERCONTENT_REQUEST);
+}
+
+MsgUnit *MsgTools::generateCreateFolderRequest(QString path, QString name)
+{
+    QString str = QString("path:%1\r\nname:%2\r\n").arg(path).arg(name);
+    return msgHandler(str, MsgType::MSG_TYPE_CREATERFOLDER_REQUEST);
+}
+
+MsgUnit *MsgTools::generateRenameFileOrFolderRequest(QString path, QString newName)
+{
+    QString str = QString("path:%1\r\nnewName:%2\r\n").arg(path).arg(newName);
+    return msgHandler(str, MsgType::MSG_TYPE_RENAMEFILEFOLDER_REQUEST);
+}
+
+MsgUnit *MsgTools::generateDeleteFileOrFolderRequest(QString path)
+{
+    QString str = QString("path:%1").arg(path);
+    return msgHandler(str, MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST);
+}
+
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {
     QStringList strList = QString((char*)munit->msg).split("\r\n");

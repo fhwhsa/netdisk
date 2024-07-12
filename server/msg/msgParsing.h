@@ -56,6 +56,26 @@ private:
     /// @return 返回对应用户的好友列表
     static MsgUnit* getFriendListRespond(const MsgUnit* munit);
 
+    /// @brief 处理获取文件夹内容请求
+    /// @param munit 通信消息
+    /// @return 返回处理响应
+    static MsgUnit* getFolderContentRespond(const MsgUnit* munit);
+
+    /// @brief 处理创建文件夹请求
+    /// @param munit 通信消息
+    /// @return 返回处理响应
+    static MsgUnit* createFolderRespond(const MsgUnit* munit);
+
+    /// @brief 处理重命名文件/文件夹请求
+    /// @param munit 通信消息
+    /// @return 返回处理响应
+    static MsgUnit* renameFileFolderRespond(const MsgUnit* munit);
+
+    /// @brief 处理删除文件/文件夹请求
+    /// @param munit 通信消息
+    /// @return 返回处理响应
+    static MsgUnit* deleteFileFolderRespond(const MsgUnit* munit);
+
 public:
 
     /// @brief 解析通信消息，并返回对应的响应

@@ -2,6 +2,7 @@
 
 SOURCES := \
 	idatabase/idatabase.cpp	\
+	ifilefolder/ifilefolder.cpp \
 	json/jsoncpp.cpp \
 	msg/msgUnit.cpp \
 	msg/msgParsing.cpp \

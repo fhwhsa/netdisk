@@ -7,6 +7,7 @@
 * [包裹函数](wrap/README.md)
 * [数据库连接池](mysql/README.md)
 * [数据库交互接口](idatabase/README.md)
+* [文件/文件夹操作](ifilefolder/README.md)
 * [运行环境](#运行环境)
 * [运行](#运行)
 

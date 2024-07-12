@@ -54,6 +54,8 @@ signals:
      */
     void _sendMsg(MsgUnit* munit);
 
+
+    /*自己接收********************************************************************************************/
     void respondGetFriendList(std::shared_ptr<MsgUnit> sptr);
 
 

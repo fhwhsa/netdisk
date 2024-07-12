@@ -16,5 +16,13 @@
         <file>res/img/search.png</file>
         <file>res/img/notification.png</file>
         <file>res/img/flush.png</file>
+        <file>res/img/upload.png</file>
+        <file>res/img/share.png</file>
+        <file>res/img/rename.png</file>
+        <file>res/img/folder.png</file>
+        <file>res/img/file.png</file>
+        <file>res/img/download.png</file>
+        <file>res/img/delete.png</file>
+        <file>res/img/addfolder.png</file>
     </qresource>
 </RCC>

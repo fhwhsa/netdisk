@@ -2,6 +2,7 @@
 #include "msgParsing.h"
 #include "../wrap/wrap.h"
 #include "../idatabase/idatabase.h"
+#include "../ifilefolder/ifilefolder.h"
 
 #include <regex>
 #include <iostream>
@@ -209,6 +210,105 @@ MsgUnit *MsgParsing::getFriendListRespond(const MsgUnit *munit)
     return respond;
 }
 
+MsgUnit *MsgParsing::getFolderContentRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    string target = getRow(munit, 0);
+    if (target.size() <= 5)
+        return nullptr;
+    target = target.substr(5);
+
+    bool res;
+    string content = "";
+    vector<pair<int, string>> v = IFileFolder::getFolderContent(target, res);
+    if (res)
+    {
+        for (const pair<int, string>& it : v)
+        {
+            content.append(it.second + "|" + to_string(it.first) + "\r\n");
+        }
+    }
+    else 
+    {
+        content = "failure\r\ninfo:\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_GETFOLDERCONTENT_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
+MsgUnit *MsgParsing::createFolderRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    vector<string> params = getAllRows(munit);
+    if (2 != params.size() || params[0].size() <= 5 || params[1].size() <= 5)
+        return nullptr;
+    
+    string path = params[0].substr(5);
+    string name = params[1].substr(5);
+    string content = "";
+    if (IFileFolder::createFolder(path, name))
+    {
+        content = "success\r\ninfo:\r\n";
+    }
+    else 
+    {
+        content = "failure\r\ninfo:\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_CREATERFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
+MsgUnit *MsgParsing::renameFileFolderRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    vector<string> params = getAllRows(munit);
+    if (2 != params.size() || params[0].size() <= 5 || params[1].size() <= 8)
+        return nullptr;
+    
+    string path = params[0].substr(5);
+    string newName = params[1].substr(8);
+    string content = "";
+    if (IFileFolder::rename(path, newName))
+    {
+        content = "success\r\ninfo:\r\n";
+    }
+    else 
+    {
+        content = "failure\r\ninfo:\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_RENAMEFILEFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
+MsgUnit *MsgParsing::deleteFileFolderRespond(const MsgUnit *munit)
+{
+    using namespace std;
+
+    string target = getRow(munit, 0);
+    if (target.size() <= 5)
+        return nullptr;
+    target = target.substr(5);
+
+    string content = "";
+    if (IFileFolder::deleteFileOrFolder(target))
+    {
+        content = "success\r\ninfo:\r\n";
+    }
+    else 
+    {
+        content = "failure\r\ninfo:\r\n";
+    }
+
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DELETEFILEFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
 {
     // std::cout << (char*)munit->msg << std::endl;
@@ -241,8 +341,25 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     case MsgType::MSG_TYPE_FRIENDVERIFICATION_REQUEST:
         return verifyFriendApplication(munit);
 
+    // 获取好友列表请求
     case MsgType::MSG_TYPE_GETFRIENDLIST_REQUEST:
         return getFriendListRespond(munit);
+
+    // 获取文件夹内容请求
+    case MsgType::MSG_TYPE_GETFOLDERCONTENT_REQUEST:
+        return getFolderContentRespond(munit);
+
+    // 创建文件夹请求
+    case MsgType::MSG_TYPE_CREATERFOLDER_REQUEST:
+        return createFolderRespond(munit);
+
+    // 重命名文件/文件夹请求
+    case MsgType::MSG_TYPE_RENAMEFILEFOLDER_REQUEST:
+        return renameFileFolderRespond(munit);
+    
+    // 删除文件/文件夹请求
+    case MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST:
+        return deleteFileFolderRespond(munit);
 
     // 未知请求
     default:

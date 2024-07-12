@@ -24,6 +24,8 @@ MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWi
 //    qDebug() << userId;
     init();
     iniSignalSlots();
+
+    folderPage->refreshFileListManually();
 }
 
 MainPage::~MainPage()
@@ -57,7 +59,7 @@ void MainPage::init()
     btnIcon.insert(ui->tb_friend, QPair(QIcon(":/img/res/img/friend_selected.png"), QIcon(":/img/res/img/friend_unselected.png")));
 
     // 创建功能页对象
-    folderPage = new FolderPage(this);
+    folderPage = new FolderPage(userId, userEmail, this);
     transmitPage = new TransmitPage(this);
     friendPage = new FriendPage(userId, userEmail, this);
     ui->funcPanel->addWidget(folderPage);
@@ -82,8 +84,10 @@ void MainPage::iniSignalSlots()
     connect(ui->tb_setting, &QToolButton::clicked, this, &MainPage::clickTbsetting);
     connect(ui->tb_userInfo, &QToolButton::clicked, this, &MainPage::clickTbUserInfo);
 
+    connect(folderPage, &FolderPage::_sendMsg, this, &MainPage::sendMsg);
     connect(friendPage, &FriendPage::_sendMsg, this, &MainPage::sendMsg);
 
+    connect(this, &MainPage::newMunit, folderPage, &FolderPage::getMsg);
     connect(this, &MainPage::newMunit, friendPage, &FriendPage::getMsg);
 
     connect(socket, &QTcpSocket::readyRead, this, &MainPage::recvMsg);
@@ -99,6 +103,9 @@ void MainPage::clickTbfolder()
     currSelectedBtn = ui->tb_folder;
     currSelectedBtn->setIcon(btnIcon.value(currSelectedBtn).first);
     ui->funcPanel->setCurrentWidget(folderPage);
+
+    // 刷新文件列表
+    folderPage->refreshFileListManually();
 }
 
 void MainPage::clickTbtransmit()

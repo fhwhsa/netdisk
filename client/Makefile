@@ -886,13 +886,21 @@ qrc_res.cpp: res.qrc \
 		/opt/Qt/6.2.3/gcc_64/libexec/rcc \
 		res/config.ini \
 		res/img/friend_unselected.png \
+		res/img/addfolder.png \
+		res/img/download.png \
 		res/img/transmit_selected.png \
-		res/img/search.png \
+		res/img/file.png \
 		res/img/folder_selected.png \
+		res/img/delete.png \
+		res/img/folder.png \
+		res/img/upload.png \
+		res/img/share.png \
+		res/img/search.png \
 		res/img/userInfo.png \
 		res/img/folder_unselected.png \
 		res/img/transmit_unselected.png \
 		res/img/notification.png \
+		res/img/rename.png \
 		res/img/icon.png \
 		res/img/setting.png \
 		res/img/friend_selected.png \
@@ -1041,6 +1049,7 @@ moc_addfrienddialog.cpp: addfrienddialog.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QDialog \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qdialog.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		moc_predefs.h \
 		/opt/Qt/6.2.3/gcc_64/libexec/moc
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include addfrienddialog.h -o moc_addfrienddialog.cpp
@@ -1316,6 +1325,7 @@ moc_bubbletips.cpp: bubbletips.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayout.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayoutitem.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgridlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		moc_predefs.h \
 		/opt/Qt/6.2.3/gcc_64/libexec/moc
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include bubbletips.h -o moc_bubbletips.cpp
@@ -1722,12 +1732,6 @@ moc_friendapplicationlist.cpp: friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpicture.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextdocument.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QFrame \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QHBoxLayout \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qboxlayout.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayout.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayoutitem.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgridlayout.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QListWidgetItem \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlistwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlistview.h \
@@ -1748,6 +1752,7 @@ moc_friendapplicationlist.cpp: friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtabbar.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qrubberband.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		moc_predefs.h \
 		/opt/Qt/6.2.3/gcc_64/libexec/moc
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include friendapplicationlist.h -o moc_friendapplicationlist.cpp
@@ -2254,6 +2259,8 @@ moc_respondwatcher.cpp: respondwatcher.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qpoint.h \
 		moc_predefs.h \
 		/opt/Qt/6.2.3/gcc_64/libexec/moc
 	/opt/Qt/6.2.3/gcc_64/libexec/moc $(DEFINES) --include /home/fws/code/netdisk/client/moc_predefs.h -I/opt/Qt/6.2.3/gcc_64/mkspecs/linux-g++ -I/home/fws/code/netdisk/client -I/opt/Qt/6.2.3/gcc_64/include -I/opt/Qt/6.2.3/gcc_64/include/QtWidgets -I/opt/Qt/6.2.3/gcc_64/include/QtGui -I/opt/Qt/6.2.3/gcc_64/include/QtNetwork -I/opt/Qt/6.2.3/gcc_64/include/QtCore -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include respondwatcher.h -o moc_respondwatcher.cpp
@@ -2575,6 +2582,7 @@ addfrienddialog.o: addfrienddialog.cpp addfrienddialog.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QDialog \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qdialog.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		ui_addfrienddialog.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QVariant \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QApplication \
@@ -2628,10 +2636,13 @@ addfrienddialog.o: addfrienddialog.cpp addfrienddialog.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QFont \
 		msgtools.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QStringList \
+		respondwatcher.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QTimer \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QMessageBox \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qmessagebox.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o addfrienddialog.o addfrienddialog.cpp
 
 alistitemwidget.o: alistitemwidget.cpp alistitemwidget.h \
@@ -2938,6 +2949,7 @@ bubbletips.o: bubbletips.cpp bubbletips.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayout.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayoutitem.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgridlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QTimer \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
@@ -2946,7 +2958,6 @@ bubbletips.o: bubbletips.cpp bubbletips.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextoption.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpen.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QRectF \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bubbletips.o bubbletips.cpp
 
@@ -3411,12 +3422,6 @@ friendapplicationlist.o: friendapplicationlist.cpp friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpicture.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qtextdocument.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QFrame \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QHBoxLayout \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qboxlayout.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayout.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayoutitem.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgridlayout.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QListWidgetItem \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlistwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlistview.h \
@@ -3437,6 +3442,7 @@ friendapplicationlist.o: friendapplicationlist.cpp friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtabbar.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qrubberband.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		ui_friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QVariant \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QApplication \
@@ -3460,6 +3466,11 @@ friendapplicationlist.o: friendapplicationlist.cpp friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qguiapplication_platform.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QGroupBox \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgroupbox.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QHBoxLayout \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qboxlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayout.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qgridlayout.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QListWidget \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QVBoxLayout \
 		bubbletips.h \
@@ -3468,6 +3479,10 @@ friendapplicationlist.o: friendapplicationlist.cpp friendapplicationlist.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QFont \
 		msgtools.h \
 		alistitemwidget.h \
+		respondwatcher.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QTimer \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QMessageBox \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qmessagebox.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug
@@ -3679,6 +3694,7 @@ friendpage.o: friendpage.cpp friendpage.h \
 		addfrienddialog.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QDialog \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qdialog.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		msgtools.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QStringList \
 		friendapplicationlist.h \
@@ -3689,10 +3705,11 @@ friendpage.o: friendpage.cpp friendpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QFont \
 		flistitemwidget.h \
 		alistitemwidget.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/QEventLoop \
+		respondwatcher.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QTimer \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QEventLoop \
 		/opt/Qt/6.2.3/gcc_64/include/QtConcurrent/QtConcurrent \
 		/opt/Qt/6.2.3/gcc_64/include/QtConcurrent/QtConcurrentDepends \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QtCore \
@@ -4171,6 +4188,7 @@ main.o: main.cpp login.h \
 		addfrienddialog.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QDialog \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qdialog.h \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QApplication \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/qapplication.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qcoreapplication.h \
@@ -4382,6 +4400,7 @@ mainpage.o: mainpage.cpp mainpage.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QColor \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QPaintEvent \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QFont \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QDebug \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPair \
 		/opt/Qt/6.2.3/gcc_64/include/QtWidgets/QMessageBox \
@@ -4520,6 +4539,8 @@ respondwatcher.o: respondwatcher.cpp respondwatcher.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qtimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qbasictimer.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/QString \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/QPoint \
+		/opt/Qt/6.2.3/gcc_64/include/QtCore/qpoint.h \
 		bubbletips.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/QColor \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qcolor.h \
@@ -4539,7 +4560,6 @@ respondwatcher.o: respondwatcher.cpp respondwatcher.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpaintdevice.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qrect.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtCore/qsize.h \
-		/opt/Qt/6.2.3/gcc_64/include/QtCore/qpoint.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qpalette.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qbrush.h \
 		/opt/Qt/6.2.3/gcc_64/include/QtGui/qimage.h \

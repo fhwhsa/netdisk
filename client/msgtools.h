@@ -67,6 +67,36 @@ public:
     static MsgUnit* generateGetFriendListRequest(QString from);
 
     /**
+     * @brief 生成获取文件夹内容请求
+     * @param path 文件夹路径
+     * @return
+     */
+    static MsgUnit* generateGetFolderContentRequest(QString path);
+
+    /**
+     * @brief 生成创建文件夹请求
+     * @param path 目标路径
+     * @param name 新文件夹名
+     * @return
+     */
+    static MsgUnit* generateCreateFolderRequest(QString path, QString name);
+
+    /**
+     * @brief 生成重命名文件/文件夹请求
+     * @param path 目标文件/文件夹路径
+     * @param newName 新名称
+     * @return
+     */
+    static MsgUnit* generateRenameFileOrFolderRequest(QString path, QString newName);
+
+    /**
+     * @brief 生成删除文件/文件夹请求
+     * @param path 目标文件/文件夹路径
+     * @return
+     */
+    static MsgUnit* generateDeleteFileOrFolderRequest(QString path);
+
+    /**
      * @brief 获取munit消息内容中第index行内容，index从0开始
      * @param munit 要获取信息的消息单元
      * @param index 第几行
