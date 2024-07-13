@@ -93,9 +93,14 @@ void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
 
 void FolderPage::clickTbAddFolder()
 {
-    QString name = QInputDialog::getText(this, "新建文件夹", "输入文件夹名称：");
+    bool ok;
+    QString name = QInputDialog::getText(this, "新建文件夹", "输入文件夹名称：", QLineEdit::Normal, "", &ok);
+    if (!ok) return;
     if (name.isEmpty())
+    {
         BubbleTips::showBubbleTips("文件夹名称不能为空", 1, this);
+        return;
+    }
     for (int i = ui->fileList->count() - 1; ~i; --i)
     {
         if (name == ui->fileList->item(i)->text())
@@ -155,7 +160,47 @@ void FolderPage::clickTbDelete()
 
 void FolderPage::clickTbRename()
 {
-    qDebug() << "rename";
+    if (ui->fileList->selectedItems().size() > 1)
+    {
+        BubbleTips::showBubbleTips("不支持重命名多个文件/文件夹", 1, this);
+        return;
+    }
+    if (0 == ui->fileList->selectedItems().size())
+    {
+        BubbleTips::showBubbleTips("请选择要重命名的文件/文件夹", 1, this);
+        return;
+    }
+
+    bool ok;
+    QString path = currPath + "/" + ui->fileList->currentItem()->text();
+    QString newName = QInputDialog::getText(this, "重命名文件/文件夹", "新名称：", QLineEdit::Normal, "", &ok);
+    if (!ok) return;
+    if (newName.isEmpty())
+    {
+        BubbleTips::showBubbleTips("文件/文件夹名不能为空", 1, this);
+        return;
+    }
+
+    for (int i = ui->fileList->count() - 1; ~i; --i)
+    {
+        if (ui->fileList->item(i)->text() == newName)
+        {
+            BubbleTips::showBubbleTips("同名文件/文件夹已存在", 1, this);
+            return;
+        }
+    }
+
+    // 发送请求
+    RespondWatcher::create(this, SIGNAL(getRenameFileOrFolderRespond(std::shared_ptr<MsgUnit>)), "重命名响应超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+                           [this](std::shared_ptr<MsgUnit> sptr){
+                                QStringList content = MsgTools::getAllRows(sptr.get());
+                                if (content.size() > 0 && content[0] == "failure")
+                                    BubbleTips::showBubbleTips("重命名失败", 1, this);
+                                else
+                                    this->clickTbFlush();
+                           });
+    emit _sendMsg(MsgTools::generateRenameFileOrFolderRequest(path, newName));
 }
 
 void FolderPage::clickTbDownload()
@@ -223,4 +268,6 @@ void FolderPage::getMsg(std::shared_ptr<MsgUnit> sptr)
         emit getCreateFolderRespond(sptr);
     else if (MsgType::MSG_TYPE_DELETEFILEFOLDER_RESPOND == sptr->msgType)
         emit getDeleteFileOrFolderRespond(sptr);
+    else if (MsgType::MSG_TYPE_RENAMEFILEFOLDER_RESPOND == sptr->msgType)
+        emit getRenameFileOrFolderRespond(sptr);
 }

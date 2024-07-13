@@ -84,7 +84,7 @@ bool IFileFolder::deleteFileOrFolder(std::string path)
     }
 }
 
-bool IFileFolder::rename(std::string path, std::string newName)
+bool IFileFolder::renameFileOrFolder(std::string path, std::string newName)
 {
     using namespace std;
     using namespace filesystem;

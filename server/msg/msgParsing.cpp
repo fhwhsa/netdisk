@@ -284,7 +284,7 @@ MsgUnit *MsgParsing::renameFileFolderRespond(const MsgUnit *munit)
     string path = params[0].substr(5);
     string newName = params[1].substr(8);
     string content = "";
-    if (IFileFolder::rename(path, newName))
+    if (IFileFolder::renameFileOrFolder(path, newName))
     {
         content = "success\r\ninfo:\r\n";
     }

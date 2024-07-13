@@ -31,7 +31,7 @@ public:
     /// @param path 文件/文件夹路径
     /// @param newName 新名称
     /// @return 操作结果，成功返回true
-    static bool rename(std::string path, std::string newName);
+    static bool renameFileOrFolder(std::string path, std::string newName);
 
 private:
     IFileFolder();
