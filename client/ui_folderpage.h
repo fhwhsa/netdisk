@@ -26,15 +26,15 @@ QT_BEGIN_NAMESPACE
 class Ui_FolderPage
 {
 public:
-    QVBoxLayout *verticalLayout_3;
-    QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
+    QGroupBox *groupBox;
+    QVBoxLayout *verticalLayout_3;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout_2;
     QListWidget *fileList;
-    QFrame *line_4;
     QVBoxLayout *verticalLayout;
     QFrame *line;
+    QToolButton *tb_back;
     QToolButton *tb_flush;
     QFrame *line_2;
     QToolButton *tb_upload;
@@ -52,31 +52,21 @@ public:
         if (FolderPage->objectName().isEmpty())
             FolderPage->setObjectName(QString::fromUtf8("FolderPage"));
         FolderPage->resize(733, 498);
-        verticalLayout_3 = new QVBoxLayout(FolderPage);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_4 = new QVBoxLayout(FolderPage);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(0, 0, 0, 0);
         groupBox = new QGroupBox(FolderPage);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        verticalLayout_4 = new QVBoxLayout(groupBox);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        verticalLayout_4->setContentsMargins(9, 9, 9, 9);
+        verticalLayout_3 = new QVBoxLayout(groupBox);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         fileList = new QListWidget(groupBox);
         fileList->setObjectName(QString::fromUtf8("fileList"));
 
         horizontalLayout_2->addWidget(fileList);
-
-        line_4 = new QFrame(groupBox);
-        line_4->setObjectName(QString::fromUtf8("line_4"));
-        line_4->setFrameShape(QFrame::HLine);
-        line_4->setFrameShadow(QFrame::Sunken);
-
-        horizontalLayout_2->addWidget(line_4);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -87,6 +77,11 @@ public:
         line->setFrameShadow(QFrame::Sunken);
 
         verticalLayout->addWidget(line);
+
+        tb_back = new QToolButton(groupBox);
+        tb_back->setObjectName(QString::fromUtf8("tb_back"));
+
+        verticalLayout->addWidget(tb_back);
 
         tb_flush = new QToolButton(groupBox);
         tb_flush->setObjectName(QString::fromUtf8("tb_flush"));
@@ -176,10 +171,10 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_2);
 
 
-        verticalLayout_4->addLayout(verticalLayout_2);
+        verticalLayout_3->addLayout(verticalLayout_2);
 
 
-        verticalLayout_3->addWidget(groupBox);
+        verticalLayout_4->addWidget(groupBox);
 
 
         retranslateUi(FolderPage);
@@ -191,6 +186,7 @@ public:
     {
         FolderPage->setWindowTitle(QCoreApplication::translate("FolderPage", "Form", nullptr));
         groupBox->setTitle(QString());
+        tb_back->setText(QCoreApplication::translate("FolderPage", "...", nullptr));
 #if QT_CONFIG(tooltip)
         tb_flush->setToolTip(QCoreApplication::translate("FolderPage", "\345\210\267\346\226\260", nullptr));
 #endif // QT_CONFIG(tooltip)

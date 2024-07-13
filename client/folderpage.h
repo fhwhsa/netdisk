@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QSize>
 #include <QString>
+#include <QListWidgetItem>
+#include <QList>
 
 namespace Ui {
 class FolderPage;
@@ -30,8 +32,9 @@ private:
     QString currPath;
     QString userId;
     QString userEmail;
+    QList<QString> backList;
 
-    static QSize itemSize;  ///< 文件列表中单项大小，值为（0,50）
+    static QSize itemSize;  ///< 文件列表中单项大小，值为（0,50）    
 
     void flushFileList(std::shared_ptr<MsgUnit> sptr);
 
@@ -44,7 +47,9 @@ private slots:
     void clickTbUpload();
     void clickTbFlush();
     void clickTbShare();
+    void clickTbBack();
 
+    void itemDoubleClick(QListWidgetItem* item);
 
 public slots:
     /**

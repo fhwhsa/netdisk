@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QToolButton>
 #include <QIcon>
-#include <QListWidgetItem>
 
 QSize FolderPage::itemSize = QSize(0, 50);
 
@@ -37,6 +36,7 @@ void FolderPage::refreshFileListManually()
 void FolderPage::init()
 {
     currPath = QString("/" + userId);
+    ui->tb_back->setEnabled(false);
 }
 
 void FolderPage::iniSignalSlots()
@@ -48,6 +48,9 @@ void FolderPage::iniSignalSlots()
     connect(ui->tb_download, &QToolButton::clicked, this, &FolderPage::clickTbDownload);
     connect(ui->tb_share, &QToolButton::clicked, this, &FolderPage::clickTbShare);
     connect(ui->tb_flush, &QToolButton::clicked, this, &FolderPage::clickTbFlush);
+    connect(ui->tb_back, &QToolButton::clicked, this, &FolderPage::clickTbBack);
+
+    connect(ui->fileList, &QListWidget::itemDoubleClicked, this, &FolderPage::itemDoubleClick);
 }
 
 void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
@@ -70,9 +73,15 @@ void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
             continue;
         QListWidgetItem* item = new QListWidgetItem(ui->fileList);
         if ("0" == str.mid(pos + 1))
+        {
+            item->setStatusTip("0");
             item->setIcon(QIcon(":/img/res/img/folder.png"));
+        }
         else
+        {
+            item->setStatusTip("1");
             item->setIcon(QIcon(":/img/res/img/file.png"));
+        }
 
         item->setText(str.first(pos));
         item->setSizeHint(itemSize);
@@ -117,6 +126,38 @@ void FolderPage::clickTbFlush()
 void FolderPage::clickTbShare()
 {
     qDebug() << "share";
+}
+
+void FolderPage::clickTbBack()
+{
+    QString path = backList.back();
+    RespondWatcher::create(this, SIGNAL(getFolderContentRespond(std::shared_ptr<MsgUnit>)), "文件列表刷新超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+                           [this, path](std::shared_ptr<MsgUnit> sptr){
+                               flushFileList(sptr);
+                               backList.pop_back();
+                               if (backList.isEmpty())
+                                   ui->tb_back->setEnabled(false);
+                               currPath = path;
+                           });
+    emit _sendMsg(MsgTools::generateGetFolderContentRequest(path));
+}
+
+void FolderPage::itemDoubleClick(QListWidgetItem *item)
+{
+    if ("1" == item->statusTip())
+        return;
+
+    QString path = currPath + "/" + item->text();
+    RespondWatcher::create(this, SIGNAL(getFolderContentRespond(std::shared_ptr<MsgUnit>)), "文件列表刷新超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+                           [this, path](std::shared_ptr<MsgUnit> sptr){
+                               flushFileList(sptr);
+                               backList.push_back(currPath);
+                               ui->tb_back->setEnabled(true);
+                               currPath = path;
+                           });
+    emit _sendMsg(MsgTools::generateGetFolderContentRequest(path));
 }
 
 void FolderPage::getMsg(std::shared_ptr<MsgUnit> sptr)
