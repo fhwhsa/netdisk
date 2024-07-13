@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QList>
 
 class MsgTools
 {
@@ -91,10 +92,10 @@ public:
 
     /**
      * @brief 生成删除文件/文件夹请求
-     * @param path 目标文件/文件夹路径
+     * @param paths 目标文件/文件夹路径
      * @return
      */
-    static MsgUnit* generateDeleteFileOrFolderRequest(QString path);
+    static MsgUnit* generateDeleteFileOrFolderRequest(QList<QString> paths);
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

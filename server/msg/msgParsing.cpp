@@ -301,20 +301,18 @@ MsgUnit *MsgParsing::deleteFileFolderRespond(const MsgUnit *munit)
 {
     using namespace std;
 
-    string target = getRow(munit, 0);
-    if (target.size() <= 5)
-        return nullptr;
-    target = target.substr(5);
+    vector<string> target = getAllRows(munit);
 
     string content = "";
-    if (IFileFolder::deleteFileOrFolder(target))
+    for (const string& it : target)
     {
+        if (!IFileFolder::deleteFileOrFolder(it))
+        {
+            content.append(it.substr(it.rfind('/') + 1) + "\r\n");
+        }
+    }
+    if ("" == content)
         content = "success\r\ninfo:\r\n";
-    }
-    else 
-    {
-        content = "failure\r\ninfo:\r\n";
-    }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DELETEFILEFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;

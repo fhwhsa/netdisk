@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QToolButton>
 #include <QIcon>
+#include <QInputDialog>
+#include <QMessageBox>
 
 QSize FolderPage::itemSize = QSize(0, 50);
 
@@ -37,6 +39,7 @@ void FolderPage::init()
 {
     currPath = QString("/" + userId);
     ui->tb_back->setEnabled(false);
+    ui->fileList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void FolderPage::iniSignalSlots()
@@ -90,12 +93,64 @@ void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
 
 void FolderPage::clickTbAddFolder()
 {
-    qDebug() << "add folder";
+    QString name = QInputDialog::getText(this, "新建文件夹", "输入文件夹名称：");
+    if (name.isEmpty())
+        BubbleTips::showBubbleTips("文件夹名称不能为空", 1, this);
+    for (int i = ui->fileList->count() - 1; ~i; --i)
+    {
+        if (name == ui->fileList->item(i)->text())
+        {
+            BubbleTips::showBubbleTips("无法创建文件夹\"" + name + "\"：文件已存在", 1, this);
+            return;
+        }
+    }
+
+    // 发送请求
+    RespondWatcher::create(this, SIGNAL(getCreateFolderRespond(std::shared_ptr<MsgUnit>)), "创建文件夹响应超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+                           [this](std::shared_ptr<MsgUnit> sptr){
+                               flushFileList(sptr);
+                           });
+    emit _sendMsg(MsgTools::generateCreateFolderRequest(currPath, name));
 }
 
 void FolderPage::clickTbDelete()
 {
-    qDebug() << "delete";
+    QList<QListWidgetItem*> selectedList = ui->fileList->selectedItems();
+    if (selectedList.isEmpty())
+    {
+        BubbleTips::showBubbleTips("请选择要删除的文件/文件夹", 1, this);
+        return;
+    }
+
+    QString str;
+    for (const QListWidgetItem* item : selectedList)
+    {
+        str.append(item->text() + "\n");
+    }
+    if (QMessageBox::No == QMessageBox::question(this, "确定删除以下文件/文件夹吗？", str, QMessageBox::Yes | QMessageBox::No))
+        return;
+
+    QList<QString> paths = str.split('\n');
+    for (QString& it : paths)
+        it = currPath + "/" + it;
+    paths.pop_back(); // 去除空行
+
+    // 发送请求
+    RespondWatcher::create(this, SIGNAL(getDeleteFileOrFolderRespond(std::shared_ptr<MsgUnit>)), "删除文件夹响应超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+                           [this](std::shared_ptr<MsgUnit> sptr){
+                                QStringList content = MsgTools::getAllRows(sptr.get());
+                                if (content.size() > 0 && content[0] == "failure")
+                                {
+                                    QString tips = "以下文件删除失败：\n";
+                                    for (int i = 1; i < content.size(); ++i)
+                                        tips.append(content[i] + "\n");
+                                    QMessageBox::information(this, " ", tips);
+                                }
+                                this->clickTbFlush();
+                           });
+    emit _sendMsg(MsgTools::generateDeleteFileOrFolderRequest(paths));
 }
 
 void FolderPage::clickTbRename()
@@ -164,4 +219,8 @@ void FolderPage::getMsg(std::shared_ptr<MsgUnit> sptr)
 {
     if (MsgType::MSG_TYPE_GETFOLDERCONTENT_RESPOND == sptr->msgType)
         emit getFolderContentRespond(sptr);
+    else if (MsgType::MSG_TYPE_CREATERFOLDER_RESPOND == sptr->msgType)
+        emit getCreateFolderRespond(sptr);
+    else if (MsgType::MSG_TYPE_DELETEFILEFOLDER_RESPOND == sptr->msgType)
+        emit getDeleteFileOrFolderRespond(sptr);
 }

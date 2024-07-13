@@ -61,6 +61,10 @@ public slots:
 signals:
     void getFolderContentRespond(std::shared_ptr<MsgUnit> sptr);
 
+    void getCreateFolderRespond(std::shared_ptr<MsgUnit> sptr);
+
+    void getDeleteFileOrFolderRespond(std::shared_ptr<MsgUnit> sptr);
+
     /**
      * @brief 向服务器发送信息，有MainPage类代理
      * @param munit 要发送给服务器的数据单元

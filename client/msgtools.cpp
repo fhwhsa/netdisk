@@ -76,9 +76,13 @@ MsgUnit *MsgTools::generateRenameFileOrFolderRequest(QString path, QString newNa
     return msgHandler(str, MsgType::MSG_TYPE_RENAMEFILEFOLDER_REQUEST);
 }
 
-MsgUnit *MsgTools::generateDeleteFileOrFolderRequest(QString path)
+MsgUnit *MsgTools::generateDeleteFileOrFolderRequest(QList<QString> paths)
 {
-    QString str = QString("path:%1").arg(path);
+    QString str;
+    for (const QString& it : paths)
+    {
+        str.append(QString(it + "\r\n"));
+    }
     return msgHandler(str, MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST);
 }
 
