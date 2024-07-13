@@ -251,13 +251,24 @@ MsgUnit *MsgParsing::createFolderRespond(const MsgUnit *munit)
     string content = "";
     if (IFileFolder::createFolder(path, name))
     {
-        content = "success\r\ninfo:\r\n";
+        bool res;
+        vector<pair<int, string>> v = IFileFolder::getFolderContent(path, res);
+        if (res)
+        {
+            for (const pair<int, string>& it : v)
+            {
+                content.append(it.second + "|" + to_string(it.first) + "\r\n");
+            }
+        }
+        else 
+        {
+            content = "failure\r\ninfo:\r\n";
+        }
     }
     else 
     {
         content = "failure\r\ninfo:\r\n";
     }
-
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_CREATERFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;
 }
