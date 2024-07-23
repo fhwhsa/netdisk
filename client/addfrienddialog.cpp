@@ -4,6 +4,7 @@
 #include "friendpage.h"
 #include "msgtools.h"
 #include "respondwatcher.h"
+#include "statusCode.h"
 
 #include <QMessageBox>
 #include <QDebug>
@@ -119,6 +120,13 @@ void AddFriendDialog::getSearchUserRespond(std::shared_ptr<MsgUnit> sptr)
         QString info = MsgTools::getRow(sptr.get(), 1);
         if ("" == info)
             info = "数据传输损坏";
+        QString statusCode = MsgTools::getRow(sptr.get(), 1);
+        if (statusCode.length() <= 7)
+            info = "通信错误";
+        else
+            info = getStatusCodeString(statusCode.mid(7));
+        return;
+
         ui->errInfo->setText(info);
         ui->errorBox->show();
     }
@@ -132,17 +140,26 @@ void AddFriendDialog::getAddFriendRespond(std::shared_ptr<MsgUnit> sptr)
         BubbleTips::showBubbleTips("数据传输错误", 2, this);
         return;
     }
+
+    QString statusCode = list[1];
     if ("success" == list[0])
     {
         BubbleTips::showBubbleTips("添加成功，等待对方通过申请", 3, this);
+        return;
     }
-    else if ("conflict" == list[0])
+
+    if (statusCode.length() <= 7)
     {
-        BubbleTips::showBubbleTips("conflict" + list[1], 3, this);
+        BubbleTips::showBubbleTips("数据传输错误", 2, this);
+        return;
+    }
+    if ("conflict" == list[0])
+    {
+        BubbleTips::showBubbleTips(getStatusCodeString(statusCode.mid(7)), 3, this);
     }
     else if ("failure" == list[0])
     {
-        BubbleTips::showBubbleTips("failure" + list[1], 3, this);
+        BubbleTips::showBubbleTips(getStatusCodeString(statusCode.mid(7)), 3, this);
     }
     else ;
 }

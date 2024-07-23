@@ -7,6 +7,7 @@
 #include "flistitemwidget.h"
 #include "alistitemwidget.h"
 #include "respondwatcher.h"
+#include "statusCode.h"
 
 #include <QEventLoop>
 #include <QTimer>
@@ -62,7 +63,11 @@ void FriendPage::flushFriendList(std::shared_ptr<MsgUnit> sptr)
 
     if (list.size() >= 2 && list[0] == "failure")
     {
-        BubbleTips::showBubbleTips(list[1], 2, this);
+        QString statusCode = list[1];
+        if (statusCode.length() <= 7)
+            BubbleTips::showBubbleTips("通信错误", 2, this);
+        else
+            BubbleTips::showBubbleTips(getStatusCodeString(statusCode.mid(7)), 2, this);
         return;
     }
 

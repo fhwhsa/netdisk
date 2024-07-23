@@ -37,6 +37,7 @@ HEADERS += \
     msgUnit.h \
     msgtools.h \
     respondwatcher.h \
+    statusCode.h \
     transmitpage.h
 
 FORMS += \

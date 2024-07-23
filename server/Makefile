@@ -9,6 +9,7 @@ SOURCES := \
 	mysql/mysqlConn.cpp \
 	mysql/connectionPool.cpp \
 	wrap/wrap.cpp \
+	statusCode/statusCode.h \
 	server.cpp \
 	run.cpp
 

@@ -8,8 +8,8 @@
     passwd:{}\r\n
     ```
 2. 响应
-    * 成功  `success\r\nid:{}\r\ninfo:{}\r\n` 
-    * 失败  `failure\r\ninfo:{}\r\n`
+    * 成功  `success\r\nid:{}\r\nstatus:{}\r\n` 
+    * 失败  `failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -27,8 +27,8 @@
     key:{id/邮箱}\r\n
     ```
 2. 响应
-    * 有该用户 `success\r\nid:{}\r\nemail:{}\r\ninfo:{}\r\n` 
-    * 没有该用户或出错 `failure\r\ninfo:{}\r\n`
+    * 有该用户 `success\r\nid:{}\r\nemail:{}\r\nstatus:{}\r\n` 
+    * 没有该用户或出错 `failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -40,9 +40,9 @@
     ```
 
 2. 响应
-    * 成功添加请求：`success\r\ninfo:{}\r\n`
-    * 重复的请求：`conflict\r\ninfo:{}\r\n`
-    * 失败：`failure\r\ninfo:{}\r\n`
+    * 成功添加请求：`success\r\nstatus:{}\r\n`
+    * 重复的请求：`conflict\r\nstatus:{}\r\n`
+    * 失败：`failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -64,7 +64,7 @@
         * 3->对方请求加为好友，等待验证
         * 4->对方请求加为好友，已拒绝
 
-    * 失败：`failure\r\ninfo:{}\r\n`
+    * 失败：`failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -75,8 +75,8 @@
     {申请记录id}\r\n
     ```
 2. 响应
-    * 成功 `success\r\ninfo:{}\r\n`
-    * 失败 `failure\r\ninfo:{}\r\n`
+    * 成功 `success\r\nstatus:{}\r\n`
+    * 失败 `failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -91,7 +91,7 @@
         {好友id}|{好友邮箱}\r\n
         ...
         ```
-    * 失败：`failure\r\ninfo:{}\r\n`
+    * 失败：`failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -106,7 +106,7 @@
         {文件名}|{文件类型，0代表文件夹，1代表其它（0/1）}
         ...
         ```
-    * 失败：`failure\r\ninfo:{}\r\n`
+    * 失败：`failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -122,7 +122,7 @@
         {文件名}|{文件类型，0代表文件夹，1代表其它（0/1）}
         ...
         ```
-    * 失败 `failure\r\ninfo:{}\r\n`
+    * 失败 `failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -133,8 +133,8 @@
     newName:{}\r\n
     ```
 2. 响应
-    * 成功 `success\r\ninfo:{}\r\n`
-    * 失败 `failure\r\ninfo:{}\r\n`
+    * 成功 `success\r\nstatus:{}\r\n`
+    * 失败 `failure\r\nstatus:{}\r\n`
 
 <br><br>
 
@@ -145,10 +145,9 @@
     ...
     ```
 2. 响应
-    * 成功 `success\r\ninfo:{}\r\n`
-    * 失败返回删除失败的文件名
+    * 成功 `success\r\n`
+    * 否则返回删除失败的文件名
         ```
-        failure\r\n
         {name}\r\n
         ...
         ```

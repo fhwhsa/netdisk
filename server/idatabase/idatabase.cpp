@@ -1,6 +1,7 @@
 #include "idatabase.h"
 #include "../mysql/mysqlConn.h"
 #include "../mysql/connectionPool.h"
+#include "../statusCode/statusCode.h"
 
 #include <memory>
 #include <iostream>
@@ -30,7 +31,7 @@ void IDatabase::serverOffline()
         ptr->update(sql);
 }
 
-int IDatabase::authentication(std::string email, std::string passwd, std::string &handleInfo)
+int IDatabase::authentication(std::string email, std::string passwd, int& statusCode)
 {
     using namespace std;
     string sql("select * from user where email='" + email + "';");
@@ -38,15 +39,20 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
     do
     {
         shared_ptr<MysqlConn> ptr = pool->getConnection();
-        if (nullptr == ptr || !ptr->query(sql))
+        if (nullptr == ptr)
         {
-            handleInfo = "There was an error with the database interaction.";
+            statusCode = DATABASEBUSY;
+            break;
+        }
+        if (!ptr->query(sql))
+        {
+            statusCode = DATABASEERROR;
             break;
         }
 
         if (!ptr->next())
         {
-            handleInfo = "The user does not exist.";
+            statusCode = USERNOTEXIST;
             break;
         }
         
@@ -54,13 +60,14 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         {
             if (passwd != ptr->value(2))
             {
-                handleInfo = "Wrong password.";
+                statusCode = WRONGPASSWD;
                 break;
             }
         }
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
+            statusCode = EXCEPTION;
             break;
         }
         
@@ -73,6 +80,7 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
+            statusCode = EXCEPTION;
             break;
         }
 
@@ -85,12 +93,13 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
+            statusCode = EXCEPTION;
             break;
         }
         
         if ("1" == status)
         {
-            handleInfo = "The user is online.";
+            statusCode = USERISONLINE;
             break;
         }
         
@@ -98,11 +107,11 @@ int IDatabase::authentication(std::string email, std::string passwd, std::string
         sql = "update user set status=1 where id=" + id + ";";
         if (!ptr->update(sql))
         {
-            handleInfo = "There was an error with the database interaction";
+            statusCode = DATABASEERROR;
             break;
         }
 
-        handleInfo = "";
+        statusCode = SUCCESS;
         return stoi(id);
     } while (0);
 
@@ -117,7 +126,7 @@ bool IDatabase::logout(std::string id)
     return pool->getConnection()->update(sql);
 }
 
-std::pair<std::string, std::string> IDatabase::searchUser(std::string key, std::string &handleInfo)
+std::pair<std::string, std::string> IDatabase::searchUser(std::string key, int& statusCode)
 {
     using namespace std;
     string sql;
@@ -131,15 +140,20 @@ std::pair<std::string, std::string> IDatabase::searchUser(std::string key, std::
     do
     {
         shared_ptr<MysqlConn> ptr = pool->getConnection();
-        if (nullptr == ptr || !ptr->query(sql))
+        if (nullptr == ptr) 
         {
-            handleInfo = "There was an error with the database interaction";
+            statusCode = DATABASEBUSY;
+            break;
+        }
+        if (!ptr->query(sql))
+        {
+            statusCode = DATABASEERROR;
             break;
         }
 
         if (!ptr->next())
         {
-            handleInfo = "The user does not exist.";
+            statusCode = USERNOTEXIST;
             break;
         }
 
@@ -153,17 +167,18 @@ std::pair<std::string, std::string> IDatabase::searchUser(std::string key, std::
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
-            handleInfo = e.what();
+            statusCode = EXCEPTION;
             break;
         }
 
+        statusCode = SUCCESS;
         return make_pair(id, email);
     } while (0);
 
     return make_pair("-1", "");
 }
 
-int IDatabase::addFriendApplication(std::string from, std::string to, std::string &handleinfo)
+int IDatabase::addFriendApplication(std::string from, std::string to, int& statusCode)
 {
     using namespace std;
 
@@ -172,49 +187,102 @@ int IDatabase::addFriendApplication(std::string from, std::string to, std::strin
     {
         shared_ptr<MysqlConn> sptr = pool->getConnection();
         if (nullptr == sptr)
+        {
+            statusCode = DATABASEBUSY;
             break;
+        }
 
-    // 是否已经为好友，由客户端检查
 
-    string sql;
+        string sql;
+        // 是否已经为好友
+        sql = "select count(*) cnt from friend where status = 0 and  ((uid_1 = " + from + " and uid_2 = " + to + ") "
+            "or (uid_1 = " + to + " and uid_2 = " + from + "));";
+        if (!sptr->query(sql))
+        {
+            statusCode = DATABASEERROR;
+            break;
+        }
+        try
+        {
+            if (sptr->next() && "0" != sptr->value(0))
+            {
+                statusCode = FRIENDSHIPS;
+                return 0;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            statusCode = EXCEPTION;
+            break;
+        }
+        
 
-    // 检查对方是否已提出申请
-    sql = "select * from friend where uid_1 = " + to + " and uid_2 = " + from + " and status = 1;";
-    // cout << sql << endl;
-    if (!sptr->query(sql))
-        break;
-    else if (sptr->next())
-    {
-        handleinfo = "The other person has initiated a friend request.";
-        return 0;
-    }
+        // 检查对方是否已提出申请
+        sql = "select count(*) cnt from friend where uid_1 = " + to + " and uid_2 = " + from + " and status = 1;";
+        // cout << sql << endl;
+        if (!sptr->query(sql))
+        {
+            statusCode = DATABASEERROR;
+            break;
+        }
+        try
+        {
+            if (sptr->next() && "0" != sptr->value(0))
+            {
+                statusCode = WAITVERITY;
+                return 0;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            statusCode = EXCEPTION;
+            break;
+        }
 
-    // 检查是否为重复的申请
-    sql = "select * from friend where uid_1 = " + from + " and uid_2 = " + to + " and status = 1;";
-    // cout << sql << endl;
-    if (!sptr->query(sql))
-        break;
-    else if (sptr->next())
-    {
-        handleinfo = "Duplicate friend requests.";
-        return 0;
-    }
+        // 检查是否为重复的申请
+        sql = "select count(*) from friend where uid_1 = " + from + " and uid_2 = " + to + " and status = 1;";
+        // cout << sql << endl;
+        if (!sptr->query(sql))
+        {
+            statusCode = DATABASEERROR;
+            break;
+        }
+        try
+        {
+            if (sptr->next() && "0" != sptr->value(0))
+            {
+                statusCode = DUPLICATEFRIENDREQ;
+                return 0;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            statusCode = EXCEPTION;
+            break;
+        }
 
-    // 添加申请记录
-    sql = "insert into friend (uid_1, uid_2, status, lastUpdateTime) values (" + from + ", " + to + ", 1, '" + getDateTime() + "');";
-    cout << sql << endl;
-    if (!sptr->update(sql))
-        break;
-    else 
-        return 1;
-    
+        // 添加申请记录
+        sql = "insert into friend (uid_1, uid_2, status, lastUpdateTime) values (" + from + ", " + to + ", 1, '" + getDateTime() + "');";
+        cout << sql << endl;
+        if (!sptr->update(sql))
+        {
+            statusCode = DATABASEERROR;
+            break;
+        }
+        else 
+        {
+            statusCode = SUCCESS;
+            return 1;
+        }
     } while (0);
     
-    handleinfo = "There was an error with the database interaction";
     return -1;
 }
 
-std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, std::string& handleinfo, bool& res)
+std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, int& statusCode, bool& res)
 {
     using namespace std;
 
@@ -223,7 +291,10 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
     {
         shared_ptr<MysqlConn> sptr = pool->getConnection();
         if (nullptr == sptr)
+        {
+            statusCode = DATABASEBUSY;
             break;
+        }
 
         vector<string> data;
         // 查找好友申请（别的用户发起）
@@ -231,7 +302,7 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         // cout << sql << endl;
         if (!sptr->query(sql))
         {
-            handleinfo = "There was an error with the database interaction";
+            statusCode = DATABASEERROR;
             break;
         }
         try
@@ -242,7 +313,7 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
-            handleinfo = string(e.what());
+            statusCode = EXCEPTION;
             break;
         }
         
@@ -251,7 +322,7 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         // cout << sql << endl;
         if (!sptr->query(sql))
         {
-            handleinfo = "There was an error with the database interaction";
+            statusCode = DATABASEERROR;
             break;
         }
         try
@@ -262,11 +333,12 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
-            handleinfo = string(e.what());
+            statusCode = EXCEPTION;
             break;
         }
         
         res = true;
+        statusCode = SUCCESS;
         return data;
     } while (0);
     
@@ -274,7 +346,7 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, s
     return {};
 }
 
-bool IDatabase::friendVerification(std::string regId, bool flag, std::string& handleinfo)
+bool IDatabase::friendVerification(std::string regId, bool flag, int& statusCode)
 {
     using namespace std;
 
@@ -287,22 +359,23 @@ bool IDatabase::friendVerification(std::string regId, bool flag, std::string& ha
         shared_ptr<MysqlConn> sptr = pool->getConnection();
         if (nullptr == sptr)
         {
-            handleinfo = "There was an error with the database interaction";
+            statusCode = DATABASEBUSY;
             break;
         }
         
         if (!sptr->update(sql))
         {
-            handleinfo = "There was an error with the database interaction";
+            statusCode = DATABASEERROR;
             break;
         }
 
+        statusCode = SUCCESS;
         return true;
     } while (0);
     return false;
 }
 
-std::vector<std::string> IDatabase::getFriendList(std::string from, std::string &handleinfo, bool &res)
+std::vector<std::string> IDatabase::getFriendList(std::string from, int& statusCode, bool &res)
 {
     using namespace std;
 
@@ -313,9 +386,14 @@ std::vector<std::string> IDatabase::getFriendList(std::string from, std::string 
     do
     {
         shared_ptr<MysqlConn> sptr = pool->getConnection();
-        if (nullptr == sptr || !sptr->query(sql))
+        if (nullptr == sptr) 
         {
-            handleinfo = "There was an error with the database interaction";
+            statusCode = DATABASEBUSY;
+            break;
+        }
+        if (!sptr->query(sql))
+        {
+            statusCode = DATABASEERROR;
             break;
         }
 
@@ -328,11 +406,12 @@ std::vector<std::string> IDatabase::getFriendList(std::string from, std::string 
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
-            handleinfo = e.what();
+            statusCode = EXCEPTION;
             break;
         }
         
         res = true;
+        statusCode = SUCCESS;
         return resList;
     } while (0);
     

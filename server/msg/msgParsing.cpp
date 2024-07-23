@@ -35,20 +35,19 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
     // cout << email << " " << passwd << "\n" << flush;
     
     MsgUnit* respond = nullptr;
-    int id;
-    string info;
+    int id, statusCode;
     string content;
     // 身份验证成功
-    if (-1 != (id = IDatabase::authentication(email, passwd, info)))
+    if (-1 != (id = IDatabase::authentication(email, passwd, statusCode)))
     {
-        // cout << info << endl;
-        content = ("success\r\nid:" + to_string(id) + "\r\ninfo:" + info + "\r\n");
+        // cout << status << endl;
+        content = ("success\r\nid:" + to_string(id) + "\r\nstatus:" + to_string(statusCode) + "\r\n");
     }
 
     else 
     {
-        // cout << info << endl;
-        content = "failure\r\ninfo:" + info + "\r\n";
+        // cout << status << endl;
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
 
     respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_RESPOND, strlen(content.c_str()), content.c_str());
@@ -80,16 +79,16 @@ MsgUnit *MsgParsing::searchUserRespond(const MsgUnit *munit)
         return nullptr;
     key = key.substr(4);
     
-    string info;
-    pair<string, string> id_email = IDatabase::searchUser(key, info);
+    int statusCode;
+    pair<string, string> id_email = IDatabase::searchUser(key, statusCode);
     string content;
     if ("-1" == id_email.first)
     {
-        content = "failure\r\ninfo:" + info + "\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     else 
     {   
-        content = "success\r\nid:" + id_email.first + "\r\nemail:" + id_email.second + "\r\ninfo:\r\n";
+        content = "success\r\nid:" + id_email.first + "\r\nemail:" + id_email.second + "\r\nstatus:\r\n";
     }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_SEARCHUSER_RESPOND, strlen(content.c_str()), content.c_str());
@@ -106,19 +105,20 @@ MsgUnit *MsgParsing::addFriendRespond(const MsgUnit *munit)
 
     string from = msg[0].substr(5);
     string to = msg[1].substr(3);
-    string info, content;
-    int res = IDatabase::addFriendApplication(from, to, info);
+    string content;
+    int statusCode;
+    int res = IDatabase::addFriendApplication(from, to, statusCode);
     if (1 == res)
     {
-        content = "success\r\ninfo:\r\n";
+        content = "success\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     else if (0 == res)
     {
-        content = "conflict\r\ninfo:" + info + "\r\n";
+        content = "conflict\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     else
     {
-        content = "failure\r\ninfo:" + info + "\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_ADDFRIEND_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;
@@ -132,9 +132,9 @@ MsgUnit *MsgParsing::getFriendApplicationListRespond(const MsgUnit *munit)
     if (from.size() <= 5)
         return nullptr;
     from = from.substr(5);
-    string info;
+    int statusCode;
     bool res;
-    vector<string> list = IDatabase::getFriendApplicationList(from, info, res);
+    vector<string> list = IDatabase::getFriendApplicationList(from, statusCode, res);
     string content = "";
     if (res)
     {
@@ -146,7 +146,7 @@ MsgUnit *MsgParsing::getFriendApplicationListRespond(const MsgUnit *munit)
     }
     else 
     {
-        content = "failure\r\ninfo:" + info + "\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_GETFRIENDAPPLICATIONLIST_RESPOND, strlen(content.c_str()), content.c_str());
@@ -166,15 +166,16 @@ MsgUnit *MsgParsing::verifyFriendApplication(const MsgUnit *munit)
     if ((op != "accept" && op != "refuse"))
         return nullptr;
 
-    string info, content;
-    bool res = IDatabase::friendVerification(id, op == "accept", info);
+    string content;
+    int statusCode;
+    bool res = IDatabase::friendVerification(id, op == "accept", statusCode);
     if (res)
     {
-        content = "success\r\ninfo:\r\n";
+        content = "success\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     else 
     {
-        content = "failure\r\ninfo:" + info + "\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_FRIENDVERIFICATION_RESPOND, strlen(content.c_str()), content.c_str());
@@ -191,8 +192,9 @@ MsgUnit *MsgParsing::getFriendListRespond(const MsgUnit *munit)
     from = from.substr(5);
 
     bool res;
-    string content, info;
-    vector<string> resList = IDatabase::getFriendList(from, info, res);
+    string content;
+    int statusCode;
+    vector<string> resList = IDatabase::getFriendList(from, statusCode, res);
     if (res)
     {
         content = "";
@@ -203,7 +205,7 @@ MsgUnit *MsgParsing::getFriendListRespond(const MsgUnit *munit)
     }
     else 
     {
-        content = "failure\r\ninfo:" + info + "\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_GETFRIENDLIST_RESPOND, strlen(content.c_str()), content.c_str());
@@ -220,8 +222,9 @@ MsgUnit *MsgParsing::getFolderContentRespond(const MsgUnit *munit)
     target = target.substr(5);
 
     bool res;
+    int statusCode;
     string content = "";
-    vector<pair<int, string>> v = IFileFolder::getFolderContent(target, res);
+    vector<pair<int, string>> v = IFileFolder::getFolderContent(target, res, statusCode);
     if (res)
     {
         for (const pair<int, string>& it : v)
@@ -231,7 +234,7 @@ MsgUnit *MsgParsing::getFolderContentRespond(const MsgUnit *munit)
     }
     else 
     {
-        content = "failure\r\ninfo:\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_GETFOLDERCONTENT_RESPOND, strlen(content.c_str()), content.c_str());
@@ -249,10 +252,11 @@ MsgUnit *MsgParsing::createFolderRespond(const MsgUnit *munit)
     string path = params[0].substr(5);
     string name = params[1].substr(5);
     string content = "";
-    if (IFileFolder::createFolder(path, name))
+    int statusCode;
+    if (IFileFolder::createFolder(path, name, statusCode))
     {
         bool res;
-        vector<pair<int, string>> v = IFileFolder::getFolderContent(path, res);
+        vector<pair<int, string>> v = IFileFolder::getFolderContent(path, res, statusCode);
         if (res)
         {
             for (const pair<int, string>& it : v)
@@ -262,12 +266,12 @@ MsgUnit *MsgParsing::createFolderRespond(const MsgUnit *munit)
         }
         else 
         {
-            content = "failure\r\ninfo:\r\n";
+            content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
         }
     }
     else 
     {
-        content = "failure\r\ninfo:\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_CREATERFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;
@@ -283,14 +287,15 @@ MsgUnit *MsgParsing::renameFileFolderRespond(const MsgUnit *munit)
     
     string path = params[0].substr(5);
     string newName = params[1].substr(8);
+    int statusCode;
     string content = "";
-    if (IFileFolder::renameFileOrFolder(path, newName))
+    if (IFileFolder::renameFileOrFolder(path, newName, statusCode))
     {
-        content = "success\r\ninfo:\r\n";
+        content = "success\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
     else 
     {
-        content = "failure\r\ninfo:\r\n";
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_RENAMEFILEFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
@@ -303,16 +308,17 @@ MsgUnit *MsgParsing::deleteFileFolderRespond(const MsgUnit *munit)
 
     vector<string> target = getAllRows(munit);
 
+    int statusCode;
     string content = "";
     for (const string& it : target)
     {
-        if (!IFileFolder::deleteFileOrFolder(it))
+        if (!IFileFolder::deleteFileOrFolder(it, statusCode))
         {
             content.append(it.substr(it.rfind('/') + 1) + "\r\n");
         }
     }
     if ("" == content)
-        content = "success\r\ninfo:\r\n";
+        content = "success\r\n";
 
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DELETEFILEFOLDER_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;

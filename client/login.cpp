@@ -2,6 +2,7 @@
 #include "ui_login.h"
 #include "msgUnit.h"
 #include "msgtools.h"
+#include "statusCode.h"
 
 #include <QSettings>
 #include <QDebug>
@@ -158,7 +159,13 @@ void Login::login()
             mainPage->show();
         }
         else
-            QMessageBox::critical(this, "登陆", respond.mid(14));
+        {
+            QString statusCode = MsgTools::getRow(munit, 1);
+            if (statusCode.length() <= 7)
+                QMessageBox::critical(this, "登陆", "通信错误");
+            else
+                QMessageBox::critical(this, "登陆", getStatusCodeString(statusCode.mid(7)));
+        }
 
         free(munit);
         munit = nullptr;

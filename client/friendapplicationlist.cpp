@@ -5,6 +5,7 @@
 #include "friendpage.h"
 #include "alistitemwidget.h"
 #include "respondwatcher.h"
+#include "statusCode.h"
 
 #include <QMessageBox>
 #include <QDebug>
@@ -84,6 +85,17 @@ void FriendApplicationList::itemDoubleClicked(QListWidgetItem *item)
 
 void FriendApplicationList::flushList(std::shared_ptr<MsgUnit> sptr)
 {
+    QStringList msg = MsgTools::getAllRows(sptr.get());
+    if (msg.size() > 2 && "failure" == msg[0])
+    {
+        QString statusCode = msg[1];
+        if (statusCode.length() <= 7)
+            BubbleTips::showBubbleTips("通信错误", 2, this);
+        else
+            BubbleTips::showBubbleTips(getStatusCodeString(statusCode.mid(7)), 2, this);
+        return;
+    }
+
     for (int i = ui->applicationList->count() - 1; ~i; --i)
     {
         QListWidgetItem* item = ui->applicationList->item(i);
@@ -96,7 +108,6 @@ void FriendApplicationList::flushList(std::shared_ptr<MsgUnit> sptr)
         ui->applicationList->takeItem(i);
     }
 
-    QStringList msg = MsgTools::getAllRows(sptr.get());
     for (const QString& str : msg)
     {
         QStringList list = str.split('|');

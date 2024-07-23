@@ -4,6 +4,7 @@
 #include "msgtools.h"
 #include "bubbletips.h"
 #include "respondwatcher.h"
+#include "statusCode.h"
 
 #include <QDebug>
 #include <QToolButton>
@@ -60,9 +61,13 @@ void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
 {
     QStringList list = MsgTools::getAllRows(sptr.get());
 
-    if (list.size() >= 2 && list[0] == "failure")
+    if (list.size() > 2 && list[0] == "failure")
     {
-        BubbleTips::showBubbleTips(list[1], 2, this);
+        QString statusCode = list[1];
+        if (statusCode.length() <= 7)
+            BubbleTips::showBubbleTips("通信错误", 2, this);
+        else
+            BubbleTips::showBubbleTips(getStatusCodeString(statusCode.mid(7)), 2, this);
         return;
     }
 
@@ -114,7 +119,17 @@ void FolderPage::clickTbAddFolder()
     RespondWatcher::create(this, SIGNAL(getCreateFolderRespond(std::shared_ptr<MsgUnit>)), "创建文件夹响应超时", 3,
             QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
                            [this](std::shared_ptr<MsgUnit> sptr){
-                               flushFileList(sptr);
+                                QStringList list = MsgTools::getAllRows(sptr.get());
+                                if (list.size() > 2 && list[0] == "failure")
+                                {
+                                    QString statusCode = list[1];
+                                    if (statusCode.length() <= 7)
+                                        BubbleTips::showBubbleTips("通信错误", 2, this);
+                                    else
+                                        BubbleTips::showBubbleTips(getStatusCodeString(statusCode.mid(7)), 2, this);
+                                }
+                                else
+                                    flushFileList(sptr);
                            });
     emit _sendMsg(MsgTools::generateCreateFolderRequest(currPath, name));
 }
@@ -146,7 +161,7 @@ void FolderPage::clickTbDelete()
             QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
                            [this](std::shared_ptr<MsgUnit> sptr){
                                 QStringList content = MsgTools::getAllRows(sptr.get());
-                                if (content.size() > 0 && content[0] == "failure")
+                                if (content.size() > 0 && content[0] == "success")
                                 {
                                     QString tips = "以下文件删除失败：\n";
                                     for (int i = 1; i < content.size(); ++i)
@@ -195,10 +210,12 @@ void FolderPage::clickTbRename()
             QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
                            [this](std::shared_ptr<MsgUnit> sptr){
                                 QStringList content = MsgTools::getAllRows(sptr.get());
-                                if (content.size() > 0 && content[0] == "failure")
-                                    BubbleTips::showBubbleTips("重命名失败", 1, this);
-                                else
+                                if (content.size() > 0 && content[0] == "success")
                                     this->clickTbFlush();
+                                else if (content.size() > 2 && content[1].length() > 7)
+                                    BubbleTips::showBubbleTips(getStatusCodeString(content[1].mid(7)), 1, this);
+                                else
+                                    BubbleTips::showBubbleTips("通信错误", 1, this);
                            });
     emit _sendMsg(MsgTools::generateRenameFileOrFolderRequest(path, newName));
 }

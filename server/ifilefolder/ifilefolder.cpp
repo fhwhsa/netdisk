@@ -1,4 +1,5 @@
 #include "ifilefolder.h"
+#include "../statusCode/statusCode.h"
 
 #include <iostream>
 #include <filesystem>
@@ -6,16 +7,23 @@
 
 const std::string basePath = "userresources";
 
-std::vector<std::pair<int, std::string>> IFileFolder::getFolderContent(std::string path, bool& res)
+std::vector<std::pair<int, std::string>> IFileFolder::getFolderContent(std::string path, bool& res, int& statusCode)
 {
     using namespace std;
     using namespace filesystem;
 
     path = basePath + path;
 
-    if (!exists(path) || !is_directory(path))
+    if (!exists(path)) 
     {
         res = false;
+        statusCode = FILEORFOLDERNOTEXIST;
+        return {};
+    }
+    if (!is_directory(path))
+    {
+        res = false;
+        statusCode = ISNOTFOLDER;
         return {};
     }
 
@@ -27,28 +35,36 @@ std::vector<std::pair<int, std::string>> IFileFolder::getFolderContent(std::stri
 
     res = true;
     sort(v.begin(), v.end());
+    statusCode = SUCCESS;
     return v;
 }
 
-bool IFileFolder::createFolder(std::string path, std::string name)
+bool IFileFolder::createFolder(std::string path, std::string name, int& statusCode)
 {
     using namespace std;
     using namespace filesystem;
     
-    path = basePath + path;
+    path = basePath + path + "/" + name;
+    if (exists(path))
+    {
+        statusCode = FOLDEREXIST;
+        return false;
+    }
     
     try
     {
+        statusCode = SUCCESS;
         return create_directory(path + "/" + name);
     }
     catch(const std::exception& e)
     {
-        cerr << e.what() << '\n';   
+        cerr << e.what() << '\n';  
+        statusCode = EXCEPTION; 
     }
     return false;
 }
 
-bool IFileFolder::deleteFileOrFolder(std::string path)
+bool IFileFolder::deleteFileOrFolder(std::string path, int& statusCode)
 {
     using namespace std;
     using namespace filesystem;
@@ -56,16 +72,21 @@ bool IFileFolder::deleteFileOrFolder(std::string path)
     path = basePath + path;
 
     if (!exists(path))
+    {
+        statusCode = FILEORFOLDERNOTEXIST;
         return false;
+    }
 
     if (is_directory(path))
     {
         try
         {
+            statusCode = SUCCESS;
             return remove_all(path) > 0;
         }
         catch(const std::exception& e)
         {
+            statusCode = EXCEPTION;
             std::cerr << e.what() << '\n';
         }
         return false;    
@@ -74,17 +95,19 @@ bool IFileFolder::deleteFileOrFolder(std::string path)
     {
         try
         {
+            statusCode = SUCCESS;
             return remove(path);
         }
         catch(const std::exception& e)
         {
+            statusCode = EXCEPTION;
             std::cerr << e.what() << '\n';
         }
         return false;
     }
 }
 
-bool IFileFolder::renameFileOrFolder(std::string path, std::string newName)
+bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int& statusCode)
 {
     using namespace std;
     using namespace filesystem;
@@ -92,7 +115,10 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName)
     path = basePath + path;
 
     if (!exists(path))
+    {
+        statusCode = FILEORFOLDERNOTEXIST;
         return false;
+    }
 
     int t = path.rfind('/');
     if (-1 != t)
@@ -105,8 +131,15 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName)
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        statusCode = EXCEPTION;
         return false;
     }
     
-    return exists(newName) && !exists(path);
+    if (exists(newName) && !exists(path))
+    {
+        statusCode = SUCCESS;
+        return true;
+    }
+    statusCode = FAILURE;
+    return false;
 }
