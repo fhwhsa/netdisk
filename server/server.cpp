@@ -109,7 +109,8 @@ void read_cb(struct bufferevent *bev, void *ctx)
     {
         std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
                 << (char*)respond->msg << std::endl;
-                
+        
+        // 记录登陆id
         if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
             mbev->loginId = MsgParsing::getRow(respond, 1).substr(3);
         bufferevent_write(bev, (char*)respond, respond->totalLen);
@@ -133,6 +134,11 @@ void event_cb(struct bufferevent *bev, short what, void *ctx)
             Printf("Connection closed\n");
         else 
             Printf("Connection timeout\n");
+        if (nullptr != mbev)
+        {
+            delete mbev;
+            mbev = nullptr;
+        }
         bufferevent_free(bev);
     }
     else if (what & BEV_EVENT_ERROR)

@@ -9,6 +9,7 @@
 #include <event.h>
 #include <sys/types.h>
 #include <string>
+#include <iostream>
 
 /// @brief 封装bufferevent作为参数传递给回调函数
 struct my_bev
@@ -16,6 +17,10 @@ struct my_bev
     struct bufferevent* bev;
     /// @brief 登陆用户的id
     std::string loginId;
+    ~my_bev()
+    {
+        std::cout << "delete" << std::endl;
+    }
 };
 
 /// @brief 运行服务器
