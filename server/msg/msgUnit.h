@@ -49,10 +49,14 @@ enum MsgType {
     /// @brief 删除文件/文件夹请求
     MSG_TYPE_DELETEFILEFOLDER_REQUEST,
     /// @brief 删除文件/文件夹响应
-    MSG_TYPE_DELETEFILEFOLDER_RESPOND
+    MSG_TYPE_DELETEFILEFOLDER_RESPOND,
+    /// @brief 上传文件请求
+    MSG_TYPE_UPLOADFILE_REQUEST,
+    /// @brief 上传文件响应
+    MSG_TYPE_UPLOADFILE_RESPOND
 };
 
-constexpr unsigned int msgTypeNum = 23;
+constexpr unsigned int msgTypeNum = 25;
 
 /// @brief 通信数据单元
 struct MsgUnit

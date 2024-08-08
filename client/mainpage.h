@@ -66,6 +66,8 @@ private slots:
     void clickTbsetting();
     void clickTbUserInfo();
 
+    void forwardAddUploadTask(QString filepath);
+
     /**
      * @brief 发送数据给服务器
      * @param munit 要发送的数据单元

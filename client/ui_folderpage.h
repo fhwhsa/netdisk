@@ -80,14 +80,17 @@ public:
 
         tb_back = new QToolButton(groupBox);
         tb_back->setObjectName(QString::fromUtf8("tb_back"));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/img/res/img/back.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_back->setIcon(icon);
 
         verticalLayout->addWidget(tb_back);
 
         tb_flush = new QToolButton(groupBox);
         tb_flush->setObjectName(QString::fromUtf8("tb_flush"));
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/img/res/img/flush.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_flush->setIcon(icon);
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/img/res/img/flush.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_flush->setIcon(icon1);
 
         verticalLayout->addWidget(tb_flush);
 
@@ -100,17 +103,17 @@ public:
 
         tb_upload = new QToolButton(groupBox);
         tb_upload->setObjectName(QString::fromUtf8("tb_upload"));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/img/res/img/upload.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_upload->setIcon(icon1);
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/img/res/img/upload.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_upload->setIcon(icon2);
 
         verticalLayout->addWidget(tb_upload);
 
         tb_download = new QToolButton(groupBox);
         tb_download->setObjectName(QString::fromUtf8("tb_download"));
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/img/res/img/download.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_download->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/img/res/img/download.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_download->setIcon(icon3);
 
         verticalLayout->addWidget(tb_download);
 
@@ -123,25 +126,25 @@ public:
 
         tb_addfolder = new QToolButton(groupBox);
         tb_addfolder->setObjectName(QString::fromUtf8("tb_addfolder"));
-        QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/img/res/img/addfolder.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_addfolder->setIcon(icon3);
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/img/res/img/addfolder.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_addfolder->setIcon(icon4);
 
         verticalLayout->addWidget(tb_addfolder);
 
         tb_rename = new QToolButton(groupBox);
         tb_rename->setObjectName(QString::fromUtf8("tb_rename"));
-        QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/img/res/img/rename.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_rename->setIcon(icon4);
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/img/res/img/rename.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_rename->setIcon(icon5);
 
         verticalLayout->addWidget(tb_rename);
 
         tb_delete = new QToolButton(groupBox);
         tb_delete->setObjectName(QString::fromUtf8("tb_delete"));
-        QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/img/res/img/delete.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_delete->setIcon(icon5);
+        QIcon icon6;
+        icon6.addFile(QString::fromUtf8(":/img/res/img/delete.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_delete->setIcon(icon6);
 
         verticalLayout->addWidget(tb_delete);
 
@@ -154,9 +157,9 @@ public:
 
         tb_share = new QToolButton(groupBox);
         tb_share->setObjectName(QString::fromUtf8("tb_share"));
-        QIcon icon6;
-        icon6.addFile(QString::fromUtf8(":/img/res/img/share.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tb_share->setIcon(icon6);
+        QIcon icon7;
+        icon7.addFile(QString::fromUtf8(":/img/res/img/share.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tb_share->setIcon(icon7);
 
         verticalLayout->addWidget(tb_share);
 

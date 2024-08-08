@@ -14,6 +14,7 @@
 #define FOLDEREXIST             208     /*文件夹已存在*/
 #define FAILURE                 209     /*失败*/
 #define FRIENDSHIPS             210     /*好友关系*/
+#define FILEEXIST               211     /*文件已存在*/
 
 // 数据库错误
 #define DATABASEBUSY            301     /*数据库繁忙*/

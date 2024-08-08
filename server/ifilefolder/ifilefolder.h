@@ -1,6 +1,8 @@
 #ifndef _IFILEFOLDER_H_
 #define _IFILEFOLDER_H_
 
+#include "../userResources/userResources.h"
+
 #include <string>
 #include <vector>
 
@@ -36,6 +38,13 @@ public:
     /// @param statusCode 处理结果状态码
     /// @return 操作结果，成功返回true
     static bool renameFileOrFolder(std::string path, std::string newName, int& statusCode);
+
+    /// @brief 创建文件
+    /// @param path 文件路径
+    /// @param ur 用户系统资源
+    /// @param statusCode 处理结果状态码
+    /// @return 操作结果，成功返回true
+    static bool createFile(std::string path, UserResources& ur, int& statusCode);
 
 private:
     IFileFolder();

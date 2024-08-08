@@ -82,7 +82,6 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
 
     my_bev* mbev = new my_bev();
     mbev->bev = bev;
-    mbev->loginId = "";
 
     bufferevent_set_timeouts(bev, &connSustainTime, nullptr);
     bufferevent_setcb(bev, read_cb, NULL, event_cb, mbev);
@@ -104,7 +103,7 @@ void read_cb(struct bufferevent *bev, void *ctx)
     res = bufferevent_read(bev, &munit->msgLen, sizeof(uint));
     res = bufferevent_read(bev, munit->msg, munit->msgLen);
 
-    MsgUnit* respond = MsgParsing::parsing(munit);
+    MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
     if (nullptr != respond)
     {
         std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
@@ -112,7 +111,7 @@ void read_cb(struct bufferevent *bev, void *ctx)
         
         // 记录登陆id
         if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
-            mbev->loginId = MsgParsing::getRow(respond, 1).substr(3);
+            mbev->ur.setUserId(MsgParsing::getRow(respond, 1).substr(3));
         bufferevent_write(bev, (char*)respond, respond->totalLen);
 
         delete respond;
@@ -128,8 +127,8 @@ void event_cb(struct bufferevent *bev, short what, void *ctx)
     if (what & BEV_EVENT_EOF || what & BEV_EVENT_TIMEOUT)
     {
         my_bev* mbev = (my_bev*)ctx;
-        if ("" != mbev->loginId)
-            IDatabase::logout(mbev->loginId);
+        if ("" != mbev->ur.getUserId())
+            IDatabase::logout(mbev->ur.getUserId());
         if (what & BEV_EVENT_EOF)
             Printf("Connection closed\n");
         else 

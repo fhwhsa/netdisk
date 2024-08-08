@@ -21,6 +21,7 @@ SOURCES += \
     mainpage.cpp \
     msgUnit.cpp \
     msgtools.cpp \
+    progressitemwidget.cpp \
     respondwatcher.cpp \
     transmitpage.cpp
 
@@ -36,6 +37,7 @@ HEADERS += \
     mainpage.h \
     msgUnit.h \
     msgtools.h \
+    progressitemwidget.h \
     respondwatcher.h \
     statusCode.h \
     transmitpage.h
@@ -49,6 +51,7 @@ FORMS += \
     friendpage.ui \
     login.ui \
     mainpage.ui \
+    progressitemwidget.ui \
     transmitpage.ui
 
 # Default rules for deployment.

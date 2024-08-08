@@ -14,6 +14,7 @@
 #define FOLDEREXIST             208     /*文件夹已存在*/
 #define FAILURE                 209     /*失败*/
 #define FRIENDSHIPS             210     /*好友关系*/
+#define FILEEXIST               211     /*文件已存在*/
 
 // 数据库错误
 #define DATABASEBUSY            301     /*数据库繁忙*/
@@ -51,6 +52,8 @@ static QString getStatusCodeString(QString status)
         return "失败";
     case FRIENDSHIPS:
         return "已添加为好友";
+    case FILEEXIST:
+        return "文件已存在";
 
     case DATABASEBUSY:
         return "数据库繁忙，请稍后再试";

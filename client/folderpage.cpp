@@ -11,6 +11,8 @@
 #include <QIcon>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QFile>
 
 QSize FolderPage::itemSize = QSize(0, 50);
 
@@ -161,7 +163,7 @@ void FolderPage::clickTbDelete()
             QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
                            [this](std::shared_ptr<MsgUnit> sptr){
                                 QStringList content = MsgTools::getAllRows(sptr.get());
-                                if (content.size() > 0 && content[0] == "success")
+                                if (content.size() > 0 && content[0] != "success")
                                 {
                                     QString tips = "以下文件删除失败：\n";
                                     for (int i = 1; i < content.size(); ++i)
@@ -227,7 +229,26 @@ void FolderPage::clickTbDownload()
 
 void FolderPage::clickTbUpload()
 {
-    qDebug() << "upload";
+    QString filepath = QFileDialog::getOpenFileName(this);
+    QString fileName = filepath.mid(filepath.lastIndexOf('/') + 1);
+
+    // 发送请求
+    RespondWatcher::create(this, SIGNAL(getUploadFileRespond(std::shared_ptr<MsgUnit>)), "上传文件请求响应超时", 3,
+            QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
+                           [this, filepath](std::shared_ptr<MsgUnit> sptr){
+                               QString respond = MsgTools::getRow(sptr.get(), 0);
+                               if ("ready" == respond)
+                                   emit deliverUploadTask(filepath);
+                               else if ("failure" == respond)
+                               {
+                                   BubbleTips::showBubbleTips(getStatusCodeString(MsgTools::getRow(sptr.get(), 1).mid(7)), 1, this);
+                               }
+                               else
+                               {
+                                   BubbleTips::showBubbleTips("未知错误", 1, this);
+                               }
+                           });
+    emit _sendMsg(MsgTools::generateUploadFileRequest_start(fileName, currPath));
 }
 
 void FolderPage::clickTbFlush()
@@ -287,4 +308,6 @@ void FolderPage::getMsg(std::shared_ptr<MsgUnit> sptr)
         emit getDeleteFileOrFolderRespond(sptr);
     else if (MsgType::MSG_TYPE_RENAMEFILEFOLDER_RESPOND == sptr->msgType)
         emit getRenameFileOrFolderRespond(sptr);
+    else if (MsgType::MSG_TYPE_UPLOADFILE_RESPOND == sptr->msgType)
+        emit getUploadFileRespond(sptr);
 }

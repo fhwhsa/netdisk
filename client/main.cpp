@@ -1,7 +1,4 @@
 #include "login.h"
-#include "friendpage.h"
-#include "addfrienddialog.h"
-#include "mainpage.h"
 
 #include <QApplication>
 

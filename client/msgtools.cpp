@@ -86,6 +86,13 @@ MsgUnit *MsgTools::generateDeleteFileOrFolderRequest(QList<QString> paths)
     return msgHandler(str, MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST);
 }
 
+MsgUnit *MsgTools::generateUploadFileRequest_start(QString filename, QString path)
+{
+    QString str;
+    str = "start\r\n" + filename + "\r\n" + path + "\r\n";
+    return msgHandler(str, MsgType::MSG_TYPE_UPLOADFILE_REQUEST);
+}
+
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {
     QStringList strList = QString((char*)munit->msg).split("\r\n");

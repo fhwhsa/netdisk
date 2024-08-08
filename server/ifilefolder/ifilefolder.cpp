@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <algorithm>
 
-const std::string basePath = "userresources";
+const std::string basePath = "./virtualDisks";
 
 std::vector<std::pair<int, std::string>> IFileFolder::getFolderContent(std::string path, bool& res, int& statusCode)
 {
@@ -54,7 +54,7 @@ bool IFileFolder::createFolder(std::string path, std::string name, int& statusCo
     try
     {
         statusCode = SUCCESS;
-        return create_directory(path + "/" + name);
+        return create_directory(path);
     }
     catch(const std::exception& e)
     {
@@ -141,5 +141,28 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int&
         return true;
     }
     statusCode = FAILURE;
+    return false;
+}
+
+bool IFileFolder::createFile(std::string path, UserResources& ur, int &statusCode)
+{
+    using namespace std;
+    using namespace filesystem;
+
+    if (exists(path))
+    {
+        statusCode = FILEEXIST;
+        return false;
+    }
+    try
+    {
+        statusCode = SUCCESS;
+        return ur.addToUploadList(path);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        statusCode = EXCEPTION;
+    }
     return false;
 }

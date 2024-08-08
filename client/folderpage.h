@@ -67,11 +67,16 @@ signals:
 
     void getRenameFileOrFolderRespond(std::shared_ptr<MsgUnit> sptr);
 
+    void getUploadFileRespond(std::shared_ptr<MsgUnit> sptr);
+
+    void deliverUploadTask(QString filepath);
+
     /**
      * @brief 向服务器发送信息，有MainPage类代理
      * @param munit 要发送给服务器的数据单元
      */
     void _sendMsg(MsgUnit* munit);
+
 };
 
 #endif // FOLDERPAGE_H

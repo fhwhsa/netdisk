@@ -324,7 +324,56 @@ MsgUnit *MsgParsing::deleteFileFolderRespond(const MsgUnit *munit)
     return respond;
 }
 
-MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
+MsgUnit *MsgParsing::uploadFileRespond(const MsgUnit *munit, UserResources& ur)
+{
+    using namespace std;
+
+    MsgUnit* respond = nullptr;
+    string content = "";
+
+    // 读取命令 start, next, pause, cont, finsh
+    string command = "";
+    command = getRow(munit, 0);
+    
+    do {
+        int statusCode;
+        if ("start" == command)
+        {
+            // 创建好临时文件
+            vector<string> data = getAllRows(munit);
+            if (data.size() != 3)
+                break;
+            string path = "./virtualDisks" + data[2] + "/" + data[1] + ".tmp";
+            if (IFileFolder::createFile(path, ur, statusCode))
+                content = "ready\r\n";
+            else 
+                content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+        }
+        else if ("next" == command)
+        {
+        
+        }
+        else if ("pause" == command)
+        {
+
+        }
+        else if ("cont" == command)
+        {
+
+        }
+        else if ("finsh" == command)
+        {
+
+        }
+        else // 数据错误
+            return nullptr;
+    } while(0);
+
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
+MsgUnit *MsgParsing::parsing(const MsgUnit *munit, UserResources& ur)
 {
     // std::cout << (char*)munit->msg << std::endl;
     switch (munit->msgType)
@@ -375,6 +424,10 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit)
     // 删除文件/文件夹请求
     case MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST:
         return deleteFileFolderRespond(munit);
+
+    // 上传文件请求
+    case MsgType::MSG_TYPE_UPLOADFILE_REQUEST:
+        return uploadFileRespond(munit, ur);
 
     // 未知请求
     default:

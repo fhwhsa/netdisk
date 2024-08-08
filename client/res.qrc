@@ -24,5 +24,9 @@
         <file>res/img/download.png</file>
         <file>res/img/delete.png</file>
         <file>res/img/addfolder.png</file>
+        <file>res/img/back.png</file>
+        <file>res/img/pause.png</file>
+        <file>res/img/continue.png</file>
+        <file>res/img/cancel.png</file>
     </qresource>
 </RCC>

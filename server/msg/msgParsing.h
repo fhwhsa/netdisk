@@ -5,6 +5,7 @@
 #ifndef _MSGPARSING_H_
 #define _MSGPARSING_H_
 
+#include "../userResources/userResources.h"
 #include "msgUnit.h"
 
 #include <vector>
@@ -76,12 +77,18 @@ private:
     /// @return 返回处理响应
     static MsgUnit* deleteFileFolderRespond(const MsgUnit* munit);
 
+    /// @brief 处理上传文件请求
+    /// @param munit 通信信息
+    /// @return 返回处理响应
+    static MsgUnit* uploadFileRespond(const MsgUnit* munit, UserResources& ur);
+
 public:
 
     /// @brief 解析通信消息，并返回对应的响应
     /// @param munit 通信消息
+    /// @param ur 用户系统资源
     /// @return 对应的响应消息
-    static MsgUnit* parsing(const MsgUnit* munit);
+    static MsgUnit* parsing(const MsgUnit* munit, UserResources& ur);
 
     /// @brief 获取munit消息内容中第index行内容，index从0开始。建议当仅需要获取其中一行时建议调用该方法，否则调用allValue方法
     /// @param munit 要获取信息的消息单元

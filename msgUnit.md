@@ -11,7 +11,7 @@
     * 成功  `success\r\nid:{}\r\nstatus:{}\r\n` 
     * 失败  `failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 注销
 1. 请求
@@ -19,7 +19,7 @@
 	id:{}\r\n	
 	```
 
-<br><br>
+---
 
 ### 查找用户（根据id或邮箱查找）
 1. 请求
@@ -30,7 +30,7 @@
     * 有该用户 `success\r\nid:{}\r\nemail:{}\r\nstatus:{}\r\n` 
     * 没有该用户或出错 `failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 好友申请
 1. 请求
@@ -44,7 +44,7 @@
     * 重复的请求：`conflict\r\nstatus:{}\r\n`
     * 失败：`failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 获取好友申请记录
 1. 请求
@@ -66,7 +66,7 @@
 
     * 失败：`failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 验证好友申请
 1. 请求
@@ -78,7 +78,7 @@
     * 成功 `success\r\nstatus:{}\r\n`
     * 失败 `failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 获取好友列表
 1. 请求
@@ -93,7 +93,7 @@
         ```
     * 失败：`failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 获取文件夹内容
 1. 请求
@@ -108,7 +108,7 @@
         ```
     * 失败：`failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 创建文件夹
 1. 请求
@@ -124,7 +124,7 @@
         ```
     * 失败 `failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 重命名文件/文件夹
 1. 请求
@@ -136,7 +136,7 @@
     * 成功 `success\r\nstatus:{}\r\n`
     * 失败 `failure\r\nstatus:{}\r\n`
 
-<br><br>
+---
 
 ### 删除文件/文件夹
 1. 请求
@@ -152,10 +152,39 @@
         ...
         ```
 
-<br><br>
+---
 
 ### 文件上传
 1. 请求
-
+    * start（开始上传）
+        ```
+        start\r\n
+        {文件名}\r\n
+        {保存路径}\r\n
+        ```
+    * next（上传下一个分块）
+        ```
+        next\r\n
+        {数据}
+        ```
+    * pause（暂停上传）
+        ```
+        pause\r\n
+        ```
+    * cont（继续上传）
+        ```
+        cont\r\n
+        {文件路径}
+        ```
+    * finsh（上传完成）
+        ```
+        finsh\r\n
+        ```
 
 2. 响应
+    * start `ready\r\n`
+    * next `recv\r\n`
+    * pause `recv\r\n`
+    * cont `ready\r\n`
+    * finsh `recv\r\n`
+    * 出错 `failure\r\nstatus:{}\r\n`

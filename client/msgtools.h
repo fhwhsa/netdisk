@@ -98,6 +98,14 @@ public:
     static MsgUnit* generateDeleteFileOrFolderRequest(QList<QString> paths);
 
     /**
+     * @brief 生成上传文件请求（start）
+     * @param filename 文件名
+     * @param path 文件路径
+     * @return
+     */
+    static MsgUnit* generateUploadFileRequest_start(QString filename, QString path);
+
+    /**
      * @brief 获取munit消息内容中第index行内容，index从0开始
      * @param munit 要获取信息的消息单元
      * @param index 第几行

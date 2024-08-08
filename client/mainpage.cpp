@@ -39,6 +39,17 @@ MainPage::~MainPage()
     delete ui;
 }
 
+void MainPage::forwardAddUploadTask(QString filepath)
+{
+    if (!transmitPage->addUploadTask(filepath))
+        BubbleTips::showBubbleTips("添加上传任务失败", 2, this);
+    else
+    {
+        this->clickTbtransmit();
+        transmitPage->clickUploadListBtn();
+    }
+}
+
 void MainPage::init()
 {
     this->setMinimumSize(1100, 700);
@@ -85,9 +96,13 @@ void MainPage::iniSignalSlots()
     connect(ui->tb_userInfo, &QToolButton::clicked, this, &MainPage::clickTbUserInfo);
 
     connect(folderPage, &FolderPage::_sendMsg, this, &MainPage::sendMsg);
-    connect(friendPage, &FriendPage::_sendMsg, this, &MainPage::sendMsg);
-
     connect(this, &MainPage::newMunit, folderPage, &FolderPage::getMsg);
+    connect(folderPage, &FolderPage::deliverUploadTask, this, &MainPage::forwardAddUploadTask);
+
+    connect(transmitPage, &TransmitPage::_sendMsg, this, &MainPage::sendMsg);
+    connect(this, &MainPage::newMunit, transmitPage, &TransmitPage::getMsg);
+
+    connect(friendPage, &FriendPage::_sendMsg, this, &MainPage::sendMsg);
     connect(this, &MainPage::newMunit, friendPage, &FriendPage::getMsg);
 
     connect(socket, &QTcpSocket::readyRead, this, &MainPage::recvMsg);
