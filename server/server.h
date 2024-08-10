@@ -5,7 +5,7 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-#include "userResources/userResources.h"
+#include "connResources/connResources.h"
 
 #include <string>
 #include <event.h>
@@ -18,7 +18,7 @@ struct my_bev
 {
     struct bufferevent* bev;
     /// @brief 登陆用户的id
-    UserResources ur;
+    ConnResources ur;
     ~my_bev()
     {
         std::cout << "delete" << std::endl;

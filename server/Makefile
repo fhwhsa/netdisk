@@ -9,7 +9,7 @@ SOURCES := \
 	mysql/mysqlConn.cpp \
 	mysql/connectionPool.cpp \
 	wrap/wrap.cpp \
-	userResources/userResources.cpp \
+	connResources/connResources.cpp \
 	statusCode/statusCode.h \
 	server.cpp \
 	run.cpp
@@ -19,11 +19,11 @@ FLAGS := -Wall -O2 -std=c++20
 
 _SLIB := $(foreach it, $(SLIB), -l$(it))
 BASE := g++ $(SOURCES) $(_SLIB) $(FLAGS)
-run: $(SOURCES)
-	$(BASE) -o run
-
 debug:
 	$(BASE) -g -o drun
+
+run: $(SOURCES)
+	$(BASE) -o run
 
 clean:
 	rm -f run drun

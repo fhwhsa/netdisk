@@ -1,8 +1,6 @@
 #ifndef _IFILEFOLDER_H_
 #define _IFILEFOLDER_H_
 
-#include "../userResources/userResources.h"
-
 #include <string>
 #include <vector>
 
@@ -41,10 +39,9 @@ public:
 
     /// @brief 创建文件
     /// @param path 文件路径
-    /// @param ur 用户系统资源
     /// @param statusCode 处理结果状态码
-    /// @return 操作结果，成功返回true
-    static bool createFile(std::string path, UserResources& ur, int& statusCode);
+    /// @return 成功返回打开的文件流指针，否则返回空指针
+    static std::ofstream* createFile(std::string path, int& statusCode);
 
 private:
     IFileFolder();

@@ -31,11 +31,12 @@ Login::~Login()
     if (mainPage)
         delete mainPage;
 
-    // 关闭连接
     if (socket)
     {
         socket->close();
         socket->waitForDisconnected();
+        delete socket;
+        socket = nullptr;
     }
 }
 

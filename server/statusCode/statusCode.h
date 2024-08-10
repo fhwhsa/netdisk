@@ -22,4 +22,6 @@
 
 #define EXCEPTION               401     /*异常*/
 
+#define UNKNOWN                 501     /*未知错误*/
+
 #endif

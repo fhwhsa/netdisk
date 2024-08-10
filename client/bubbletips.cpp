@@ -5,6 +5,7 @@
 #include <QRectF>
 #include <QPoint>
 #include <QDebug>
+#include <QApplication>
 
 void BubbleTips::showBubbleTips(QString showStr, int sec, QWidget *parent, bool flag)
 {
@@ -55,11 +56,11 @@ BubbleTips::BubbleTips(QString showStr, bool flag, int sec, QWidget *parent): QW
     this->setWindowOpacity(opacityValue);
     initTimer();
 
-    if (nullptr != parent)
-    {
-        QPoint pPos = parent->pos();
-        this->move(pPos.rx() + parent->width() / 2 - this->width() / 2, pPos.ry() + parent->height() / 2 - this->height() / 2);
-    }
+    QPoint pPos = QApplication::activeWindow()->pos();
+    QSize pSize = QApplication::activeWindow()->size();
+    pPos += QPoint(pSize.width() / 2, pSize.height() / 2);
+    this->move(pPos - QPoint(this->width() / 2, this->height() / 2));
+
     if (flag)
         this->setWindowModality(Qt::WindowModal);
 }
@@ -110,6 +111,7 @@ void BubbleTips::initTimer()
     connect(singleShotTimer, &QTimer::timeout, this, [=](){
         closeTimer->start(closeTime);
     });
+
     singleShotTimer->start(showTime);
 }
 

@@ -93,6 +93,19 @@ MsgUnit *MsgTools::generateUploadFileRequest_start(QString filename, QString pat
     return msgHandler(str, MsgType::MSG_TYPE_UPLOADFILE_REQUEST);
 }
 
+MsgUnit *MsgTools::generateUploadFileRequest_next(QByteArray data)
+{
+
+    data = QByteArray("next\r\n") + data;
+    MsgUnit* munit = MsgUnit::make_dataunit(MSG_TYPE_UPLOADFILE_REQUEST, static_cast<uint>(data.size()), data.data());
+    return munit;
+}
+
+MsgUnit *MsgTools::generateUploadFileRequest_finsh()
+{
+    return msgHandler(QString("finsh\r\n"), MsgType::MSG_TYPE_UPLOADFILE_REQUEST);
+}
+
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {
     QStringList strList = QString((char*)munit->msg).split("\r\n");

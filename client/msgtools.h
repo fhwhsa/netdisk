@@ -6,6 +6,7 @@
 #include <QString>
 #include <QStringList>
 #include <QList>
+#include <QByteArray>
 
 class MsgTools
 {
@@ -104,6 +105,19 @@ public:
      * @return
      */
     static MsgUnit* generateUploadFileRequest_start(QString filename, QString path);
+
+    /**
+     * @brief 生成上传文件请求（next）
+     * @param data 发送的文件数据
+     * @return
+     */
+    static MsgUnit *generateUploadFileRequest_next(QByteArray data);
+
+    /**
+     * @brief 生成上传文件请求（finsh）
+     * @return
+     */
+    static MsgUnit *generateUploadFileRequest_finsh();
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

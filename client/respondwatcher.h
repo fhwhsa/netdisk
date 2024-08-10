@@ -17,15 +17,15 @@ class RespondWatcher : public QObject
     Q_OBJECT
 public:
     /**
-     * @brief 创建一个响应监听器
+     * @brief 创建一个后台响应监听器（不影响主线程）
      * @param _sender 响应信号的发送类
-     * @param signal 响应信号
+     * @param signal 响应信号，携带一个参数：std::shared_ptr<MsgUnit>
      * @param _timeoutStr 超时显示的提示信息
      * @param _timeoutSec 等待时长
      * @param pos 超时显示的气泡提示框的中心位置
      * @param _func 接收到信号后调用的回调函数
      */
-    static void create(QObject *_sender, const char *signal,
+    static void createBgRw(QObject *_sender, const char *signal,
                        QString _timeoutStr, int _timeoutSec, QPoint pos,
                        std::function<void(std::shared_ptr<MsgUnit>)> _func);
 

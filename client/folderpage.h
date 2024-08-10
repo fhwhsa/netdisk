@@ -69,7 +69,7 @@ signals:
 
     void getUploadFileRespond(std::shared_ptr<MsgUnit> sptr);
 
-    void deliverUploadTask(QString filepath);
+    void deliverUploadTask(QString filepath, QString diskPath);
 
     /**
      * @brief 向服务器发送信息，有MainPage类代理

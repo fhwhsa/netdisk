@@ -60,13 +60,14 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath)
 
     UploadWorker* uw = new UploadWorker(taskId, filepath, diskPath, piw);
     connect(uw, &UploadWorker::taskFinsh, [this](int taskId){ // 任务完成释放资源，并添加到传输完成列
+        qDebug() << "taskfinsh";
         for (int i = ui->uploadList->count() - 1; ~i; --i)
         {
             ProgressItemWidget* piw = static_cast<ProgressItemWidget*>(ui->uploadList->itemWidget(ui->uploadList->item(i)));
             if (taskId == piw->getTaskId())
             {
                 ui->finshList->addItem(piw->getFileName());
-//                delete piw; 调用takeitem切换到该ui时触发析构函数？？？？
+                delete piw;
                 ui->uploadList->takeItem(i);
                 uploadTaskList.erase(uploadTaskList.find(taskId));
 
@@ -140,7 +141,7 @@ UploadWorker::UploadWorker(int _taskId, QString filepath, QString diskPath, Prog
     connect(piw, &ProgressItemWidget::cont, this, &UploadWorker::contTask);
 
     // 连接服务器
-    QSettings ini = QSettings(":/config/res/config.ini", QSettings::IniFormat);
+    QSettings ini = QSettings(":/config/Settings::IniFormat);
     ini.beginGroup("ADDRESS");
     QString ip = ini.value("IPADDR").toString();
     QString port = ini.value("PORT").toString();

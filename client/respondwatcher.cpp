@@ -1,7 +1,9 @@
 #include "respondwatcher.h"
 #include "bubbletips.h"
 
-void RespondWatcher::create(QObject *_sender, const char *signal,
+#include <QEventLoop>
+
+void RespondWatcher::createBgRw(QObject *_sender, const char *signal,
                             QString _timeoutStr, int _timeoutSec, QPoint pos,
                             std::function<void(std::shared_ptr<MsgUnit>)> _func)
 {

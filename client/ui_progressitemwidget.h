@@ -34,7 +34,10 @@ public:
     QProgressBar *progressBar;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer_2;
-    QLabel *progress;
+    QLabel *currSize;
+    QLabel *totalSize;
+    QLabel *unit;
+    QLabel *errorMsg;
     QToolButton *pauseOrContBtn;
     QToolButton *cancelBtn;
 
@@ -42,7 +45,7 @@ public:
     {
         if (progressItems->objectName().isEmpty())
             progressItems->setObjectName(QString::fromUtf8("progressItems"));
-        progressItems->resize(688, 42);
+        progressItems->resize(820, 44);
         horizontalLayout_3 = new QHBoxLayout(progressItems);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         gridLayout = new QGridLayout();
@@ -56,7 +59,7 @@ public:
         filename = new QLabel(progressItems);
         filename->setObjectName(QString::fromUtf8("filename"));
         QFont font;
-        font.setPointSize(10);
+        font.setPointSize(11);
         filename->setFont(font);
 
         horizontalLayout_2->addWidget(filename);
@@ -88,11 +91,26 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer_2);
 
-        progress = new QLabel(progressItems);
-        progress->setObjectName(QString::fromUtf8("progress"));
-        progress->setFont(font);
+        currSize = new QLabel(progressItems);
+        currSize->setObjectName(QString::fromUtf8("currSize"));
+        currSize->setFont(font);
 
-        horizontalLayout->addWidget(progress);
+        horizontalLayout->addWidget(currSize);
+
+        totalSize = new QLabel(progressItems);
+        totalSize->setObjectName(QString::fromUtf8("totalSize"));
+
+        horizontalLayout->addWidget(totalSize);
+
+        unit = new QLabel(progressItems);
+        unit->setObjectName(QString::fromUtf8("unit"));
+
+        horizontalLayout->addWidget(unit);
+
+        errorMsg = new QLabel(progressItems);
+        errorMsg->setObjectName(QString::fromUtf8("errorMsg"));
+
+        horizontalLayout->addWidget(errorMsg);
 
         pauseOrContBtn = new QToolButton(progressItems);
         pauseOrContBtn->setObjectName(QString::fromUtf8("pauseOrContBtn"));
@@ -100,7 +118,7 @@ public:
         pauseOrContBtn->setMaximumSize(QSize(20, 20));
         pauseOrContBtn->setCursor(QCursor(Qt::PointingHandCursor));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/img/res/img/continue.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/img/res/img/pause.png"), QSize(), QIcon::Normal, QIcon::Off);
         pauseOrContBtn->setIcon(icon);
 
         horizontalLayout->addWidget(pauseOrContBtn);
@@ -132,7 +150,10 @@ public:
     {
         progressItems->setWindowTitle(QCoreApplication::translate("progressItems", "Form", nullptr));
         filename->setText(QCoreApplication::translate("progressItems", "\346\226\207\344\273\266\345\220\215", nullptr));
-        progress->setText(QCoreApplication::translate("progressItems", "0/0", nullptr));
+        currSize->setText(QCoreApplication::translate("progressItems", "0", nullptr));
+        totalSize->setText(QCoreApplication::translate("progressItems", "/0", nullptr));
+        unit->setText(QCoreApplication::translate("progressItems", "KB", nullptr));
+        errorMsg->setText(QString());
         pauseOrContBtn->setText(QCoreApplication::translate("progressItems", "...", nullptr));
         cancelBtn->setText(QCoreApplication::translate("progressItems", "...", nullptr));
     } // retranslateUi

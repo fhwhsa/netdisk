@@ -12,6 +12,8 @@
 #include <string.h>
 #include <QDateTime>
 #include <QPoint>
+#include <QtConcurrent/QtConcurrent>
+#include <functional>
 
 MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWidget *parent) :
     userId(_userId),
@@ -37,17 +39,6 @@ MainPage::~MainPage()
     delete friendPage;
 
     delete ui;
-}
-
-void MainPage::forwardAddUploadTask(QString filepath)
-{
-    if (!transmitPage->addUploadTask(filepath))
-        BubbleTips::showBubbleTips("添加上传任务失败", 2, this);
-    else
-    {
-        this->clickTbtransmit();
-        transmitPage->clickUploadListBtn();
-    }
 }
 
 void MainPage::init()
@@ -97,7 +88,7 @@ void MainPage::iniSignalSlots()
 
     connect(folderPage, &FolderPage::_sendMsg, this, &MainPage::sendMsg);
     connect(this, &MainPage::newMunit, folderPage, &FolderPage::getMsg);
-    connect(folderPage, &FolderPage::deliverUploadTask, this, &MainPage::forwardAddUploadTask);
+    connect(folderPage, &FolderPage::deliverUploadTask, transmitPage, &TransmitPage::addUploadTask);
 
     connect(transmitPage, &TransmitPage::_sendMsg, this, &MainPage::sendMsg);
     connect(this, &MainPage::newMunit, transmitPage, &TransmitPage::getMsg);
@@ -176,7 +167,6 @@ void MainPage::sendMsg(MsgUnit *munit)
 
     if (-1 == socket->write((char*)munit, munit->totalLen))
         BubbleTips::showBubbleTips(socket->errorString(), 2, this);
-
     if (nullptr != munit)
     {
         delete munit;
@@ -186,8 +176,8 @@ void MainPage::sendMsg(MsgUnit *munit)
 
 void MainPage::recvMsg()
 {
-    QString now = QDateTime::currentDateTime().toString();
-    qDebug() << "main get" << now;
+//    QString now = QDateTime::currentDateTime().toString();
+//    qDebug() << "main get" << now;
     if (nullptr == revMunit && socket->bytesAvailable() >= 4)
     {
         QByteArray ba = socket->read(4);
@@ -211,6 +201,6 @@ void MainPage::recvMsg()
         emit newMunit(sptr);
         revMunit = nullptr;
     }
-    qDebug() << "main end" << now;
+//    qDebug() << "main end" << now;
 }
 

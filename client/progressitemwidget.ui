@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>688</width>
-    <height>42</height>
+    <width>820</width>
+    <height>44</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,14 +111,35 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="progress">
+        <widget class="QLabel" name="currSize">
          <property name="font">
           <font>
            <pointsize>11</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>0/0</string>
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="totalSize">
+         <property name="text">
+          <string>/0</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="unit">
+         <property name="text">
+          <string>KB</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="errorMsg">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
@@ -144,7 +165,7 @@
          </property>
          <property name="icon">
           <iconset resource="res.qrc">
-           <normaloff>:/img/res/img/continue.png</normaloff>:/img/res/img/continue.png</iconset>
+           <normaloff>:/img/res/img/pause.png</normaloff>:/img/res/img/pause.png</iconset>
          </property>
         </widget>
        </item>

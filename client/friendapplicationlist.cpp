@@ -27,7 +27,7 @@ FriendApplicationList::~FriendApplicationList()
 
 void FriendApplicationList::refreshManually()
 {
-    RespondWatcher::create(parent, SIGNAL(respondGetFriendApplication(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 2, centerPos,
+    RespondWatcher::createBgRw(parent, SIGNAL(respondGetFriendApplication(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 2, centerPos,
         [this](std::shared_ptr<MsgUnit> sptr){
             flushList(sptr);
         });

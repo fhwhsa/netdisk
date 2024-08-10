@@ -68,7 +68,7 @@ void AddFriendDialog::clickTbSearch()
         return;
     }
 
-    RespondWatcher::create(parent, SIGNAL(respondSearch(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 3, centerPos,
+    RespondWatcher::createBgRw(parent, SIGNAL(respondSearch(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 3, centerPos,
                            [this](std::shared_ptr<MsgUnit> sptr){
                                getSearchUserRespond(sptr);
                            });
@@ -86,7 +86,7 @@ void AddFriendDialog::clickTbAdd()
         return;
     }
 
-    RespondWatcher::create(parent, SIGNAL(respondAddFriend(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 3, centerPos,
+    RespondWatcher::createBgRw(parent, SIGNAL(respondAddFriend(std::shared_ptr<MsgUnit>)), "等待响应超时，请检查网络", 3, centerPos,
                            [this](std::shared_ptr<MsgUnit> sptr){
                                 getAddFriendRespond(sptr);
                            });

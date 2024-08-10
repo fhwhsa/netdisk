@@ -180,11 +180,12 @@
         ```
         finsh\r\n
         ```
-
 2. 响应
-    * start `ready\r\n`
-    * next `recv\r\n`
-    * pause `recv\r\n`
-    * cont `ready\r\n`
-    * finsh `recv\r\n`
+    * 成功
+        * start `recv\r\n`
+        * next `recvdata\r\n{读取的字节数}\r\n`
+        * pause `recv\r\n`
+        * cont `recv\r\n`
+        * finsh `finsh\r\n`
+
     * 出错 `failure\r\nstatus:{}\r\n`

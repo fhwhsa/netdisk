@@ -150,7 +150,7 @@ void FriendPage::clickTbNotification()
 
 void FriendPage::clickTbFlushFriendList()
 {
-    RespondWatcher::create(this, SIGNAL(respondGetFriendList(std::shared_ptr<MsgUnit>)), "好友列表刷新超时", 3,
+    RespondWatcher::createBgRw(this, SIGNAL(respondGetFriendList(std::shared_ptr<MsgUnit>)), "好友列表刷新超时", 3,
             QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
         [this](std::shared_ptr<MsgUnit> sptr){
         flushFriendList(sptr);
@@ -160,7 +160,6 @@ void FriendPage::clickTbFlushFriendList()
 
 void FriendPage::getMsg(std::shared_ptr<MsgUnit> sptr)
 {
-    qDebug() << "friendpage getmsg";
     if (MsgType::MSG_TYPE_SEARCHUSER_RESPOND == sptr->msgType)
         emit respondSearch(sptr);
     else if (MsgType::MSG_TYPE_ADDFRIEND_RESPOND == sptr->msgType)

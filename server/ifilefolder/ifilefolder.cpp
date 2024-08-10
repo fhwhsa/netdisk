@@ -4,6 +4,7 @@
 #include <iostream>
 #include <filesystem>
 #include <algorithm>
+#include <fstream>
 
 const std::string basePath = "./virtualDisks";
 
@@ -112,8 +113,6 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int&
     using namespace std;
     using namespace filesystem;
     
-    path = basePath + path;
-
     if (!exists(path))
     {
         statusCode = FILEORFOLDERNOTEXIST;
@@ -144,7 +143,7 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int&
     return false;
 }
 
-bool IFileFolder::createFile(std::string path, UserResources& ur, int &statusCode)
+std::ofstream* IFileFolder::createFile(std::string path, int &statusCode)
 {
     using namespace std;
     using namespace filesystem;
@@ -152,17 +151,24 @@ bool IFileFolder::createFile(std::string path, UserResources& ur, int &statusCod
     if (exists(path))
     {
         statusCode = FILEEXIST;
-        return false;
+        return nullptr;
     }
     try
     {
         statusCode = SUCCESS;
-        return ur.addToUploadList(path);
+        ofstream* of = new ofstream(path);
+        if (!of->is_open())
+        {
+            delete of;
+            of = nullptr;
+            return nullptr;
+        }
+        return of;
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
         statusCode = EXCEPTION;
     }
-    return false;
+    return nullptr;
 }

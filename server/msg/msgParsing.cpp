@@ -7,6 +7,7 @@
 #include <regex>
 #include <iostream>
 #include <string.h>
+#include <filesystem>
 // #include <iostream>
 
 std::vector<std::string> MsgParsing::split_string(const std::string &str, std::string reg)
@@ -324,34 +325,57 @@ MsgUnit *MsgParsing::deleteFileFolderRespond(const MsgUnit *munit)
     return respond;
 }
 
-MsgUnit *MsgParsing::uploadFileRespond(const MsgUnit *munit, UserResources& ur)
+MsgUnit *MsgParsing::uploadFileRespond(const MsgUnit *munit, ConnResources& ur)
 {
     using namespace std;
+    using namespace filesystem;
 
     MsgUnit* respond = nullptr;
+    string command = getRow(munit, 0);
     string content = "";
-
-    // 读取命令 start, next, pause, cont, finsh
-    string command = "";
-    command = getRow(munit, 0);
-    
-    do {
-        int statusCode;
+    do
+    {
         if ("start" == command)
         {
-            // 创建好临时文件
             vector<string> data = getAllRows(munit);
-            if (data.size() != 3)
-                break;
+            if (3 != data.size())
+                return nullptr;
+            
+            // 创建临时文件
+            int statusCode;
             string path = "./virtualDisks" + data[2] + "/" + data[1] + ".tmp";
-            if (IFileFolder::createFile(path, ur, statusCode))
-                content = "ready\r\n";
-            else 
+            ofstream* of = IFileFolder::createFile(path, statusCode);
+            if (nullptr == of)
+            {
                 content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+                break;
+            }
+
+            // 将文件流绑定到连接资源中
+            if (!ur.setUploadStream(of))
+            {
+                content = "failure\r\nstatus:501\r\n";
+                break;
+            }
+            ur.setFilePath(path);
+            content = "recv\r\n";
         }
         else if ("next" == command)
         {
-        
+            try
+            {
+                char* data = (char*)munit->msg;
+                data = data + 6;
+                ofstream* of = ur.getUploadStream();
+                *of << data;
+                content = "recv\r\n";
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+                content = "failure\r\nstatus:401\r\n";
+                break;
+            }
         }
         else if ("pause" == command)
         {
@@ -363,17 +387,31 @@ MsgUnit *MsgParsing::uploadFileRespond(const MsgUnit *munit, UserResources& ur)
         }
         else if ("finsh" == command)
         {
-
+            ur.getUploadStream()->close();
+            int statusCode;
+            string filepath = ur.getFilePath();
+            string filename = filepath.substr(filepath.rfind('/') + 1);
+            if (IFileFolder::renameFileOrFolder(filepath, filename.substr(0, filename.rfind(".tmp")), statusCode))
+            {
+                content = "finsh\r\n";
+            }
+            else 
+            {
+                content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+            }
         }
-        else // 数据错误
-            return nullptr;
-    } while(0);
+        else 
+        {
+            content = "failure\r\nstatus:501\r\n";
+        }
+
+    } while (0);
 
     respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;
 }
 
-MsgUnit *MsgParsing::parsing(const MsgUnit *munit, UserResources& ur)
+MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
 {
     // std::cout << (char*)munit->msg << std::endl;
     switch (munit->msgType)
