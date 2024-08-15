@@ -77,10 +77,28 @@ private:
     /// @return 返回处理响应
     static MsgUnit* deleteFileFolderRespond(const MsgUnit* munit);
 
-    /// @brief 处理上传文件请求
+    /// @brief 处理文件上传任务创建请求
     /// @param munit 通信信息
+    /// @param ur 连接资源
     /// @return 返回处理响应
-    static MsgUnit* uploadFileRespond(const MsgUnit* munit, ConnResources& ur);
+    static MsgUnit* uploadFileStartRespond(const MsgUnit* munit, ConnResources& ur);
+
+    /// @brief 处理文件上传上传数据请求
+    /// @param munit 通信信息
+    /// @param ur 连接资源
+    /// @return 返回处理响应
+    static MsgUnit* uploadFileDataRespond(const MsgUnit* munit, ConnResources& ur);
+
+    /// @brief 处理文件上传上传完成请求
+    /// @param munit 通信信息
+    /// @param ur 连接资源
+    /// @return 返回处理响应
+    static MsgUnit* uploadFileFinshRespond(const MsgUnit* munit, ConnResources& ur);
+
+    /// @brief 检查字符串是否为数字（正整数）
+    /// @param str 
+    /// @return 
+    static bool checkNumString(const std::string& str);
 
 public:
 

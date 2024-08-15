@@ -9,19 +9,20 @@ ProgressItemWidget::ProgressItemWidget(QWidget *parent) :
     iniSignalSlots();
 }
 
-ProgressItemWidget::ProgressItemWidget(int _taskId, QString _filename, qint64 filesize, QWidget *parent) :
+ProgressItemWidget::ProgressItemWidget(int tid, QString _filename, qint64 filesize, QWidget *parent) :
+    taskId(tid),
     filename(_filename),
-    taskId(_taskId),
     QWidget(parent),
     ui(new Ui::progressItems)
 {
     ui->setupUi(this);
     iniSignalSlots();
-    init(taskId, filename, filesize);
+    init(filename, filesize);
 }
 
 ProgressItemWidget::~ProgressItemWidget()
 {
+    qDebug() << "delete progress";
     emit pause();
     delete ui;
 }
@@ -48,37 +49,36 @@ void ProgressItemWidget::iniSignalSlots()
     });
 }
 
-void ProgressItemWidget::init(int _taskId, QString _filename, qint64 filesize)
+void ProgressItemWidget::init(QString _filename, qint64 filesize)
 {
     filename = _filename;
-    taskId = _taskId;
     ui->filename->setText(filename);
     totalSize = filesize;
     finshSize = 0;
 
-    if (totalSize > 1024)
+    if (totalSize > 1024 * 1024 * 1024)
     {
-        ui->unit->setText("KB");
-        func = toKB;
+        progressSuffix = "/" + toGB(totalSize) + "GB";
+        func = toGB;
     }
     else if (totalSize > 1024 * 1024)
     {
-        ui->unit->setText("MB");
+        progressSuffix = "/" + toMB(totalSize) + "MB";
         func = toMB;
     }
     else
     {
-        ui->unit->setText("GB");
-        func = toGB;
+        progressSuffix = "/" + toKB(totalSize) + "KB";
+        func = toKB;
     }
-    ui->totalSize->setText("/" + func(totalSize));
-    ui->currSize->setText("0.00");
+
+    ui->progress->setText("0.00" + progressSuffix);
 }
 
 void ProgressItemWidget::updateFinshSize(qint64 val)
 {
     finshSize += val;
-    ui->currSize->setText(func(finshSize));
+    ui->progress->setText(func(finshSize) + progressSuffix);
     ui->progressBar->setValue(1.0 * finshSize / totalSize * 100);
 }
 

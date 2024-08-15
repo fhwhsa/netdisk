@@ -1,6 +1,7 @@
 #include "msgtools.h"
 
 #include <string>
+#include <QDebug>
 
 MsgTools::MsgTools()
 {
@@ -86,25 +87,22 @@ MsgUnit *MsgTools::generateDeleteFileOrFolderRequest(QList<QString> paths)
     return msgHandler(str, MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST);
 }
 
-MsgUnit *MsgTools::generateUploadFileRequest_start(QString filename, QString path)
+MsgUnit *MsgTools::generateUploadFileStartRequest(QString filename, QString path)
 {
-    QString str;
-    str = "start\r\n" + filename + "\r\n" + path + "\r\n";
-    return msgHandler(str, MsgType::MSG_TYPE_UPLOADFILE_REQUEST);
+    QString str = QString("%1\r\n%2\r\n").arg(filename).arg(path);
+    return msgHandler(str, MsgType::MSG_TYPE_UPLOADFILE_START_REQUEST);
 }
 
-MsgUnit *MsgTools::generateUploadFileRequest_next(QByteArray data)
+MsgUnit *MsgTools::generateUploadFileDataRequest(qint64 size, const char *buffer)
 {
-
-    data = QByteArray("next\r\n") + data;
-    MsgUnit* munit = MsgUnit::make_dataunit(MSG_TYPE_UPLOADFILE_REQUEST, static_cast<uint>(data.size()), data.data());
-    return munit;
+    return MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_DATA_REQUEST, size, buffer);
 }
 
-MsgUnit *MsgTools::generateUploadFileRequest_finsh()
+MsgUnit *MsgTools::generateUploadFileFinshRequest()
 {
-    return msgHandler(QString("finsh\r\n"), MsgType::MSG_TYPE_UPLOADFILE_REQUEST);
+    return MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_FINSH_REQUEST, 0, "/0");
 }
+
 
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {

@@ -15,36 +15,11 @@ std::string ConnResources::getUserId()
 
 ConnResources::~ConnResources()
 {
-    if (nullptr != uploadTo)
-    {
-        uploadTo->close();
-        delete uploadTo;
-        uploadTo = nullptr;
-    }
-    if (nullptr != downloadFrom)
-    {
-        downloadFrom->close();
-        delete downloadFrom;
-        downloadFrom = nullptr;
-    }
 }
 
 void ConnResources::setUserId(std::string _userId)
 {
     userId = _userId;
-}
-
-bool ConnResources::setUploadStream(std::ofstream *of)
-{
-    if (nullptr == of || !of->is_open())
-        return false;
-    uploadTo = of;
-    return true;
-}
-
-std::ofstream *ConnResources::getUploadStream()
-{
-    return uploadTo;
 }
 
 std::string ConnResources::getFilePath()
@@ -55,4 +30,14 @@ std::string ConnResources::getFilePath()
 void ConnResources::setFilePath(std::string _filepath)
 {
     filepath = _filepath;
+}
+
+void ConnResources::setFd(int _fd)
+{
+    fd = _fd;
+}
+
+int ConnResources::getFd()
+{
+    return fd;
 }

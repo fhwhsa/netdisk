@@ -40,8 +40,8 @@ public:
     /// @brief 创建文件
     /// @param path 文件路径
     /// @param statusCode 处理结果状态码
-    /// @return 成功返回打开的文件流指针，否则返回空指针
-    static std::ofstream* createFile(std::string path, int& statusCode);
+    /// @return 成功返回打开的文件标识符，否则返回空指针
+    static int createFile(std::string path, int& statusCode);
 
 private:
     IFileFolder();

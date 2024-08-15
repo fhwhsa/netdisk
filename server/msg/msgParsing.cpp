@@ -325,90 +325,98 @@ MsgUnit *MsgParsing::deleteFileFolderRespond(const MsgUnit *munit)
     return respond;
 }
 
-MsgUnit *MsgParsing::uploadFileRespond(const MsgUnit *munit, ConnResources& ur)
+MsgUnit *MsgParsing::uploadFileStartRespond(const MsgUnit *munit, ConnResources& ur)
 {
     using namespace std;
     using namespace filesystem;
 
-    MsgUnit* respond = nullptr;
-    string command = getRow(munit, 0);
-    string content = "";
-    do
+    // 处理信息
+    vector<string> fileinfo = getAllRows(munit);
+    if (2 != fileinfo.size())
+        return nullptr;
+    
+    string content;
+    int statusCode;
+    string path = fileinfo[1] + "/" + fileinfo[0] + ".tmp";
+    int fd = IFileFolder::createFile(path, statusCode);
+    if (-1 == fd)
     {
-        if ("start" == command)
-        {
-            vector<string> data = getAllRows(munit);
-            if (3 != data.size())
-                return nullptr;
-            
-            // 创建临时文件
-            int statusCode;
-            string path = "./virtualDisks" + data[2] + "/" + data[1] + ".tmp";
-            ofstream* of = IFileFolder::createFile(path, statusCode);
-            if (nullptr == of)
-            {
-                content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
-                break;
-            }
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+    }
+    else 
+    {
+        ur.setFd(fd);
+        ur.setFilePath(path);
+        content = "recv\r\n0\r\n";
+    }
 
-            // 将文件流绑定到连接资源中
-            if (!ur.setUploadStream(of))
-            {
-                content = "failure\r\nstatus:501\r\n";
-                break;
-            }
-            ur.setFilePath(path);
-            content = "recv\r\n";
-        }
-        else if ("next" == command)
-        {
-            try
-            {
-                char* data = (char*)munit->msg;
-                data = data + 6;
-                ofstream* of = ur.getUploadStream();
-                *of << data;
-                content = "recv\r\n";
-            }
-            catch(const std::exception& e)
-            {
-                std::cerr << e.what() << '\n';
-                content = "failure\r\nstatus:401\r\n";
-                break;
-            }
-        }
-        else if ("pause" == command)
-        {
-
-        }
-        else if ("cont" == command)
-        {
-
-        }
-        else if ("finsh" == command)
-        {
-            ur.getUploadStream()->close();
-            int statusCode;
-            string filepath = ur.getFilePath();
-            string filename = filepath.substr(filepath.rfind('/') + 1);
-            if (IFileFolder::renameFileOrFolder(filepath, filename.substr(0, filename.rfind(".tmp")), statusCode))
-            {
-                content = "finsh\r\n";
-            }
-            else 
-            {
-                content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
-            }
-        }
-        else 
-        {
-            content = "failure\r\nstatus:501\r\n";
-        }
-
-    } while (0);
-
-    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_RESPOND, strlen(content.c_str()), content.c_str());
+    MsgUnit* respond = nullptr;
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_START_RESPOND, strlen(content.c_str()), content.c_str());
+    
     return respond;
+}
+
+MsgUnit *MsgParsing::uploadFileDataRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    string content;
+    long writeBytes = write(ur.getFd(), munit->msg, munit->msgLen - 1);
+    if (-1 == writeBytes)
+    {
+        content = "failure\r\nstatus:501\r\n";
+    }
+    else 
+    {
+        content = "recv\r\n" + to_string(writeBytes) + "\r\n";
+    }
+
+    MsgUnit* respond = nullptr;
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_DATA_RESPOND, strlen(content.c_str()), content.c_str());
+
+    return respond;
+}
+
+MsgUnit *MsgParsing::uploadFileFinshRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    string content;
+    int statusCode;
+
+    string path = ur.getFilePath();
+    string nameTo = path.substr(0, path.size() - 4);
+    if (!IFileFolder::renameFileOrFolder(path, nameTo, statusCode))
+    {
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+    }
+    else 
+    {
+        content = "recv\r\n";
+    }
+
+    MsgUnit* respond = nullptr;
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_FINSH_RESPOND, strlen(content.c_str()), content.c_str());
+
+    return respond;
+}
+
+bool MsgParsing::checkNumString(const std::string &str)
+{
+    if ("" == str)
+        return false;
+    if (str[0] == '0' && 1 != str.size())
+        return false;
+    else 
+        return true;
+
+    for (const char& c : str)
+    {
+        if (!isdigit(c))
+            return false;
+    }
+
+    return true;
 }
 
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
@@ -463,9 +471,17 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     case MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST:
         return deleteFileFolderRespond(munit);
 
-    // 上传文件请求
-    case MsgType::MSG_TYPE_UPLOADFILE_REQUEST:
-        return uploadFileRespond(munit, ur);
+    // 文件上传任务创建请求
+    case MsgType::MSG_TYPE_UPLOADFILE_START_REQUEST:
+        return uploadFileStartRespond(munit, ur);
+
+    // 文件上传上传数据请求
+    case MsgType::MSG_TYPE_UPLOADFILE_DATA_REQUEST:
+        return uploadFileDataRespond(munit, ur);
+
+    // 文件上传上传完成请求
+    case MsgType::MSG_TYPE_UPLOADFILE_FINSH_REQUEST:
+        return uploadFileFinshRespond(munit, ur);
 
     // 未知请求
     default:

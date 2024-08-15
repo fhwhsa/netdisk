@@ -102,12 +102,13 @@ void read_cb(struct bufferevent *bev, void *ctx)
     res = bufferevent_read(bev, &munit->msgType, sizeof(uint));
     res = bufferevent_read(bev, &munit->msgLen, sizeof(uint));
     res = bufferevent_read(bev, munit->msg, munit->msgLen);
+    // std::cout << (char*)munit->msg << std::endl;
 
     MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
     if (nullptr != respond)
     {
-        std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
-                << (char*)respond->msg << std::endl;
+        // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
+        //         << (char*)respond->msg << std::endl;
         
         // 记录登陆id
         if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)

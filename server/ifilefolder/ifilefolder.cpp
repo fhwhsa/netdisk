@@ -4,7 +4,10 @@
 #include <iostream>
 #include <filesystem>
 #include <algorithm>
-#include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
 
 const std::string basePath = "./virtualDisks";
 
@@ -113,15 +116,14 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int&
     using namespace std;
     using namespace filesystem;
     
+    path = basePath + path;
+    newName = basePath + newName;
+
     if (!exists(path))
     {
         statusCode = FILEORFOLDERNOTEXIST;
         return false;
     }
-
-    int t = path.rfind('/');
-    if (-1 != t)
-        newName = path.substr(0, t + 1) + newName;
 
     try
     {
@@ -143,32 +145,30 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int&
     return false;
 }
 
-std::ofstream* IFileFolder::createFile(std::string path, int &statusCode)
+int IFileFolder::createFile(std::string path, int &statusCode)
 {
     using namespace std;
     using namespace filesystem;
 
+    path = basePath + path;
+
     if (exists(path))
     {
         statusCode = FILEEXIST;
-        return nullptr;
+        return -1;
     }
     try
     {
         statusCode = SUCCESS;
-        ofstream* of = new ofstream(path);
-        if (!of->is_open())
-        {
-            delete of;
-            of = nullptr;
-            return nullptr;
-        }
-        return of;
+        int fd = open(path.c_str(), O_WRONLY | O_CREAT, 0644);
+        if (-1 == fd)
+            perror("open");
+        return fd;
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
         statusCode = EXCEPTION;
     }
-    return nullptr;
+    return -1;
 }

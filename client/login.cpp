@@ -34,7 +34,8 @@ Login::~Login()
     if (socket)
     {
         socket->close();
-        socket->waitForDisconnected();
+        if (socket->state() != QAbstractSocket::UnconnectedState)
+            socket->waitForDisconnected();
         delete socket;
         socket = nullptr;
     }
@@ -45,6 +46,7 @@ bool Login::init()
     this->setMinimumSize(QSize(1100, 700));
     this->setWindowTitle(" ");
     loadconfig();
+    return true;
 }
 
 void Login::iniSignalSlots()
@@ -89,6 +91,8 @@ bool Login::tryConnect()
                 return false;
         }
     } while (flag);
+
+    return false;
 }
 
 void Login::login()

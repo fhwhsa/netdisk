@@ -9,7 +9,7 @@ MsgUnit* MsgUnit::make_dataunit(MsgType msgType, uint msgLen, const char *msg)
     if (msgType >= msgTypeNum || msgType < 0)
         return nullptr;
 
-    uint totalLen = sizeof(MsgUnit) + msgLen + 1;
+    uint totalLen = sizeof(MsgUnit) + msgLen + 1;   // 留空一个字节
     MsgUnit *munit = (MsgUnit*)malloc(totalLen);
     if (!munit)
     {

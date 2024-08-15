@@ -99,25 +99,28 @@ public:
     static MsgUnit* generateDeleteFileOrFolderRequest(QList<QString> paths);
 
     /**
-     * @brief 生成上传文件请求（start）
+     * @brief 生成文件上传任务创建请求
      * @param filename 文件名
      * @param path 文件路径
      * @return
      */
-    static MsgUnit* generateUploadFileRequest_start(QString filename, QString path);
+    static MsgUnit* generateUploadFileStartRequest(QString filename, QString path);
 
     /**
-     * @brief 生成上传文件请求（next）
-     * @param data 发送的文件数据
+     * @brief 生成文件上传上传数据请求
+     * @param size 上传的文件数据大小
+     * @param buffer 存储数据的首地址
      * @return
      */
-    static MsgUnit *generateUploadFileRequest_next(QByteArray data);
+    static MsgUnit *generateUploadFileDataRequest(qint64 size, const char* buffer);
 
     /**
-     * @brief 生成上传文件请求（finsh）
+     * @brief 生成文件上传上传完成请求
      * @return
      */
-    static MsgUnit *generateUploadFileRequest_finsh();
+    static MsgUnit* generateUploadFileFinshRequest();
+
+
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

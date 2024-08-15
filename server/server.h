@@ -30,7 +30,7 @@ struct my_bev
 /// @param port 监听端口
 /// @param _connSustainTime 连接维持时间
 /// @return 如果失败函数立即结束返回1，否则函数进入循环监听状态
-int run(std::string host, uint port, struct timeval _connSustainTime = {60, 0});
+int run(std::string host, uint port, struct timeval _connSustainTime = {60 * 5, 0});
 
 /// @brief 监听套接字回调函数
 void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);

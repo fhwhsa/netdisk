@@ -50,13 +50,22 @@ enum MsgType {
     MSG_TYPE_DELETEFILEFOLDER_REQUEST,
     /// @brief 删除文件/文件夹响应
     MSG_TYPE_DELETEFILEFOLDER_RESPOND,
-    /// @brief 上传文件请求
-    MSG_TYPE_UPLOADFILE_REQUEST,
-    /// @brief 上传文件响应
-    MSG_TYPE_UPLOADFILE_RESPOND
+    /// @brief 文件上传任务创建请求
+    MSG_TYPE_UPLOADFILE_START_REQUEST,
+    /// @brief 文件上传任务创建响应
+    MSG_TYPE_UPLOADFILE_START_RESPOND,
+    /// @brief 文件上传上传数据请求
+    MSG_TYPE_UPLOADFILE_DATA_REQUEST,
+    /// @brief 文件上传上传数据响应
+    MSG_TYPE_UPLOADFILE_DATA_RESPOND,
+    /// @brief 文件上传上传完成请求
+    MSG_TYPE_UPLOADFILE_FINSH_REQUEST,
+    /// @brief 文件上传上传完成响应
+    MSG_TYPE_UPLOADFILE_FINSH_RESPOND,
+    TYPE_NUM
 };
 
-constexpr unsigned int msgTypeNum = 25;
+constexpr unsigned int msgTypeNum = TYPE_NUM;
 
 /// @brief 通信数据单元
 struct MsgUnit

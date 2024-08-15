@@ -15,17 +15,16 @@ public:
     std::string getUserId();
     void setUserId(std::string _userId);
 
-    std::ofstream* getUploadStream();
-    bool setUploadStream(std::ofstream* of);
-
     std::string getFilePath();
     void setFilePath(std::string _filepath);
 
+    void setFd(int _fd);
+    int getFd();
+
 private:
     std::string userId;
-    std::ofstream* uploadTo;
-    std::ifstream* downloadFrom;
     std::string filepath;
+    int fd;
 };
 
 #endif

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
+    <width>850</width>
     <height>44</height>
    </rect>
   </property>
@@ -36,6 +36,24 @@
        </item>
        <item>
         <widget class="QLabel" name="filename">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <pointsize>11</pointsize>
@@ -74,13 +92,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>500</width>
+         <width>450</width>
          <height>20</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>500</width>
+         <width>450</width>
          <height>20</height>
         </size>
        </property>
@@ -111,26 +129,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="currSize">
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="totalSize">
-         <property name="text">
-          <string>/0</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="unit">
+        <widget class="QLabel" name="progress">
          <property name="text">
           <string>KB</string>
          </property>

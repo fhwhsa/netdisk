@@ -56,8 +56,25 @@ BubbleTips::BubbleTips(QString showStr, bool flag, int sec, QWidget *parent): QW
     this->setWindowOpacity(opacityValue);
     initTimer();
 
-    QPoint pPos = QApplication::activeWindow()->pos();
-    QSize pSize = QApplication::activeWindow()->size();
+    QPoint pPos;
+    QSize pSize;
+    QWidget* aw = QApplication::activeWindow();
+    if (nullptr != aw) // 检查是否有激活的窗口，如果有则将气泡消息显示在激活窗口中央
+    {
+        pPos = QApplication::activeWindow()->pos();
+        pSize = QApplication::activeWindow()->size();
+    }
+    else if (parent != nullptr) // 没有激活窗口，如果有传入QWidget对象则显示在其中间
+    {
+        pPos = parent->pos();
+        pSize = parent->size();
+    }
+    else // 显示在电脑全屏中间
+    {
+        QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+        pPos = QPoint(screenGeometry.width() / 2, screenGeometry.height() / 2);
+    }
+
     pPos += QPoint(pSize.width() / 2, pSize.height() / 2);
     this->move(pPos - QPoint(this->width() / 2, this->height() / 2));
 

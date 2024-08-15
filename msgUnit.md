@@ -154,38 +154,24 @@
 
 ---
 
-### 文件上传
+### 文件上传任务创建
 1. 请求
-    * start（开始上传）
-        ```
-        start\r\n
-        {文件名}\r\n
-        {保存路径}\r\n
-        ```
-    * next（上传下一个分块）
-        ```
-        next\r\n
-        {数据}
-        ```
-    * pause（暂停上传）
-        ```
-        pause\r\n
-        ```
-    * cont（继续上传）
-        ```
-        cont\r\n
-        {文件路径}
-        ```
-    * finsh（上传完成）
-        ```
-        finsh\r\n
-        ```
+    ```
+    {文件名}\r\n
+    {网盘存储路径}\r\n
+    ```
 2. 响应
-    * 成功
-        * start `recv\r\n`
-        * next `recvdata\r\n{读取的字节数}\r\n`
-        * pause `recv\r\n`
-        * cont `recv\r\n`
-        * finsh `finsh\r\n`
+    * 成功 `recv\r\n0\r\n`
+    * 失败 `failure\r\nstatus:{}\r\n`
 
-    * 出错 `failure\r\nstatus:{}\r\n`
+### 文件上传上传数据
+1. 请求 `{数据}`
+2. 响应 
+    * 成功 `recv\r\n{读取的字节数}\r\n`
+    * 失败 `failure\r\nstatus:{}\r\n`
+
+### 文件上传上传完成
+1. 请求 ``
+2. 响应 
+    * 成功 `recv\r\n`
+    * 失败 `failure\r\nstatus:{}\r\n`

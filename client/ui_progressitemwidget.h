@@ -34,9 +34,7 @@ public:
     QProgressBar *progressBar;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer_2;
-    QLabel *currSize;
-    QLabel *totalSize;
-    QLabel *unit;
+    QLabel *progress;
     QLabel *errorMsg;
     QToolButton *pauseOrContBtn;
     QToolButton *cancelBtn;
@@ -45,7 +43,7 @@ public:
     {
         if (progressItems->objectName().isEmpty())
             progressItems->setObjectName(QString::fromUtf8("progressItems"));
-        progressItems->resize(820, 44);
+        progressItems->resize(850, 44);
         horizontalLayout_3 = new QHBoxLayout(progressItems);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         gridLayout = new QGridLayout();
@@ -58,6 +56,13 @@ public:
 
         filename = new QLabel(progressItems);
         filename->setObjectName(QString::fromUtf8("filename"));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(filename->sizePolicy().hasHeightForWidth());
+        filename->setSizePolicy(sizePolicy);
+        filename->setMinimumSize(QSize(150, 0));
+        filename->setMaximumSize(QSize(150, 16777215));
         QFont font;
         font.setPointSize(11);
         filename->setFont(font);
@@ -73,13 +78,13 @@ public:
 
         progressBar = new QProgressBar(progressItems);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(progressBar->sizePolicy().hasHeightForWidth());
-        progressBar->setSizePolicy(sizePolicy);
-        progressBar->setMinimumSize(QSize(500, 20));
-        progressBar->setMaximumSize(QSize(500, 20));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(progressBar->sizePolicy().hasHeightForWidth());
+        progressBar->setSizePolicy(sizePolicy1);
+        progressBar->setMinimumSize(QSize(450, 20));
+        progressBar->setMaximumSize(QSize(450, 20));
         progressBar->setValue(0);
         progressBar->setAlignment(Qt::AlignCenter);
 
@@ -91,21 +96,10 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer_2);
 
-        currSize = new QLabel(progressItems);
-        currSize->setObjectName(QString::fromUtf8("currSize"));
-        currSize->setFont(font);
+        progress = new QLabel(progressItems);
+        progress->setObjectName(QString::fromUtf8("progress"));
 
-        horizontalLayout->addWidget(currSize);
-
-        totalSize = new QLabel(progressItems);
-        totalSize->setObjectName(QString::fromUtf8("totalSize"));
-
-        horizontalLayout->addWidget(totalSize);
-
-        unit = new QLabel(progressItems);
-        unit->setObjectName(QString::fromUtf8("unit"));
-
-        horizontalLayout->addWidget(unit);
+        horizontalLayout->addWidget(progress);
 
         errorMsg = new QLabel(progressItems);
         errorMsg->setObjectName(QString::fromUtf8("errorMsg"));
@@ -150,9 +144,7 @@ public:
     {
         progressItems->setWindowTitle(QCoreApplication::translate("progressItems", "Form", nullptr));
         filename->setText(QCoreApplication::translate("progressItems", "\346\226\207\344\273\266\345\220\215", nullptr));
-        currSize->setText(QCoreApplication::translate("progressItems", "0", nullptr));
-        totalSize->setText(QCoreApplication::translate("progressItems", "/0", nullptr));
-        unit->setText(QCoreApplication::translate("progressItems", "KB", nullptr));
+        progress->setText(QCoreApplication::translate("progressItems", "KB", nullptr));
         errorMsg->setText(QString());
         pauseOrContBtn->setText(QCoreApplication::translate("progressItems", "...", nullptr));
         cancelBtn->setText(QCoreApplication::translate("progressItems", "...", nullptr));

@@ -16,9 +16,7 @@ class ProgressItemWidget : public QWidget
 
 public:
     explicit ProgressItemWidget(QWidget *parent = nullptr);
-    explicit ProgressItemWidget(int _taskId, QString _filename, qint64 filesize, QWidget *parent = nullptr);
-
-    void init(int _taskId, QString _filename, qint64 filesize);
+    explicit ProgressItemWidget(int tid, QString _filename, qint64 filesize, QWidget *parent = nullptr);
 
     void updateFinshSize(qint64 val);
 
@@ -28,12 +26,13 @@ public:
 
     QString getFileName();
 
+    void init(QString _filename, qint64 filesize);
+
     ~ProgressItemWidget();
 
 private:
     Ui::progressItems *ui;
 
-    const qint64 unit = 4096;
     qint64 totalSize;
     qint64 finshSize;
     std::function<QString(qint64)> func;
@@ -41,10 +40,13 @@ private:
     int taskId;
     QString filename;
 
+    QString progressSuffix;
+
     int pauseOrCont; // 标识按钮状态
     QIcon pauseIcon, contIcon;
 
     void iniSignalSlots();
+
 
 signals:
     void cancel();

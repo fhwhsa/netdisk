@@ -20,9 +20,8 @@ namespace Ui {
 class TransmitPage;
 }
 
-class UploadWorker;
-class DownloadWorker;
 class TransmitPage;
+class UploadWorker;
 
 class TransmitPage : public QWidget
 {
@@ -36,8 +35,8 @@ private:
     Ui::TransmitPage *ui;
 
     QListWidget* currListWidget;
-    QHash<int, UploadWorker*> uploadTaskList;
 
+    QHash<int, UploadWorker*> uploadWorkerList;
     const int maxUploadTaskNum = 2;
 
     void init();
@@ -71,29 +70,28 @@ class UploadWorker : public QThread
     Q_OBJECT
 
 public:
-    UploadWorker(int _taskId, QString filepath, QString diskPath, ProgressItemWidget* _piw);
-    ~UploadWorker();
+    explicit UploadWorker(int _tid, QString _filepath, QString _diskPath);
+
 
 private:
-    QTcpSocket* socket;
-    QFile* file;
-    ProgressItemWidget* piw;
-    int taskId;
 
-    void releaseSources();
+    QFile file;
+    qint64 uploadSize;
+    qint64 fileSize;
+    QString filename, filepath, diskpath;
+    int tid;
+    const int blockSize = 1024;
 
-private slots:
-    void recvHandler();
-    void cancelTask();
-    void pauseTask();
-    void contTask();
+    bool initFile();
+    void upload(QTcpSocket* socket);
 
 protected:
     void run() override;
 
 signals:
-    void exitEventLoop();   // 退出时间循环信号
-    void taskFinsh(int taskId);   // 上传任务完成信号器
+    void updateProgress(qint64 value);
+    void workFinsh(bool isSuccess, int taskId, QString errorMsg = ""); // 工作线程结束时发起
+
 };
 
-#endif // TRANSMITPAGE_H
+#endif
