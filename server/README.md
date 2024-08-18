@@ -26,5 +26,4 @@
 <span id="运行"></span>
 ## 运行
 * 数据库配置：运行MySQL数据库脚本，修改数据库连接池配置文件
-* 服务器运行：`cd server && make && ./run`
-* 客户端运行：`cd client && make && ./client`
+* 运行：`cd server && make && ./run`

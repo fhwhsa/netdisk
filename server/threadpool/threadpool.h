@@ -48,7 +48,6 @@ public:
             tasks.emplace([task]() { (*task)(); });
         }
         condition.notify_one();
-        adjust_thread_count();
         return res;
     }
 

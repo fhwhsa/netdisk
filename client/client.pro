@@ -23,6 +23,7 @@ SOURCES += \
     msgtools.cpp \
     progressitemwidget.cpp \
     respondwatcher.cpp \
+    settingdialog.cpp \
     transmitpage.cpp
 
 HEADERS += \
@@ -39,6 +40,7 @@ HEADERS += \
     msgtools.h \
     progressitemwidget.h \
     respondwatcher.h \
+    settingdialog.h \
     statusCode.h \
     transmitpage.h
 
@@ -52,6 +54,7 @@ FORMS += \
     login.ui \
     mainpage.ui \
     progressitemwidget.ui \
+    settingdialog.ui \
     transmitpage.ui
 
 # Default rules for deployment.

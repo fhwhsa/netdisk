@@ -31,7 +31,6 @@ TransmitPage::TransmitPage(QWidget *parent) :
 TransmitPage::~TransmitPage()
 {
     delete ui;
-    qDebug() << "transmitpage delete";
 }
 
 void TransmitPage::addUploadTask(QString filepath, QString diskPath)

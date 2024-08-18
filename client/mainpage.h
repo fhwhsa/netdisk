@@ -4,6 +4,7 @@
 #include "folderpage.h"
 #include "transmitpage.h"
 #include "friendpage.h"
+#include "settingdialog.h"
 
 #include <QWidget>
 #include <QHash>

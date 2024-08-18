@@ -32,8 +32,6 @@ MainPage::MainPage(QString _userId, QString _userEmail, QTcpSocket* _socket, QWi
 
 MainPage::~MainPage()
 {
-    qDebug() << "mainpage delete";
-
     delete folderPage;
     delete transmitPage;
     delete friendPage;
@@ -152,7 +150,8 @@ void MainPage::clickTblogout()
 
 void MainPage::clickTbsetting()
 {
-
+    SettingDialog* settingDialog = new SettingDialog(this);
+    settingDialog->show();
 }
 
 void MainPage::clickTbUserInfo()
