@@ -1,11 +1,27 @@
 {
-    "ip": "127.0.0.1",
-    "port": 3306,
-    "userName": "root",
-    "passwd": "123456",
-    "dbName": "netdisk",
-    "minConnSize": 1,
-    "maxConnSize": 150,
-    "maxIdleTime": 5000,
-    "maxWaitTime": 5000
+    "connection-pool" : {
+        "ip": "127.0.0.1",      // 数据库服务器ip
+        "port": 3306,           // 数据库服务器端口
+        "userName": "root",     // 用户名
+        "passwd": "123456",     // 密码
+        "dbName": "netdisk",    // 数据库名
+        "minConnSize": 1,       // 最小连接数
+        "maxConnSize": 150,     // 最大连接数
+        "maxIdleTime": 5000,    // 连接最大空闲时间，长时间处于空间将会关闭
+        "maxWaitTime": 5000     // 获取连接最大等待时长
+    },
+
+    "thread-pool" : {
+        "maxIdleTime": 60,      // 最长空闲时间（s)
+        "maxThreads": 16,       // 最大工作线程数
+        "minThreads": 5,        // 最小工作线程数
+        "adjustAddThreads": 5,  // 单次调整增加工作线程数的最大值
+        "adjustDuration": 60    // 执行调整函数的间隔时间（s)
+    },
+
+    "server-setting" : {
+        "ip": "127.0.0.1",         // 服务器ip
+        "port": 9999,              // 监听端口
+        "connSustainTime": 60      // 连接最大空闲时间（s）
+    }
 }

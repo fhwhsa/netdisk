@@ -7,17 +7,27 @@
 #include "msg/msgUnit.h"
 #include "msg/msgParsing.h"
 #include "idatabase/idatabase.h"
+#include "mysql/connectionPool.h"
+#include "threadpool/threadpool.h"
 
 #include <stdlib.h>
 #include <signal.h>
 #include <event.h>
 #include <event2/listener.h>
 #include <iostream>
+#include <thread>
+#include <arpa/inet.h>
 
 struct timeval connSustainTime;
 
 int run(std::string host, uint port, struct timeval _connSustainTime)
 {
+    // 初始化数据库连接池
+    ConnectionPool::getConnectionPool();
+
+    // 初始化线程池
+    ThreadPool::getInstance();
+
     connSustainTime = _connSustainTime;
 
     struct event_base *ebase = event_base_new();
@@ -50,7 +60,7 @@ int run(std::string host, uint port, struct timeval _connSustainTime)
     }
 
     // 忽略SIGPIPE信号，避免可能的写操作错误导致服务器退出
-    if (signal(SIGPIPE, SIG_IGN))
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         perr_exit("signal error");
 
     event_base_dispatch(ebase);
@@ -88,6 +98,27 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
     bufferevent_enable(bev, EV_READ | EV_WRITE);
 }
 
+void respondToClient(MsgUnit* munit, my_bev* mbev)
+{
+    MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
+    if (nullptr != respond)
+    {
+        // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
+        //         << (char*)respond->msg << std::endl;
+        
+        // 记录登陆id
+        if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
+            mbev->ur.setUserId(MsgParsing::getRow(respond, 1).substr(3));
+        bufferevent_write(mbev->bev, (char*)respond, respond->totalLen);
+
+        delete respond;
+        respond = nullptr;
+    }
+    // std::cout << "write" << std::endl;
+    delete munit;
+    munit = nullptr;
+}
+
 void read_cb(struct bufferevent *bev, void *ctx)
 {
     // Printf("read\n");
@@ -104,23 +135,25 @@ void read_cb(struct bufferevent *bev, void *ctx)
     res = bufferevent_read(bev, munit->msg, munit->msgLen);
     // std::cout << (char*)munit->msg << std::endl;
 
-    MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
-    if (nullptr != respond)
-    {
-        // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
-        //         << (char*)respond->msg << std::endl;
-        
-        // 记录登陆id
-        if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
-            mbev->ur.setUserId(MsgParsing::getRow(respond, 1).substr(3));
-        bufferevent_write(bev, (char*)respond, respond->totalLen);
+    ThreadPool::getInstance().enqueue(respondToClient, munit, mbev);
 
-        delete respond;
-        respond = nullptr;
-    }
-    // std::cout << "write" << std::endl;
-    delete munit;
-    munit = nullptr;
+    // MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
+    // if (nullptr != respond)
+    // {
+    //     // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
+    //     //         << (char*)respond->msg << std::endl;
+        
+    //     // 记录登陆id
+    //     if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
+    //         mbev->ur.setUserId(MsgParsing::getRow(respond, 1).substr(3));
+    //     bufferevent_write(bev, (char*)respond, respond->totalLen);
+
+    //     delete respond;
+    //     respond = nullptr;
+    // }
+    // // std::cout << "write" << std::endl;
+    // delete munit;
+    // munit = nullptr;
 }
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)

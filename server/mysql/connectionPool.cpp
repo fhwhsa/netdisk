@@ -123,16 +123,28 @@ void ConnectionPool::loadConfig()
     bool ok = Json::parseFromStream(ReaderBuilder, ifs, &root, &strerr);
     if (!ok)
         throw std::runtime_error("Failed to read the configuration file!");
-
-    this->ip = root["ip"].asString();
-    this->port = root["port"].asUInt();
-    this->userName = root["userName"].asString();
-    this->passwd = root["passwd"].asString();
-    this->dbName = root["dbName"].asString();
-    this->minConnSize = root["minConnSize"].asUInt();
-    this->maxConnSize = root["maxConnSize"].asUInt();
-    this->maxIdleTime = root["maxIdleTime"].asUInt64();
-    this->maxWaitTime = root["maxWaitTime"].asUInt64();
+    
+    if (!root.isMember("connection-pool"))
+        throw std::runtime_error("Profile is missing value 'connection-pool'!");
+    
+    auto check = [&](const std::string& key) {
+        if (!root["connection-pool"].isMember(key))
+            throw std::runtime_error("The connection-pool configuration is missing the value '" + key + "'");
+    };
+    
+    for (const std::string& key : {"ip", "port", "userName", "passwd", "dbName", 
+        "minConnSize", "maxConnSize", "maxIdleTime", "maxWaitTime"})
+        check(key);
+    
+    this->ip = root["connection-pool"]["ip"].asString();
+    this->port = root["connection-pool"]["port"].asUInt();
+    this->userName = root["connection-pool"]["userName"].asString();
+    this->passwd = root["connection-pool"]["passwd"].asString();
+    this->dbName = root["connection-pool"]["dbName"].asString();
+    this->minConnSize = root["connection-pool"]["minConnSize"].asUInt();
+    this->maxConnSize = root["connection-pool"]["maxConnSize"].asUInt();
+    this->maxIdleTime = root["connection-pool"]["maxIdleTime"].asUInt64();
+    this->maxWaitTime = root["connection-pool"]["maxWaitTime"].asUInt64();
 }
 
 void ConnectionPool::addConnection()

@@ -21,7 +21,7 @@ struct my_bev
     ConnResources ur;
     ~my_bev()
     {
-        std::cout << "delete" << std::endl;
+        // std::cout << "delete" << std::endl;
     }
 };
 
