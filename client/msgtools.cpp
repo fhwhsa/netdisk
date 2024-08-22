@@ -103,6 +103,18 @@ MsgUnit *MsgTools::generateUploadFileFinshRequest()
     return MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_FINSH_REQUEST, 0, "/0");
 }
 
+MsgUnit *MsgTools::generateDownloadFileStartRequest(QString filePath)
+{
+    QString str = filePath + "\r\n";
+    return msgHandler(str, MsgType::MSG_TYPE_DOWNLOADFILE_START_REQUEST);
+}
+
+MsgUnit *MsgTools::generateDownloadFileDataRequest(qint64 hasDownloadSize)
+{
+    QString str = QString("%1\r\n").arg(hasDownloadSize);
+    return msgHandler(str, MsgType::MSG_TYPE_DOWNLOADFILE_DATA_REQUEST);
+}
+
 
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {

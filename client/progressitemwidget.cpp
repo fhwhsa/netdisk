@@ -79,7 +79,8 @@ void ProgressItemWidget::updateFinshSize(qint64 val)
 {
     finshSize += val;
     ui->progress->setText(func(finshSize) + progressSuffix);
-    ui->progressBar->setValue(1.0 * finshSize / totalSize * 100);
+    if (0 != totalSize)
+        ui->progressBar->setValue(1.0 * finshSize / totalSize * 100);
 }
 
 void ProgressItemWidget::setErrorMsg(QString text)

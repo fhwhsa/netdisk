@@ -6,6 +6,7 @@
 #define _SERVER_H_
 
 #include "connResources/connResources.h"
+#include "msg/msgUnit.h"
 
 #include <string>
 #include <event.h>
@@ -34,6 +35,11 @@ int run(std::string host, uint port, struct timeval _connSustainTime = {60 * 5, 
 
 /// @brief 监听套接字回调函数
 void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
+
+/// @brief 根据不同的munit作出响应
+/// @param munit 从客户端接收到的消息
+/// @param mbev 
+void respondToClient(MsgUnit* munit, my_bev* mbev);
 
 /// @brief 读回调函数
 void read_cb(struct bufferevent *, void *);

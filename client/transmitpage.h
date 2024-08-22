@@ -22,6 +22,7 @@ class TransmitPage;
 
 class TransmitPage;
 class UploadWorker;
+class DownloadWorker;
 
 class TransmitPage : public QWidget
 {
@@ -39,6 +40,9 @@ private:
     QHash<int, UploadWorker*> uploadWorkerList;
     const int maxUploadTaskNum = 2;
 
+    QHash<int, DownloadWorker*> downloadWorkerList;
+    const int maxDownloadTaskNum = 2;
+
     void init();
     void iniSignalSlots();
 
@@ -49,6 +53,7 @@ public slots:
      */
     void getMsg(std::shared_ptr<MsgUnit> sptr);
     void addUploadTask(QString filepath, QString diskPath);
+    void addDownloadTask(QString filepath, qint64 filesize);
 
 private slots:
     void clickUploadListBtn();
@@ -74,7 +79,6 @@ public:
 
 
 private:
-
     QFile file;
     qint64 uploadSize;
     qint64 fileSize;
@@ -91,6 +95,31 @@ protected:
 signals:
     void updateProgress(qint64 value);
     void workFinsh(bool isSuccess, int taskId, QString errorMsg = ""); // 工作线程结束时发起
+
+};
+
+class DownloadWorker : public QThread
+{
+    Q_OBJECT
+
+public:
+    explicit DownloadWorker(int _tid, QString _downloadPath, qint64 _fileSize, QString _storePath);
+
+private:
+    QFile file;
+    qint64 downloadSize, fileSize;
+    QString downloadPath, storePath, filename;
+    int tid;
+
+    void download(QTcpSocket* socket);
+
+
+protected:
+    void run() override;
+
+signals:
+    void updateProgress(qint64 value);
+    void workFinsh(bool isSuccess, int taskId, QString errorMsg = "");
 
 };
 

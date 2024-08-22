@@ -22,6 +22,6 @@
     "server-setting" : {
         "ip": "127.0.0.1",         // 服务器ip
         "port": 9999,              // 监听端口
-        "connSustainTime": 60      // 连接最大空闲时间（s）
+        "connSustainTime": 300      // 连接最大空闲时间（s）
     }
 }

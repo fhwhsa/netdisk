@@ -121,7 +121,6 @@ void respondToClient(MsgUnit* munit, my_bev* mbev)
 
 void read_cb(struct bufferevent *bev, void *ctx)
 {
-    // Printf("read\n");
     int res = 0;
     my_bev* mbev = (my_bev*)ctx;
 
@@ -136,24 +135,6 @@ void read_cb(struct bufferevent *bev, void *ctx)
     // std::cout << (char*)munit->msg << std::endl;
 
     ThreadPool::getInstance().enqueue(respondToClient, munit, mbev);
-
-    // MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
-    // if (nullptr != respond)
-    // {
-    //     // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
-    //     //         << (char*)respond->msg << std::endl;
-        
-    //     // 记录登陆id
-    //     if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
-    //         mbev->ur.setUserId(MsgParsing::getRow(respond, 1).substr(3));
-    //     bufferevent_write(bev, (char*)respond, respond->totalLen);
-
-    //     delete respond;
-    //     respond = nullptr;
-    // }
-    // // std::cout << "write" << std::endl;
-    // delete munit;
-    // munit = nullptr;
 }
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)

@@ -8,10 +8,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 const std::string basePath = "./virtualDisks";
 
-std::vector<std::pair<int, std::string>> IFileFolder::getFolderContent(std::string path, bool& res, int& statusCode)
+std::vector<FileInfo> IFileFolder::getFolderContent(std::string path, bool& res, int& statusCode)
 {
     using namespace std;
     using namespace filesystem;
@@ -31,10 +33,10 @@ std::vector<std::pair<int, std::string>> IFileFolder::getFolderContent(std::stri
         return {};
     }
 
-    vector<pair<int, string>> v;
+    vector<FileInfo> v;
     for (const auto& it : directory_iterator(path))
     {
-        v.emplace_back(it.is_directory() ? 0 : 1, it.path().filename());
+        v.emplace_back(it.is_directory() ? 0 : 1, it.path().filename(), it.file_size());
     }
 
     res = true;
@@ -162,7 +164,10 @@ int IFileFolder::createFile(std::string path, int &statusCode)
         statusCode = SUCCESS;
         int fd = open(path.c_str(), O_WRONLY | O_CREAT, 0644);
         if (-1 == fd)
+        {
+            statusCode = FILEOPENFAILURE;
             perror("open");
+        }
         return fd;
     }
     catch(const std::exception& e)
@@ -171,4 +176,49 @@ int IFileFolder::createFile(std::string path, int &statusCode)
         statusCode = EXCEPTION;
     }
     return -1;
+}
+
+int IFileFolder::openFile(std::string path, off_t offset, int &statusCode)
+{
+    using namespace std;
+    using namespace filesystem;
+
+    path = basePath + path;
+
+    if (!exists(path))
+    {
+        statusCode = FILEORFOLDERNOTEXIST;
+        return -1;
+    }
+    try
+    {
+        statusCode = SUCCESS;
+        int fd = open(path.c_str(), O_RDONLY);
+        if (-1 == fd)
+        {
+            statusCode = FILEOPENFAILURE;
+            perror("open");
+        }
+        if (-1 == lseek(fd, offset, SEEK_SET))
+        {
+            statusCode = FILEOPENFAILURE;
+            perror("lseek"); 
+        }
+        return fd;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        statusCode = EXCEPTION;
+    }
+    return -1;
+}
+
+long IFileFolder::getFileSize(std::string path)
+{
+    path = basePath + path;
+    struct stat filestat;
+    if (0 != stat(path.c_str(), &filestat))
+        return -1;
+    return static_cast<long>(filestat.st_size);
 }

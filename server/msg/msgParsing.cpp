@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string.h>
 #include <filesystem>
+#include <unistd.h>
 // #include <iostream>
 
 std::vector<std::string> MsgParsing::split_string(const std::string &str, std::string reg)
@@ -225,12 +226,12 @@ MsgUnit *MsgParsing::getFolderContentRespond(const MsgUnit *munit)
     bool res;
     int statusCode;
     string content = "";
-    vector<pair<int, string>> v = IFileFolder::getFolderContent(target, res, statusCode);
+    vector<FileInfo> v = IFileFolder::getFolderContent(target, res, statusCode);
     if (res)
     {
-        for (const pair<int, string>& it : v)
+        for (const FileInfo& it : v)
         {
-            content.append(it.second + "|" + to_string(it.first) + "\r\n");
+            content.append(it.fileName + "|" + to_string(it.type) + "|" + to_string(it.fileSize) + "\r\n");
         }
     }
     else 
@@ -257,12 +258,12 @@ MsgUnit *MsgParsing::createFolderRespond(const MsgUnit *munit)
     if (IFileFolder::createFolder(path, name, statusCode))
     {
         bool res;
-        vector<pair<int, string>> v = IFileFolder::getFolderContent(path, res, statusCode);
+        vector<FileInfo> v = IFileFolder::getFolderContent(path, res, statusCode);
         if (res)
         {
-            for (const pair<int, string>& it : v)
+            for (const FileInfo& it : v)
             {
-                content.append(it.second + "|" + to_string(it.first) + "\r\n");
+                content.append(it.fileName + "|" + to_string(it.type) + "|" + to_string(it.fileSize) + "\r\n");
             }
         }
         else 
@@ -364,7 +365,7 @@ MsgUnit *MsgParsing::uploadFileDataRespond(const MsgUnit *munit, ConnResources &
     long writeBytes = write(ur.getFd(), munit->msg, munit->msgLen - 1);
     if (-1 == writeBytes)
     {
-        content = "failure\r\nstatus:501\r\n";
+        content = "failure\r\nstatus:214\r\n";
     }
     else 
     {
@@ -397,6 +398,75 @@ MsgUnit *MsgParsing::uploadFileFinshRespond(const MsgUnit *munit, ConnResources 
 
     MsgUnit* respond = nullptr;
     respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_FINSH_RESPOND, strlen(content.c_str()), content.c_str());
+
+    return respond;
+}
+
+MsgUnit *MsgParsing::downloadFileStartRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+    using namespace filesystem;
+
+    // 处理信息
+    vector<string> fileinfo = getAllRows(munit);
+    if (1 != fileinfo.size())
+        return nullptr;
+
+    bool isSuccess = true;
+    string content;
+    int statusCode;
+    int fd = IFileFolder::openFile(fileinfo[0], 0, statusCode);
+    if (-1 == fd)
+    {
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+        isSuccess = false;
+    }
+    else 
+    {
+        long size = IFileFolder::getFileSize(fileinfo[0]);
+        if (-1 == size)
+        {
+            content = "failure\r\nstatus:213\r\n";
+            isSuccess = false;
+        }
+        else 
+        {
+            ur.setFd(fd);
+            ur.setFilePath(fileinfo[0]);   
+            content = "recv\r\n" + to_string(size) + "\r\n";
+        }
+    }
+    
+    MsgUnit* respond = nullptr;
+    if (isSuccess)
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_START_RESPOND, strlen(content.c_str()), content.c_str());
+    else 
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND, strlen(content.c_str()), content.c_str());
+
+    return respond;
+}
+
+MsgUnit *MsgParsing::downloadFileDataRequestRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    // 处理信息
+    vector<string> fileinfo = getAllRows(munit);
+    if (1 != fileinfo.size())
+        return nullptr;
+
+    char buf[1024];
+    MsgUnit* respond = nullptr;
+    long readBytes = read(ur.getFd(), buf, 1024);
+    if (-1 == readBytes)
+    {
+        char* content = "failure\r\nstatus:215\r\n";
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND, strlen(content), content);
+    }
+    else 
+    {
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_DATA_RESPOND, readBytes, buf);
+    }
 
     return respond;
 }
@@ -482,6 +552,12 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     // 文件上传上传完成请求
     case MsgType::MSG_TYPE_UPLOADFILE_FINSH_REQUEST:
         return uploadFileFinshRespond(munit, ur);
+
+    case MsgType::MSG_TYPE_DOWNLOADFILE_START_REQUEST:
+        return downloadFileStartRespond(munit, ur);
+    
+    case MsgType::MSG_TYPE_DOWNLOADFILE_DATA_REQUEST:
+        return downloadFileDataRequestRespond(munit, ur);
 
     // 未知请求
     default:

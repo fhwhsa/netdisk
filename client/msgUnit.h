@@ -3,6 +3,7 @@
 
 typedef unsigned int uint;
 
+/// @brief
 enum MsgType {
     /// @brief 注册请求
     MSG_TYPE_REGIST_REQUEST,
@@ -62,6 +63,16 @@ enum MsgType {
     MSG_TYPE_UPLOADFILE_FINSH_REQUEST,
     /// @brief 文件上传上传完成响应
     MSG_TYPE_UPLOADFILE_FINSH_RESPOND,
+    /// @brief 文件下载任务创建请求
+    MSG_TYPE_DOWNLOADFILE_START_REQUEST,
+    /// @brief 文件下载任务创建响应
+    MSG_TYPE_DOWNLOADFILE_START_RESPOND,
+    /// @brief 文件下载数据请求
+    MSG_TYPE_DOWNLOADFILE_DATA_REQUEST,
+    /// @brief 文件下载数据请求响应
+    MSG_TYPE_DOWNLOADFILE_DATA_RESPOND,
+    /// @brief 文件下载错误时，将错误返回设置的消息类型，单独作为一个类型主要是方便客户端解析消息
+    MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND,
     TYPE_NUM
 };
 

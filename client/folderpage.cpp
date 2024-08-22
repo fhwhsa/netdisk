@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QFile>
+#include <QStringList>
 
 QSize FolderPage::itemSize = QSize(0, 50);
 
@@ -78,22 +79,27 @@ void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
 
     for (const QString& str : list)
     {
-        int pos = str.lastIndexOf('|');
-        if (-1 == pos)
+        if ("" == str)
             continue;
+        QStringList info = str.split('|');
+        if (info.size() != 3)
+        {
+            BubbleTips::showBubbleTips("目录文件信息出错", 2, this);
+            continue;
+        }
         QListWidgetItem* item = new QListWidgetItem(ui->fileList);
-        if ("0" == str.mid(pos + 1))
+        if (info[1] == "0")
         {
             item->setStatusTip("0");
             item->setIcon(QIcon(":/img/res/img/folder.png"));
+            item->setText(info[0]);
         }
         else
         {
             item->setStatusTip("1");
             item->setIcon(QIcon(":/img/res/img/file.png"));
+            item->setText(info[0] + ":" + info[2]);
         }
-
-        item->setText(str.first(pos));
         item->setSizeHint(itemSize);
     }
 }
@@ -224,7 +230,32 @@ void FolderPage::clickTbRename()
 
 void FolderPage::clickTbDownload()
 {
-    qDebug() << "download";
+    QList<QListWidgetItem*> selectedList = ui->fileList->selectedItems();
+    if (selectedList.isEmpty())
+    {
+        BubbleTips::showBubbleTips("请选择要删除的文件/文件夹", 1, this);
+        return;
+    }
+
+    QStringList fileList;
+    for (const QListWidgetItem* item : selectedList)
+    {
+        if ("1" == item->statusTip())   // 文件
+            fileList.push_back(item->text());
+    }
+
+    QString str;
+    for (const QString& it : fileList)
+    {
+        str.append(it.first(it.lastIndexOf(':')) + "\n");
+    }
+    if (QMessageBox::No == QMessageBox::question(this, "确定下载以下文件吗？", str, QMessageBox::Yes | QMessageBox::No))
+        return;
+
+
+    // 测试功能，仅下载第一个
+    int pos = fileList[0].lastIndexOf(':');
+    emit deliverDownloadTask(currPath + "/" + fileList[0].first(pos), fileList[0].mid(pos + 1).toULong());
 }
 
 void FolderPage::clickTbUpload()

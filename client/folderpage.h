@@ -71,6 +71,8 @@ signals:
 
     void deliverUploadTask(QString filepath, QString diskPath);
 
+    void deliverDownloadTask(QString filepath, qint64 filesize);
+
     /**
      * @brief 向服务器发送信息，有MainPage类代理
      * @param munit 要发送给服务器的数据单元

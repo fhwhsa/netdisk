@@ -1,11 +1,15 @@
 #include "connResources.h"
 
+#include <unistd.h>
+
 ConnResources::ConnResources()
 {
+    fd = -1;
 }
 
 ConnResources::ConnResources(std::string _userId) : userId(_userId)
 {
+    fd = -1;
 }
 
 std::string ConnResources::getUserId()
@@ -15,6 +19,8 @@ std::string ConnResources::getUserId()
 
 ConnResources::~ConnResources()
 {
+    if (-1 != fd)
+        close(fd);
 }
 
 void ConnResources::setUserId(std::string _userId)

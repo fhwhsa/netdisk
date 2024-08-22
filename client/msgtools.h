@@ -120,7 +120,19 @@ public:
      */
     static MsgUnit* generateUploadFileFinshRequest();
 
+    /**
+     * @brief 生成文件下载创建请求
+     * @param filePath 下载文件的网盘路径
+     * @return
+     */
+    static MsgUnit *generateDownloadFileStartRequest(QString filePath);
 
+    /**
+     * @brief 生成文件下载数据请求
+     * @param hasDownloadSize 当前已下载的字节数
+     * @return
+     */
+    static MsgUnit *generateDownloadFileDataRequest(qint64 hasDownloadSize);
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

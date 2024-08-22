@@ -15,6 +15,10 @@
 #define FAILURE                 209     /*失败*/
 #define FRIENDSHIPS             210     /*好友关系*/
 #define FILEEXIST               211     /*文件已存在*/
+#define FILEOPENFAILURE         212     /*文件打开失败*/
+#define GETFILESTATFAILURE      213     /*获取文件信息失败*/
+#define WRITEFILEFAILURE        214     /*写文件失败*/
+#define READFILEFAILURE         215     /*读文件失败*/
 
 // 数据库错误
 #define DATABASEBUSY            301     /*数据库繁忙*/

@@ -35,6 +35,7 @@ TransmitPage::~TransmitPage()
 
 void TransmitPage::addUploadTask(QString filepath, QString diskPath)
 {
+    // 检查任务数限制
     if (uploadWorkerList.size() >= maxUploadTaskNum)
     {
         BubbleTips::showBubbleTips("当前上传任务数已达到最大", 2, this);
@@ -81,7 +82,7 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath)
         if (isSuccess)
         {
             // 添加到传输完成队列
-            ui->finshList->addItem(piw->getFileName());
+            ui->finshList->addItem(QString("上传：%1").arg(piw->getFileName()));
             ui->uploadList->takeItem(row);
 //            delete piw;
         }
@@ -92,6 +93,72 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath)
         uploadWorkerList.erase(uploadWorkerList.find(taskId));
     });
     uw->start();
+}
+
+void TransmitPage::addDownloadTask(QString filepath, qint64 filesize)
+{
+    // 检查任务数限制
+    if (downloadWorkerList.size() >= maxDownloadTaskNum)
+    {
+        BubbleTips::showBubbleTips("当前下载任务数已达到最大", 2, this);
+        return;
+    }
+
+    // 生成标识id
+    QRandomGenerator* randomGenerator = QRandomGenerator::global();
+    int tid;
+    do
+    {
+        tid = randomGenerator->bounded(100);
+    } while (downloadWorkerList.find(tid) != downloadWorkerList.end());
+
+    // ui初始化
+    QString filename = filepath.mid(filepath.lastIndexOf('/') + 1);
+    ProgressItemWidget* piw = new ProgressItemWidget(tid, filename, filesize);
+    QListWidgetItem* item = new QListWidgetItem(ui->downloadList);
+    ui->downloadList->setItemWidget(item, piw);
+    item->setSizeHint(QSize(0, piw->height()));
+
+    // 获取下载路径
+    QSettings ini = QSettings("./setting.ini", QSettings::IniFormat);
+    ini.beginGroup("DOWNLOADSETTING");
+    QString path = ini.value("PATH").toString();
+    ini.endGroup();
+
+    // 创建任务
+    DownloadWorker* dw = new DownloadWorker(tid, filepath, filesize, path);
+    downloadWorkerList.insert(tid, dw);
+    connect(dw, &DownloadWorker::updateProgress, this, [piw](qint64 val){
+        QMetaObject::invokeMethod(piw, [piw, val](){
+                piw->updateFinshSize(val);
+            }, Qt::QueuedConnection);
+    });
+    connect(dw, &DownloadWorker::workFinsh, [this](bool isSuccess, int taskId, QString errorMsg){
+        int row;
+        ProgressItemWidget* piw = nullptr;
+        for (row = ui->downloadList->count() - 1; ~row; --row)
+        {
+            QListWidgetItem* item = ui->downloadList->item(row);
+            ProgressItemWidget* _piw = static_cast<ProgressItemWidget*>(ui->downloadList->itemWidget(item));
+            if (taskId == _piw->getTaskId())
+            {
+                piw = _piw;
+                break;
+            }
+        }
+
+        if (isSuccess)
+        {
+            ui->finshList->addItem(QString("下载：%1").arg(piw->getFileName()));
+            ui->downloadList->takeItem(row);
+        }
+        else
+        {
+            piw->setErrorMsg(errorMsg);
+        }
+        downloadWorkerList.erase(downloadWorkerList.find(taskId));
+    });
+    dw->start();
 }
 
 void TransmitPage::init()
@@ -178,7 +245,7 @@ void UploadWorker::run()
         }
 
         // 连接服务器
-        QSettings ini = QSettings(":/config/res/config.ini", QSettings::IniFormat);
+        QSettings ini = QSettings("./setting.ini", QSettings::IniFormat);
         ini.beginGroup("ADDRESS");
         QString ip = ini.value("IPADDR").toString();
         QString port = ini.value("PORT").toString();
@@ -213,9 +280,12 @@ void UploadWorker::run()
     } while (0);
 
     disconnect(conn);
-    socket->close();
-    delete socket;
-    socket = nullptr;
+    if (nullptr != socket && socket->state() == QAbstractSocket::ConnectedState)
+    {
+        socket->close();
+        delete socket;
+        socket = nullptr;
+    }
 }
 
 void UploadWorker::upload(QTcpSocket* socket)
@@ -237,7 +307,7 @@ void UploadWorker::upload(QTcpSocket* socket)
         }
         else
         {
-            emit workFinsh(false, tid, getStatusCodeString(recvList[1]));
+            emit workFinsh(false, tid, getStatusCodeString(recvList[1].mid(7)));
         }
         free(munit);
         return;
@@ -253,7 +323,7 @@ void UploadWorker::upload(QTcpSocket* socket)
     }
     if ("failure" == recvList[0])
     {
-        emit workFinsh(false, tid, getStatusCodeString(recvList[1]));
+        emit workFinsh(false, tid, getStatusCodeString(recvList[1].mid(7)));
         return;
     }
     qint64 serverRecv = recvList[1].toLong();
@@ -291,3 +361,145 @@ void UploadWorker::upload(QTcpSocket* socket)
         free(req);
     }
 }
+
+DownloadWorker::DownloadWorker(int _tid, QString _downloadPath, qint64 _fileSize, QString _storePath) :
+    tid(_tid),
+    downloadPath(_downloadPath),
+    fileSize(_fileSize),
+    storePath(_storePath)
+{
+    filename = downloadPath.mid(downloadPath.lastIndexOf("/") + 1);
+    downloadSize = 0;
+}
+
+void DownloadWorker::download(QTcpSocket* socket)
+{
+    QByteArray data = socket->peek(4);
+    uint totalLen;
+    memcpy(&totalLen, data.constData(), 4);
+    MsgUnit* munit = (MsgUnit*)malloc(totalLen);
+    QByteArray allData = socket->readAll();
+    memcpy(munit, allData.constData(), totalLen);
+
+    if (munit->msgType == MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND)
+    {
+        QString recvContent((char*)munit->msg);
+        QStringList recvList = recvContent.split("\r\n");
+        if (recvList.size() != 2)
+            emit workFinsh(false, tid, "数据传输错误");
+        else
+            emit workFinsh(false, tid, getStatusCodeString(recvList[0].mid(7)));
+    }
+    else if (munit->msgType == MsgType::MSG_TYPE_DOWNLOADFILE_START_RESPOND)
+    {
+        QString recvContent((char*)munit->msg);
+        QStringList recvList = recvContent.split("\r\n");
+        if (recvList.size() != 3)
+            emit workFinsh(false, tid, "数据传输错误");
+        else
+            fileSize = recvList[1].toLong();
+
+        MsgUnit* req = MsgTools::generateDownloadFileDataRequest(downloadSize);
+        socket->write((char*)req, req->totalLen);
+        if (!socket->waitForBytesWritten(5000))
+            emit workFinsh(false, tid, socket->errorString());
+        free(req);
+    }
+    else
+    {
+        qint64 writeBytes = file.write((char*)munit->msg, munit->msgLen - 1);
+        if (-1 == writeBytes)
+            emit workFinsh(false, tid, file.errorString());
+        else
+        {
+            downloadSize += writeBytes;
+            emit updateProgress(writeBytes);
+
+            // 继续请求数据
+            if (downloadSize < fileSize)
+            {
+                MsgUnit* req = MsgTools::generateDownloadFileDataRequest(downloadSize);
+                socket->write((char*)req, req->totalLen);
+                if (!socket->waitForBytesWritten(5000))
+                    emit workFinsh(false, tid, socket->errorString());
+                free(req);
+            }
+
+            // 下载完成
+            else
+            {
+                emit workFinsh(true, tid);
+                file.close();
+            }
+        }
+    }
+    free(munit);
+}
+
+void DownloadWorker::run()
+{
+    QTcpSocket* socket = nullptr;
+    QMetaObject::Connection conn;
+    do
+    {
+        QString storeFilePath = storePath + "/" + filename;
+        // 打开文件
+        if (QFile::exists(storeFilePath))
+        {
+            emit workFinsh(false, tid, "文件已下载");
+            break;
+        }
+        file.setFileName(storeFilePath);
+        if (!file.open(QIODevice::WriteOnly))
+        {
+            emit workFinsh(false, tid, "文件打开失败");
+            break;
+        }
+
+        // 连接服务器
+        QSettings ini = QSettings(":/config/res/config.ini", QSettings::IniFormat);
+        ini.beginGroup("ADDRESS");
+        QString ip = ini.value("IPADDR").toString();
+        QString port = ini.value("PORT").toString();
+        ini.endGroup();
+        socket = new QTcpSocket();
+        socket->connectToHost(QHostAddress(ip), port.toUInt());
+        if (!socket->waitForConnected(5000))
+        {
+            emit workFinsh(false, tid, socket->errorString());
+            break;
+        }
+
+        // 绑定槽函数
+        conn = connect(socket, &QTcpSocket::readyRead, [this, socket](){
+            download(socket);
+        });
+
+        // 发送start指令，并等待响应
+        MsgUnit* munit = MsgTools::generateDownloadFileStartRequest(downloadPath);
+        socket->write((char*)munit, munit->totalLen);
+        if (!socket->waitForBytesWritten())
+        {
+            emit workFinsh(false, tid, socket->errorString());
+            break;
+        }
+
+        QEventLoop loop;
+        connect(this, &DownloadWorker::workFinsh, [&loop](){
+            loop.quit();
+        });
+        loop.exec();
+
+        qDebug() << "loop exit";
+    } while (0);
+
+    disconnect(conn);
+    if (nullptr != socket && socket->state() == QAbstractSocket::ConnectedState)
+    {
+        socket->close();
+        delete socket;
+        socket = nullptr;
+    }
+}
+
+
