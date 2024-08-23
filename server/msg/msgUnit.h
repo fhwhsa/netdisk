@@ -51,26 +51,34 @@ enum MsgType {
     MSG_TYPE_DELETEFILEFOLDER_REQUEST,
     /// @brief 删除文件/文件夹响应
     MSG_TYPE_DELETEFILEFOLDER_RESPOND,
-    /// @brief 文件上传任务创建请求
+    /// @brief 创建文件上传任务请求
     MSG_TYPE_UPLOADFILE_START_REQUEST,
-    /// @brief 文件上传任务创建响应
+    /// @brief 创建文件上传任务响应
     MSG_TYPE_UPLOADFILE_START_RESPOND,
-    /// @brief 文件上传上传数据请求
+    /// @brief 上传数据请求
     MSG_TYPE_UPLOADFILE_DATA_REQUEST,
-    /// @brief 文件上传上传数据响应
+    /// @brief 上传数据响应
     MSG_TYPE_UPLOADFILE_DATA_RESPOND,
-    /// @brief 文件上传上传完成请求
+    /// @brief 上传完成请求
     MSG_TYPE_UPLOADFILE_FINSH_REQUEST,
-    /// @brief 文件上传上传完成响应
+    /// @brief 上传完成响应
     MSG_TYPE_UPLOADFILE_FINSH_RESPOND,
-    /// @brief 文件下载任务创建请求
+    /// @brief 取消上传请求
+    MSG_TYPE_UPLOADFILE_CANCEL_REQUEST,
+    /// @brief 取消上传响应
+    MSG_TYPE_UPLOADFILE_CANCEL_RESPOND,
+    /// @brief 创建文件下载任务请求
     MSG_TYPE_DOWNLOADFILE_START_REQUEST,
-    /// @brief 文件下载任务创建响应
+    /// @brief 创建文件下载任务响应
     MSG_TYPE_DOWNLOADFILE_START_RESPOND,
-    /// @brief 文件下载数据请求
+    /// @brief 下载数据请求
     MSG_TYPE_DOWNLOADFILE_DATA_REQUEST,
-    /// @brief 文件下载数据请求响应
+    /// @brief 下载数据响应
     MSG_TYPE_DOWNLOADFILE_DATA_RESPOND,
+    /// @brief 取消下载请求
+    MSG_TYPE_DOWNLOADFILE_CANCEL_REQUEST,
+    /// @brief 取消上传请求
+    MSG_TYPE_DOWNLOADFILE_CANCEL_RESPOND,
     /// @brief 文件下载错误时，将错误返回设置的消息类型，单独作为一个类型主要是方便客户端解析消息
     MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND,
     TYPE_NUM

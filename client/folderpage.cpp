@@ -5,6 +5,7 @@
 #include "bubbletips.h"
 #include "respondwatcher.h"
 #include "statusCode.h"
+#include "folderlistitemwidget.h"
 
 #include <QDebug>
 #include <QToolButton>
@@ -90,15 +91,15 @@ void FolderPage::flushFileList(std::shared_ptr<MsgUnit> sptr)
         QListWidgetItem* item = new QListWidgetItem(ui->fileList);
         if (info[1] == "0")
         {
-            item->setStatusTip("0");
-            item->setIcon(QIcon(":/img/res/img/folder.png"));
-            item->setText(info[0]);
+            FolderListItemWidget* fiw = new FolderListItemWidget(0);
+            fiw->init(info[0], ":/img/res/img/folder.png", -1);
+            ui->fileList->setItemWidget(item, fiw);
         }
         else
         {
-            item->setStatusTip("1");
-            item->setIcon(QIcon(":/img/res/img/file.png"));
-            item->setText(info[0] + ":" + info[2]);
+            FolderListItemWidget* fiw = new FolderListItemWidget(1);
+            fiw->init(info[0], ":/img/res/img/file.png", info[2].toLongLong());
+            ui->fileList->setItemWidget(item, fiw);
         }
         item->setSizeHint(itemSize);
     }
@@ -152,14 +153,15 @@ void FolderPage::clickTbDelete()
     }
 
     QString str;
-    for (const QListWidgetItem* item : selectedList)
+    for (QListWidgetItem* item : selectedList)
     {
-        str.append(item->text() + "\n");
+        FolderListItemWidget* fiw = static_cast<FolderListItemWidget*>(ui->fileList->itemWidget(item));
+        str.append(fiw->getFileName() + "\n");
     }
     if (QMessageBox::No == QMessageBox::question(this, "确定删除以下文件/文件夹吗？", str, QMessageBox::Yes | QMessageBox::No))
         return;
 
-    QList<QString> paths = str.split('\n');
+    QList<QString> paths = str.split('\n');    
     for (QString& it : paths)
         it = currPath + "/" + it;
     paths.pop_back(); // 去除空行
@@ -195,7 +197,8 @@ void FolderPage::clickTbRename()
     }
 
     bool ok;
-    QString path = currPath + "/" + ui->fileList->currentItem()->text();
+    FolderListItemWidget* fiw = static_cast<FolderListItemWidget*>(ui->fileList->itemWidget(ui->fileList->currentItem()));
+    QString path = currPath + "/" + fiw->getFileName();
     QString newName = QInputDialog::getText(this, "重命名文件/文件夹", "新名称：", QLineEdit::Normal, "", &ok);
     if (!ok) return;
     if (newName.isEmpty())
@@ -206,7 +209,8 @@ void FolderPage::clickTbRename()
 
     for (int i = ui->fileList->count() - 1; ~i; --i)
     {
-        if (ui->fileList->item(i)->text() == newName)
+        FolderListItemWidget* f = static_cast<FolderListItemWidget*>(ui->fileList->itemWidget(ui->fileList->item(i)));
+        if (f->getFileName() == newName)
         {
             BubbleTips::showBubbleTips("同名文件/文件夹已存在", 1, this);
             return;
@@ -238,24 +242,22 @@ void FolderPage::clickTbDownload()
     }
 
     QStringList fileList;
-    for (const QListWidgetItem* item : selectedList)
+    QVector<qint64> fileSize;
+    for (QListWidgetItem* item : selectedList)
     {
-        if ("1" == item->statusTip())   // 文件
-            fileList.push_back(item->text());
+        FolderListItemWidget* fiw = static_cast<FolderListItemWidget*>(ui->fileList->itemWidget(item));
+        if (1 == fiw->getType())   // 文件
+        {
+            fileList.push_back(fiw->getFileName());
+            fileSize.push_back(fiw->getFileSize());
+        }
     }
-
-    QString str;
-    for (const QString& it : fileList)
-    {
-        str.append(it.first(it.lastIndexOf(':')) + "\n");
-    }
-    if (QMessageBox::No == QMessageBox::question(this, "确定下载以下文件吗？", str, QMessageBox::Yes | QMessageBox::No))
+    if (QMessageBox::No == QMessageBox::question(this, "确定下载以下文件吗？", fileList.join("\n"), QMessageBox::Yes | QMessageBox::No))
         return;
 
 
     // 测试功能，仅下载第一个
-    int pos = fileList[0].lastIndexOf(':');
-    emit deliverDownloadTask(currPath + "/" + fileList[0].first(pos), fileList[0].mid(pos + 1).toULong());
+    emit deliverDownloadTask(currPath + "/" + fileList[0], fileSize[0]);
 }
 
 void FolderPage::clickTbUpload()
@@ -298,10 +300,11 @@ void FolderPage::clickTbBack()
 
 void FolderPage::itemDoubleClick(QListWidgetItem *item)
 {
-    if ("1" == item->statusTip())
+    FolderListItemWidget* fiw = static_cast<FolderListItemWidget*>(ui->fileList->itemWidget(item));
+    if (1 == fiw->getType())
         return;
 
-    QString path = currPath + "/" + item->text();
+    QString path = currPath + "/" + fiw->getFileName();
     RespondWatcher::createBgRw(this, SIGNAL(getFolderContentRespond(std::shared_ptr<MsgUnit>)), "文件列表刷新超时", 3,
             QPoint(this->pos().rx() + this->width() / 2, this->pos().ry() + this->height() / 2),
                            [this, path](std::shared_ptr<MsgUnit> sptr){

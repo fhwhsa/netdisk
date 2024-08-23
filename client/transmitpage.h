@@ -85,6 +85,7 @@ private:
     QString filename, filepath, diskpath;
     int tid;
     const int blockSize = 1024;
+    bool isCancel;
 
     bool initFile();
     void upload(QTcpSocket* socket);
@@ -93,9 +94,15 @@ protected:
     void run() override;
 
 signals:
+    void cancel();
     void updateProgress(qint64 value);
-    void workFinsh(bool isSuccess, int taskId, QString errorMsg = ""); // 工作线程结束时发起
-
+    /**
+     * @brief workFinsh 工作线程结束时发出
+     * @param status -1代表出错，0代表上传完成，1代表暂停，2代表取消
+     * @param taskId
+     * @param errorMsg
+     */
+    void workFinsh(int status, int taskId, QString errorMsg = "");
 };
 
 class DownloadWorker : public QThread
@@ -110,6 +117,7 @@ private:
     qint64 downloadSize, fileSize;
     QString downloadPath, storePath, filename;
     int tid;
+    bool isCancel;
 
     void download(QTcpSocket* socket);
 
@@ -118,8 +126,15 @@ protected:
     void run() override;
 
 signals:
+    void cancel();
     void updateProgress(qint64 value);
-    void workFinsh(bool isSuccess, int taskId, QString errorMsg = "");
+    /**
+     * @brief workFinsh 工作线程结束时发出
+     * @param status -1代表出错，0代表下载完成，1代表暂停，2代表取消
+     * @param taskId
+     * @param msg
+     */
+    void workFinsh(int status, int taskId, QString msg = "");
 
 };
 

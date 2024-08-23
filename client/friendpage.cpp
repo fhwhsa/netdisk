@@ -4,7 +4,7 @@
 #include "msgtools.h"
 #include "friendapplicationlist.h"
 #include "bubbletips.h"
-#include "flistitemwidget.h"
+#include "friendlistitemwidget.h"
 #include "alistitemwidget.h"
 #include "respondwatcher.h"
 #include "statusCode.h"
@@ -74,7 +74,7 @@ void FriendPage::flushFriendList(std::shared_ptr<MsgUnit> sptr)
     for (int i = ui->friendList->count() - 1; ~i; --i)
     {
         QListWidgetItem* item = ui->friendList->item(i);
-        FListItemWidget* iw = (FListItemWidget*)ui->friendList->itemWidget(item);
+        FriendListItemWidget* iw = (FriendListItemWidget*)ui->friendList->itemWidget(item);
         if (nullptr != iw)
         {
             iw->deleteLater();
@@ -89,7 +89,7 @@ void FriendPage::flushFriendList(std::shared_ptr<MsgUnit> sptr)
             continue;
         QStringList para = str.split('|');
         QListWidgetItem* item = new QListWidgetItem(ui->friendList);
-        FListItemWidget* iw = new FListItemWidget(para[1], "", para[0], para[1], ui->friendList);
+        FriendListItemWidget* iw = new FriendListItemWidget(para[1], "", para[0], para[1], ui->friendList);
         ui->friendList->setItemWidget(item, iw);
         item->setSizeHint(QSize(ui->friendList->width() - 10, iw->height()));
     }

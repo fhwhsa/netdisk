@@ -95,6 +95,12 @@ private:
     /// @return 返回处理响应
     static MsgUnit* uploadFileFinshRespond(const MsgUnit* munit, ConnResources& ur);
 
+    /// @brief 处理取消上传请求
+    /// @param munit 通信信息
+    /// @param ur 连接资源
+    /// @return 返回处理响应
+    static MsgUnit* uploadFileCancelRespond(const MsgUnit* munit, ConnResources& ur);
+
     /// @brief 处理下载文件任务创建请求
     /// @param munit 通信信息
     /// @param ur 连接资源
@@ -106,6 +112,12 @@ private:
     /// @param ur 连接资源
     /// @return 返回处理响应
     static MsgUnit* downloadFileDataRequestRespond(const MsgUnit* munit, ConnResources& ur);
+
+    /// @brief 处理取消下载请求
+    /// @param munit 通信信息
+    /// @param ur 连接资源
+    /// @return 返回处理响应
+    static MsgUnit* downloadFileCancelRespond(const MsgUnit* munit, ConnResources& ur);
 
     /// @brief 检查字符串是否为数字（正整数）
     /// @param str 

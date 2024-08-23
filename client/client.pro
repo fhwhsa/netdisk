@@ -12,9 +12,10 @@ SOURCES += \
     addfrienddialog.cpp \
     alistitemwidget.cpp \
     bubbletips.cpp \
-    flistitemwidget.cpp \
+    folderlistitemwidget.cpp \
     folderpage.cpp \
     friendapplicationlist.cpp \
+    friendlistitemwidget.cpp \
     friendpage.cpp \
     login.cpp \
     main.cpp \
@@ -30,9 +31,10 @@ HEADERS += \
     addfrienddialog.h \
     alistitemwidget.h \
     bubbletips.h \
-    flistitemwidget.h \
+    folderlistitemwidget.h \
     folderpage.h \
     friendapplicationlist.h \
+    friendlistitemwidget.h \
     friendpage.h \
     login.h \
     mainpage.h \
@@ -47,9 +49,10 @@ HEADERS += \
 FORMS += \
     addfrienddialog.ui \
     alistitemwidget.ui \
-    flistitemwidget.ui \
+    folderlistitemwidget.ui \
     folderpage.ui \
     friendapplicationlist.ui \
+    friendlistitemwidget.ui \
     friendpage.ui \
     login.ui \
     mainpage.ui \

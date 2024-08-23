@@ -36,7 +36,9 @@ std::vector<FileInfo> IFileFolder::getFolderContent(std::string path, bool& res,
     vector<FileInfo> v;
     for (const auto& it : directory_iterator(path))
     {
-        v.emplace_back(it.is_directory() ? 0 : 1, it.path().filename(), it.file_size());
+        bool isDir = it.is_directory();
+        FileInfo fi((isDir ? 0 : 1), it.path().filename(), isDir ? -1 : it.file_size());
+        v.push_back(move(fi));
     }
 
     res = true;

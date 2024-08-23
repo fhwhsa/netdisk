@@ -1,5 +1,5 @@
-#ifndef FLISTITEMWIDGET_H
-#define FLISTITEMWIDGET_H
+#ifndef FRIENDLISTITEMWIDGET_H
+#define FRIENDLISTITEMWIDGET_H
 
 #include <QWidget>
 #include <QString>
@@ -8,13 +8,13 @@ namespace Ui {
 class FListItemWidget;
 }
 
-class FListItemWidget : public QWidget
+class FriendListItemWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FListItemWidget(QString l, QString r, QString _id, QString _email, QWidget *parent = nullptr);
-    ~FListItemWidget();
+    explicit FriendListItemWidget(QString l, QString r, QString _id, QString _email, QWidget *parent = nullptr);
+    ~FriendListItemWidget();
 
     QString getId() const;
     QString getEmail() const;
@@ -27,4 +27,4 @@ private:
     QString id, email;
 };
 
-#endif // FLISTITEMWIDGET_H
+#endif // FRIENDLISTITEMWIDGET_H

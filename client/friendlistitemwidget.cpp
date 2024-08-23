@@ -1,7 +1,7 @@
-#include "flistitemwidget.h"
+#include "friendlistitemwidget.h"
 #include "ui_flistitemwidget.h"
 
-FListItemWidget::FListItemWidget(QString l, QString r, QString _id, QString _email, QWidget *parent) :
+FriendListItemWidget::FriendListItemWidget(QString l, QString r, QString _id, QString _email, QWidget *parent) :
     id(_id),
     email(_email),
     QWidget(parent),
@@ -16,22 +16,22 @@ FListItemWidget::FListItemWidget(QString l, QString r, QString _id, QString _ema
     ui->rightLabel->setText(r);
 }
 
-FListItemWidget::~FListItemWidget()
+FriendListItemWidget::~FriendListItemWidget()
 {
     delete ui;
 }
 
-QString FListItemWidget::getId() const
+QString FriendListItemWidget::getId() const
 {
     return id;
 }
 
-QString FListItemWidget::getEmail() const
+QString FriendListItemWidget::getEmail() const
 {
     return email;
 }
 
-void FListItemWidget::setRightText(QString t) const
+void FriendListItemWidget::setRightText(QString t) const
 {
     ui->rightLabel->setText(t);
 }

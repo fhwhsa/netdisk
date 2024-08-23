@@ -112,7 +112,7 @@ public:
      * @param buffer 存储数据的首地址
      * @return
      */
-    static MsgUnit *generateUploadFileDataRequest(qint64 size, const char* buffer);
+    static MsgUnit* generateUploadFileDataRequest(qint64 size, const char* buffer);
 
     /**
      * @brief 生成文件上传上传完成请求
@@ -121,18 +121,30 @@ public:
     static MsgUnit* generateUploadFileFinshRequest();
 
     /**
+     * @brief 生成取消上传任务请求
+     * @return
+     */
+    static MsgUnit* generateUploadFileCancelRequest();
+
+    /**
      * @brief 生成文件下载创建请求
      * @param filePath 下载文件的网盘路径
      * @return
      */
-    static MsgUnit *generateDownloadFileStartRequest(QString filePath);
+    static MsgUnit* generateDownloadFileStartRequest(QString filePath);
 
     /**
      * @brief 生成文件下载数据请求
      * @param hasDownloadSize 当前已下载的字节数
      * @return
      */
-    static MsgUnit *generateDownloadFileDataRequest(qint64 hasDownloadSize);
+    static MsgUnit* generateDownloadFileDataRequest(qint64 hasDownloadSize);
+
+    /**
+     * @brief 取消下载请求
+     * @return
+     */
+    static MsgUnit* generateDownloadFileCancelRequest();
 
     /**
      * @brief 获取munit消息内容中第index行内容，index从0开始

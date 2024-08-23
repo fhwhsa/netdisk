@@ -402,6 +402,30 @@ MsgUnit *MsgParsing::uploadFileFinshRespond(const MsgUnit *munit, ConnResources 
     return respond;
 }
 
+MsgUnit *MsgParsing::uploadFileCancelRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    // 关闭资源文件
+    int fd = ur.getFd();
+    close(fd);
+
+    // 删除资源文件
+    int statusCode;
+    string content;
+    MsgUnit* respond = nullptr;
+    if (IFileFolder::deleteFileOrFolder(ur.getFilePath(), statusCode))
+    {
+        content = "recv\r\n";
+    }
+    else 
+    {
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+    }
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_CANCEL_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
 MsgUnit *MsgParsing::downloadFileStartRespond(const MsgUnit *munit, ConnResources &ur)
 {
     using namespace std;
@@ -468,6 +492,30 @@ MsgUnit *MsgParsing::downloadFileDataRequestRespond(const MsgUnit *munit, ConnRe
         respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_DATA_RESPOND, readBytes, buf);
     }
 
+    return respond;
+}
+
+MsgUnit *MsgParsing::downloadFileCancelRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    // 关闭资源文件
+    int fd = ur.getFd();
+    close(fd);
+
+    // 删除资源文件
+    int statusCode;
+    string content;
+    MsgUnit* respond = nullptr;
+    if (IFileFolder::deleteFileOrFolder(ur.getFilePath(), statusCode))
+    {
+        content = "recv\r\n";
+    }
+    else 
+    {
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+    }
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_RESPOND, strlen(content.c_str()), content.c_str());
     return respond;
 }
 
@@ -545,7 +593,7 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     case MsgType::MSG_TYPE_UPLOADFILE_START_REQUEST:
         return uploadFileStartRespond(munit, ur);
 
-    // 文件上传上传数据请求
+    // 文件上传数据请求
     case MsgType::MSG_TYPE_UPLOADFILE_DATA_REQUEST:
         return uploadFileDataRespond(munit, ur);
 
@@ -553,11 +601,21 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     case MsgType::MSG_TYPE_UPLOADFILE_FINSH_REQUEST:
         return uploadFileFinshRespond(munit, ur);
 
+    // 取消上传请求
+    case MsgType::MSG_TYPE_UPLOADFILE_CANCEL_REQUEST:
+        return uploadFileCancelRespond(munit, ur);
+
+    // 创建下载任务请求
     case MsgType::MSG_TYPE_DOWNLOADFILE_START_REQUEST:
         return downloadFileStartRespond(munit, ur);
     
+    // 文件下载数据请求
     case MsgType::MSG_TYPE_DOWNLOADFILE_DATA_REQUEST:
         return downloadFileDataRequestRespond(munit, ur);
+
+    // 取消下载请求
+    case MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_REQUEST:
+        return downloadFileCancelRespond(munit, ur);
 
     // 未知请求
     default:
