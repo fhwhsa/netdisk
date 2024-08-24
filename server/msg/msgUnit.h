@@ -87,6 +87,14 @@ enum MsgType {
     MSG_TYPE_DOWNLOADFILE_CANCEL_REQUEST,
     /// @brief 取消上传请求
     MSG_TYPE_DOWNLOADFILE_CANCEL_RESPOND,
+    /// @brief 暂停下载请求
+    MSG_TYPE_DOWNLOADFILE_PAUSE_REQUEST,
+    /// @brief 暂停下载响应
+    MSG_TYPE_DOWNLOADFILE_PAUSE_RESPOND,
+    /// @brief 继续下载请求
+    MSG_TYPE_DOWNLOADFILE_CONTINUE_REQUEST,
+    /// @brief 继续下载响应
+    MSG_TYPE_DOWNLOADFILE_CONTINUE_RESPOND,
     /// @brief 文件下载错误时，将错误返回设置的消息类型，单独作为一个类型主要是方便客户端解析消息
     MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND,
     TYPE_NUM

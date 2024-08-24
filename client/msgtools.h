@@ -161,6 +161,12 @@ public:
     static MsgUnit* generateDownloadFileCancelRequest();
 
     /**
+     * @brief 继续下载请求
+     * @return
+     */
+    static MsgUnit* generateDownloadFileContinueRequest(QString downloadPath, qint64 alreadyDownloadSize);
+
+    /**
      * @brief 获取munit消息内容中第index行内容，index从0开始
      * @param munit 要获取信息的消息单元
      * @param index 第几行

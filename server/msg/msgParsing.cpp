@@ -485,7 +485,7 @@ MsgUnit *MsgParsing::downloadFileStartRespond(const MsgUnit *munit, ConnResource
     int fd = IFileFolder::openFile(fileinfo[0], 0, statusCode);
     if (-1 == fd)
     {
-        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+        content = "status:" + to_string(statusCode) + "\r\n";
         isSuccess = false;
     }
     else 
@@ -493,7 +493,7 @@ MsgUnit *MsgParsing::downloadFileStartRespond(const MsgUnit *munit, ConnResource
         long size = IFileFolder::getFileSize(fileinfo[0]);
         if (-1 == size)
         {
-            content = "failure\r\nstatus:213\r\n";
+            content = "status:213\r\n";
             isSuccess = false;
         }
         else 
@@ -527,7 +527,7 @@ MsgUnit *MsgParsing::downloadFileDataRequestRespond(const MsgUnit *munit, ConnRe
     long readBytes = read(ur.getFd(), buf, 1024);
     if (-1 == readBytes)
     {
-        char* content = "failure\r\nstatus:215\r\n";
+        char* content = "status:215\r\n";
         respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND, strlen(content), content);
     }
     else 
@@ -548,17 +548,55 @@ MsgUnit *MsgParsing::downloadFileCancelRespond(const MsgUnit *munit, ConnResourc
 
     // 删除资源文件
     int statusCode;
-    string content;
     MsgUnit* respond = nullptr;
     if (IFileFolder::deleteFileOrFolder(ur.getFilePath(), statusCode))
     {
-        content = "recv\r\n";
+        char* content = "recv\r\n";
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_RESPOND, strlen(content), content);
     }
     else 
     {
-        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+        string content = "status:" + to_string(statusCode) + "\r\n";
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND, strlen(content.c_str()), content.c_str());
     }
-    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
+// MsgUnit *MsgParsing::downloadFilePauseRespond(const MsgUnit *munit, ConnResources &ur)
+// {
+//     // 关闭资源文件
+//     int fd = ur.getFd();
+//     close(fd);
+
+//     return nullptr;
+// }
+
+MsgUnit *MsgParsing::downloadFileContinueRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    // 处理信息
+    vector<string> fileinfo = getAllRows(munit);
+    if (2 != fileinfo.size())
+        return nullptr;
+
+    MsgUnit* respond = nullptr;
+    string content;
+    int statusCode;
+    int fd = IFileFolder::openFile(fileinfo[0], stol(fileinfo[1]), statusCode);
+    if (-1 != fd)
+    {
+        ur.setFd(fd);
+        ur.setFilePath(fileinfo[0]);
+        char* content = "recv\r\n";
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CONTINUE_RESPOND, strlen(content), content);
+    }
+    else 
+    {
+        string content = "status:" + to_string(statusCode) + "\r\n";
+        respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND, strlen(content.c_str()), content.c_str());
+    }
+
     return respond;
 }
 
@@ -667,6 +705,13 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     // 取消下载请求
     case MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_REQUEST:
         return downloadFileCancelRespond(munit, ur);
+    
+    // case MsgType::MSG_TYPE_DOWNLOADFILE_PAUSE_REQUEST:
+    //     return nullptr;
+    
+    // 继续下载请求
+    case MsgType::MSG_TYPE_DOWNLOADFILE_CONTINUE_REQUEST:
+        return downloadFileContinueRespond(munit, ur);
 
     // 未知请求
     default:

@@ -48,6 +48,7 @@ private:
 
     QHash<int, DownloadWorker*> downloadWorkerList;
     const int maxDownloadTaskNum = 2;
+    void downloadWorkFinshHandler(int status, int taskId, QString errorMsg);
 
     void init();
     void iniSignalSlots();
@@ -59,7 +60,7 @@ public slots:
      */
     void getMsg(std::shared_ptr<MsgUnit> sptr);
     void addUploadTask(QString filepath, QString diskPath, WorkType wt = WorkType::NEW_WORK);
-    void addDownloadTask(QString filepath, qint64 filesize);
+    void addDownloadTask(QString filepath, qint64 filesize, WorkType wt = WorkType::NEW_WORK);
 
 private slots:
     void clickUploadListBtn();
@@ -119,7 +120,7 @@ class DownloadWorker : public QThread
     Q_OBJECT
 
 public:
-    explicit DownloadWorker(int _tid, QString _downloadPath, qint64 _fileSize, QString _storePath);
+    explicit DownloadWorker(int _tid, QString _downloadPath, qint64 _fileSize, QString _storePath, WorkType _wt = WorkType::NEW_WORK);
 
 private:
     QFile file;
@@ -127,6 +128,8 @@ private:
     QString downloadPath, storePath, filename;
     int tid;
     bool isCancel;
+    bool isPause;
+    WorkType wt;
 
     void download(QTcpSocket* socket);
 
@@ -136,6 +139,7 @@ protected:
 
 signals:
     void cancel();
+    void pause();
     void updateProgress(qint64 value);
     /**
      * @brief workFinsh 工作线程结束时发出

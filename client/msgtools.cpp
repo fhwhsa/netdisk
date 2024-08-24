@@ -136,6 +136,12 @@ MsgUnit *MsgTools::generateDownloadFileCancelRequest()
     return MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_REQUEST, 0, "/0");
 }
 
+MsgUnit *MsgTools::generateDownloadFileContinueRequest(QString downloadPath, qint64 alreadyDownloadSize)
+{
+    QString str = QString("%1\r\n%2\r\n").arg(downloadPath).arg(alreadyDownloadSize);
+    return msgHandler(str, MsgType::MSG_TYPE_DOWNLOADFILE_CONTINUE_REQUEST);
+}
+
 
 QString MsgTools::getRow(const MsgUnit *munit, int index)
 {

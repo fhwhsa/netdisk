@@ -89,7 +89,9 @@ void MainPage::iniSignalSlots()
     connect(folderPage, &FolderPage::deliverUploadTask, [this](QString filepath, QString diskpath){
         transmitPage->addUploadTask(filepath, diskpath);
     });
-    connect(folderPage, &FolderPage::deliverDownloadTask, transmitPage, &TransmitPage::addDownloadTask);
+    connect(folderPage, &FolderPage::deliverDownloadTask, [this](QString filepath, qint64 filesize){
+        transmitPage->addDownloadTask(filepath, filesize);
+    });
 
     connect(transmitPage, &TransmitPage::_sendMsg, this, &MainPage::sendMsg);
     connect(this, &MainPage::newMunit, transmitPage, &TransmitPage::getMsg);

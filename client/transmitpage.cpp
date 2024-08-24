@@ -70,6 +70,44 @@ void TransmitPage::uploadWorkFinshHandler(int status, int taskId, QString errorM
     uploadWorkerList.erase(uploadWorkerList.find(taskId));
 }
 
+void TransmitPage::downloadWorkFinshHandler(int status, int taskId, QString msg)
+{
+    int row;
+    ProgressItemWidget* piw = nullptr;
+    for (row = ui->downloadList->count() - 1; ~row; --row)
+    {
+        QListWidgetItem* item = ui->downloadList->item(row);
+        ProgressItemWidget* _piw = static_cast<ProgressItemWidget*>(ui->downloadList->itemWidget(item));
+        if (taskId == _piw->getTaskId())
+        {
+            piw = _piw;
+            break;
+        }
+    }
+
+    if (0 == status)
+    {
+        ui->finshList->addItem(QString("下载：%1").arg(piw->getFileName()));
+        ui->downloadList->takeItem(row);
+    }
+    else if (-1 == status)
+    {
+        piw->setErrorMsg(msg);
+    }
+    else if (2 == status)
+    {
+        ui->downloadList->takeItem(row);
+        // 删除文件
+        QFile file(msg);
+        file.remove();
+    }
+    else if (1 == status)
+    {
+//        qDebug() << "worker exit";
+    }
+    downloadWorkerList.erase(downloadWorkerList.find(taskId));
+}
+
 void TransmitPage::addUploadTask(QString filepath, QString diskPath, WorkType wt)
 {
     // 检查任务数限制
@@ -89,7 +127,7 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath, WorkType wt
 
     // ui初始化
     QFileInfo finfo = QFileInfo(filepath);
-    ProgressItemWidget* piw = new ProgressItemWidget(tid, finfo.fileName(), finfo.size(), filepath, diskPath);
+    ProgressItemWidget* piw = new ProgressItemWidget(tid, finfo.fileName(), finfo.size());
     QListWidgetItem* item = new QListWidgetItem(ui->uploadList);
     ui->uploadList->setItemWidget(item, piw);
     item->setSizeHint(QSize(0, piw->height()));
@@ -99,9 +137,7 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath, WorkType wt
     uploadWorkerList.insert(tid, uw);
     connect(piw, &ProgressItemWidget::cancel, uw, &UploadWorker::cancel);
     connect(piw, &ProgressItemWidget::pause, uw, &UploadWorker::pause);
-    connect(piw, &ProgressItemWidget::cont, [this, piw]() {
-        QString filepath = piw->getFilePath();
-        QString diskpath = piw->getDiskPath();
+    connect(piw, &ProgressItemWidget::cont, [this, piw, filepath, diskPath]() {
         for (int row = ui->uploadList->count() - 1; ~row; --row)
         {
             QListWidgetItem* item = ui->uploadList->item(row);
@@ -112,8 +148,7 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath, WorkType wt
                 break;
             }
         }
-        qDebug() << filepath << diskpath;
-        addUploadTask(filepath, diskpath, WorkType::CONTINUE_WORK);
+        addUploadTask(filepath, diskPath, WorkType::CONTINUE_WORK);
     });
     connect(uw, &UploadWorker::updateProgress, this, [piw](qint64 val){
         QMetaObject::invokeMethod(piw, [piw, val](){
@@ -126,7 +161,7 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath, WorkType wt
     uw->start();
 }
 
-void TransmitPage::addDownloadTask(QString filepath, qint64 filesize)
+void TransmitPage::addDownloadTask(QString filepath, qint64 filesize, WorkType wt)
 {
     // 检查任务数限制
     if (downloadWorkerList.size() >= maxDownloadTaskNum)
@@ -157,7 +192,7 @@ void TransmitPage::addDownloadTask(QString filepath, qint64 filesize)
     ini.endGroup();
 
     // 创建任务
-    DownloadWorker* dw = new DownloadWorker(tid, filepath, filesize, path);
+    DownloadWorker* dw = new DownloadWorker(tid, filepath, filesize, path, wt);
     downloadWorkerList.insert(tid, dw);
     connect(dw, &DownloadWorker::updateProgress, this, [piw](qint64 val){
         QMetaObject::invokeMethod(piw, [piw, val](){
@@ -165,37 +200,22 @@ void TransmitPage::addDownloadTask(QString filepath, qint64 filesize)
             }, Qt::QueuedConnection);
     });
     connect(piw, &ProgressItemWidget::cancel, dw, &DownloadWorker::cancel);
-    connect(dw, &DownloadWorker::workFinsh, [this](int status, int taskId, QString msg){
-        int row;
-        ProgressItemWidget* piw = nullptr;
-        for (row = ui->downloadList->count() - 1; ~row; --row)
+    connect(piw, &ProgressItemWidget::pause, dw, &DownloadWorker::pause);
+    connect(piw, &ProgressItemWidget::cont, [this, piw, filepath, filesize](){
+        for (int row = ui->downloadList->count() - 1; ~row; --row)
         {
             QListWidgetItem* item = ui->downloadList->item(row);
             ProgressItemWidget* _piw = static_cast<ProgressItemWidget*>(ui->downloadList->itemWidget(item));
-            if (taskId == _piw->getTaskId())
+            if (piw->getTaskId() == _piw->getTaskId())
             {
-                piw = _piw;
+                ui->downloadList->takeItem(row);
                 break;
             }
         }
-
-        if (0 == status)
-        {
-            ui->finshList->addItem(QString("下载：%1").arg(piw->getFileName()));
-            ui->downloadList->takeItem(row);
-        }
-        else if (-1 == status)
-        {
-            piw->setErrorMsg(msg);
-        }
-        else if (2 == status)
-        {
-            ui->downloadList->takeItem(row);
-            // 删除文件
-            QFile file(msg);
-            file.remove();
-        }
-        downloadWorkerList.erase(downloadWorkerList.find(taskId));
+        addDownloadTask(filepath, filesize, WorkType::CONTINUE_WORK);
+    });
+    connect(dw, &DownloadWorker::workFinsh, [this](int status, int taskId, QString msg){
+        downloadWorkFinshHandler(status, taskId, msg);
     });
     dw->start();
 }
@@ -521,12 +541,14 @@ void UploadWorker::upload(QTcpSocket* socket)
     free(munit);
 }
 
-DownloadWorker::DownloadWorker(int _tid, QString _downloadPath, qint64 _fileSize, QString _storePath) :
+DownloadWorker::DownloadWorker(int _tid, QString _downloadPath, qint64 _fileSize, QString _storePath, WorkType _wt) :
     tid(_tid),
     downloadPath(_downloadPath),
     fileSize(_fileSize),
     isCancel(false),
-    storePath(_storePath)
+    isPause(false),
+    storePath(_storePath),
+    wt(_wt)
 {
     filename = downloadPath.mid(downloadPath.lastIndexOf("/") + 1);
     downloadSize = 0;
@@ -554,6 +576,12 @@ void DownloadWorker::download(QTcpSocket* socket)
         isCancel = false; // 让其接下来能正常接收取消任务的响应
     }
 
+    else if (isPause)
+    {
+        // 直接退出线程，关闭连接
+        emit workFinsh(1, tid);
+    }
+
     else if (munit->msgType == MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND)
     {
         QString recvContent((char*)munit->msg);
@@ -571,13 +599,14 @@ void DownloadWorker::download(QTcpSocket* socket)
         if (recvList.size() != 3)
             emit workFinsh(-1, tid, "数据传输错误");
         else
+        {
             fileSize = recvList[1].toLong();
-
-        MsgUnit* req = MsgTools::generateDownloadFileDataRequest(downloadSize);
-        socket->write((char*)req, req->totalLen);
-        if (!socket->waitForBytesWritten(5000))
-            emit workFinsh(-1, tid, socket->errorString());
-        free(req);
+            MsgUnit* req = MsgTools::generateDownloadFileDataRequest(downloadSize);
+            socket->write((char*)req, req->totalLen);
+            if (!socket->waitForBytesWritten(5000))
+                emit workFinsh(-1, tid, socket->errorString());
+            free(req);
+        }
     }
 
     else if (munit->msgType == MsgType::MSG_TYPE_DOWNLOADFILE_DATA_RESPOND)
@@ -619,27 +648,65 @@ void DownloadWorker::download(QTcpSocket* socket)
             BubbleTips::showBubbleTips("请重试(" + getStatusCodeString(recvList[1].mid(7)) + "）", 2);
     }
 
+    else if (munit->msgType == MsgType::MSG_TYPE_DOWNLOADFILE_CONTINUE_RESPOND)
+    {
+        qDebug() << "get continue";
+        // 继续请求数据
+        if (downloadSize < fileSize)
+        {
+            MsgUnit* req = MsgTools::generateDownloadFileDataRequest(downloadSize);
+            socket->write((char*)req, req->totalLen);
+            if (!socket->waitForBytesWritten(5000))
+                emit workFinsh(-1, tid, socket->errorString());
+            free(req);
+        }
+
+        // 下载完成
+        else
+        {
+            emit workFinsh(0, tid);
+            file.close();
+        }
+    }
+
     free(munit);
 }
 
 void DownloadWorker::run()
 {
     QTcpSocket* socket = nullptr;
-    QMetaObject::Connection conn1, conn2;
+    QMetaObject::Connection conn1, conn2, conn3;
     do
     {
         QString storeFilePath = storePath + "/" + filename;
         // 打开文件
-        if (QFile::exists(storeFilePath))
+        if (WorkType::NEW_WORK == wt)
         {
-            emit workFinsh(-1, tid, "文件已下载");
-            break;
+            if (QFile::exists(storeFilePath))
+            {
+                emit workFinsh(-1, tid, "文件已下载");
+                break;
+            }
+            file.setFileName(storeFilePath);
+            if (!file.open(QIODevice::WriteOnly))
+            {
+                emit workFinsh(-1, tid, "文件打开失败");
+                break;
+            }
         }
-        file.setFileName(storeFilePath);
-        if (!file.open(QIODevice::WriteOnly))
+        else
         {
-            emit workFinsh(-1, tid, "文件打开失败");
-            break;
+            if (!QFile::exists(storeFilePath))
+            {
+                emit workFinsh(-1, tid, "文件已损坏");
+                break;
+            }
+            file.setFileName(storeFilePath);
+            if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
+            {
+                emit workFinsh(-1, tid, "文件打开失败");
+                break;
+            }
         }
 
         // 连接服务器
@@ -663,14 +730,31 @@ void DownloadWorker::run()
         conn2 = connect(this, &DownloadWorker::cancel, [this]{
             isCancel = true;
         });
+        conn3 = connect(this, &DownloadWorker::pause, [this]{
+            isPause = true;
+        });
 
-        // 发送start指令，并等待响应
-        MsgUnit* munit = MsgTools::generateDownloadFileStartRequest(downloadPath);
-        socket->write((char*)munit, munit->totalLen);
-        if (!socket->waitForBytesWritten())
+        if (wt == WorkType::NEW_WORK) // 发送start指令，并等待响应
         {
-            emit workFinsh(-1, tid, socket->errorString());
-            break;
+            MsgUnit* munit = MsgTools::generateDownloadFileStartRequest(downloadPath);
+            socket->write((char*)munit, munit->totalLen);
+            if (!socket->waitForBytesWritten())
+            {
+                emit workFinsh(-1, tid, socket->errorString());
+                break;
+            }
+        }
+        else // 发送continue指令
+        {
+            downloadSize = file.size();
+            MsgUnit* munit = MsgTools::generateDownloadFileContinueRequest(downloadPath, downloadSize);
+            socket->write((char*)munit, munit->totalLen);
+            if (!socket->waitForBytesWritten())
+            {
+                emit workFinsh(-1, tid, socket->errorString());
+                break;
+            }
+            emit updateProgress(downloadSize);
         }
 
         QEventLoop loop;
@@ -678,9 +762,9 @@ void DownloadWorker::run()
             loop.quit();
         });
         loop.exec();
-
-        qDebug() << "loop exit";
     } while (0);
+
+    qDebug() << "loop exit";
 
     disconnect(conn1);
     disconnect(conn2);
@@ -690,6 +774,8 @@ void DownloadWorker::run()
         delete socket;
         socket = nullptr;
     }
+
+    deleteLater();
 }
 
 
