@@ -9,9 +9,11 @@ ProgressItemWidget::ProgressItemWidget(QWidget *parent) :
     iniSignalSlots();
 }
 
-ProgressItemWidget::ProgressItemWidget(int tid, QString _filename, qint64 filesize, QWidget *parent) :
+ProgressItemWidget::ProgressItemWidget(int tid, QString _filename, qint64 filesize, QString _filepath, QString _diskpath, QWidget *parent) :
     taskId(tid),
     filename(_filename),
+    filepath(_filepath),
+    diskpath(_diskpath),
     QWidget(parent),
     ui(new Ui::progressItems)
 {
@@ -96,6 +98,28 @@ int ProgressItemWidget::getTaskId()
 QString ProgressItemWidget::getFileName()
 {
     return filename;
+}
+
+QString ProgressItemWidget::getFilePath()
+{
+    return filepath;
+}
+
+QString ProgressItemWidget::getDiskPath()
+{
+    return diskpath;
+}
+
+void ProgressItemWidget::setTaskId(int tid)
+{
+    taskId = tid;
+}
+
+void ProgressItemWidget::clearProgress()
+{
+    finshSize = 0;
+    ui->progressBar->setValue(0);
+    taskId = -1;
 }
 
 QString toKB(qint64 v)

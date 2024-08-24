@@ -23,6 +23,11 @@ class TransmitPage;
 class TransmitPage;
 class UploadWorker;
 class DownloadWorker;
+enum WorkType
+{
+    NEW_WORK,
+    CONTINUE_WORK
+};
 
 class TransmitPage : public QWidget
 {
@@ -39,6 +44,7 @@ private:
 
     QHash<int, UploadWorker*> uploadWorkerList;
     const int maxUploadTaskNum = 2;
+    void uploadWorkFinshHandler(int status, int taskId, QString errorMsg);
 
     QHash<int, DownloadWorker*> downloadWorkerList;
     const int maxDownloadTaskNum = 2;
@@ -52,7 +58,7 @@ public slots:
      * @param sptr 接收到的消息单元
      */
     void getMsg(std::shared_ptr<MsgUnit> sptr);
-    void addUploadTask(QString filepath, QString diskPath);
+    void addUploadTask(QString filepath, QString diskPath, WorkType wt = WorkType::NEW_WORK);
     void addDownloadTask(QString filepath, qint64 filesize);
 
 private slots:
@@ -75,7 +81,7 @@ class UploadWorker : public QThread
     Q_OBJECT
 
 public:
-    explicit UploadWorker(int _tid, QString _filepath, QString _diskPath);
+    explicit UploadWorker(int _tid, QString _filepath, QString _diskPath, WorkType _wt);
     ~UploadWorker();
 
 private:
@@ -87,6 +93,7 @@ private:
     const int blockSize = 1024;
     bool isCancel;
     bool isPause;
+    WorkType wt;
 
     bool initFile();
     void upload(QTcpSocket* socket);

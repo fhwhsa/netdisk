@@ -653,7 +653,7 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
         return uploadFilePauseRespond(munit, ur);
     
     // 继续上传请求
-    case MsgType::MSG_TYPE_UPLOADFILE_PAUSE_RESPOND:
+    case MsgType::MSG_TYPE_UPLOADFILE_CONTINUE_REQUEST:
         return uploadFileContinueRespond(munit, ur);
 
     // 创建下载任务请求

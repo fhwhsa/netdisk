@@ -16,17 +16,18 @@ class ProgressItemWidget : public QWidget
 
 public:
     explicit ProgressItemWidget(QWidget *parent = nullptr);
-    explicit ProgressItemWidget(int tid, QString _filename, qint64 filesize, QWidget *parent = nullptr);
+    explicit ProgressItemWidget(int tid, QString _filename, qint64 filesize, QString _filepath = "", QString _diskpath = "", QWidget *parent = nullptr);
 
     void updateFinshSize(qint64 val);
-
     void setErrorMsg(QString text);
+    void clearProgress();
 
-    int getTaskId();
-
+    int getTaskId();    
     QString getFileName();
+    QString getFilePath();
+    QString getDiskPath();
 
-    void init(QString _filename, qint64 filesize);
+    void setTaskId(int tid);
 
     ~ProgressItemWidget();
 
@@ -39,6 +40,7 @@ private:
 
     int taskId;
     QString filename;
+    QString filepath, diskpath;
 
     QString progressSuffix;
 
@@ -46,6 +48,7 @@ private:
     QIcon pauseIcon, contIcon;
 
     void iniSignalSlots();
+    void init(QString _filename, qint64 filesize);
 
 
 signals:
