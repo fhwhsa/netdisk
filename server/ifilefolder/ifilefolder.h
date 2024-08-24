@@ -62,12 +62,19 @@ public:
     /// @return 成功返回打开的文件标识符，否则返回-1
     static int createFile(std::string path, int& statusCode);
 
-    /// @brief 打开文件
+    /// @brief 打开文件（只读）
     /// @param path 文件路径（网盘路径）
     /// @param offset 指定位置
     /// @param statusCode 处理结果状态码
-    /// @return 成功返回打开的文件标识符，否则返回-1
+    /// @return 
     static int openFile(std::string path, off_t offset, int& statusCode);
+
+    /// @brief 打开文件（追加，只写）
+    /// @param path 文件路径（网盘路径）
+    /// @param statusCode 处理结果状态码
+    /// @param fileSize 这是一个传出参数，标识文件当前大小（byte）
+    /// @return 成功返回打开的文件标识符，否则返回-1
+    static int openFile(std::string path, int& statusCode, long* fileSize = nullptr);
 
     /// @brief 获取文件大小（byte）
     /// @param path 文件路径（网盘路径）

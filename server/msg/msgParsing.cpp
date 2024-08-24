@@ -23,7 +23,7 @@ std::vector<std::string> MsgParsing::split_string(const std::string &str, std::s
     return tokens; 
 }
 
-MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
+MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit, ConnResources& ur)
 {
     using namespace std;
     string msg((char*)munit->msg);
@@ -43,7 +43,8 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
     if (-1 != (id = IDatabase::authentication(email, passwd, statusCode)))
     {
         // cout << status << endl;
-        content = ("success\r\nid:" + to_string(id) + "\r\nstatus:" + to_string(statusCode) + "\r\n");
+        ur.setUserId(to_string(id));
+        content = ("success\r\nid:" + ur.getUserId() + "\r\nstatus:" + to_string(statusCode) + "\r\n");
     }
 
     else 
@@ -51,6 +52,7 @@ MsgUnit *MsgParsing::loginRespond(const MsgUnit *munit)
         // cout << status << endl;
         content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
     }
+
 
     respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_LOGIN_RESPOND, strlen(content.c_str()), content.c_str());
     
@@ -426,6 +428,47 @@ MsgUnit *MsgParsing::uploadFileCancelRespond(const MsgUnit *munit, ConnResources
     return respond;
 }
 
+MsgUnit *MsgParsing::uploadFilePauseRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    // 关闭资源文件
+    int fd = ur.getFd();
+    close(fd);
+
+    char* content = "recv\r\n";
+    MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_PAUSE_RESPOND, strlen(content), content);
+    return respond;
+}
+
+MsgUnit *MsgParsing::uploadFileContinueRespond(const MsgUnit *munit, ConnResources &ur)
+{
+    using namespace std;
+
+    // 处理信息
+    vector<string> fileinfo = getAllRows(munit);
+    if (2 != fileinfo.size())
+        return nullptr;
+    
+    string content;
+    int statusCode;
+    long size = -1;
+    string path = fileinfo[1] + "/" + fileinfo[0] + ".tmp";
+    int fd = IFileFolder::openFile(path, statusCode, &size);
+    if (-1 != fd)
+    {
+        content = "recv\r\n" + to_string(size) + "\r\n";
+        ur.setFd(fd);
+        ur.setFilePath(path);
+    }
+    else 
+        content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";
+    
+    MsgUnit* respond = nullptr;
+    respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_CONTINUE_RESPOND, strlen(content.c_str()), content.c_str());
+    return respond;
+}
+
 MsgUnit *MsgParsing::downloadFileStartRespond(const MsgUnit *munit, ConnResources &ur)
 {
     using namespace std;
@@ -544,7 +587,7 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     {
     // 登陆请求
     case MsgType::MSG_TYPE_LOGIN_REQUEST:
-        return loginRespond(munit);
+        return loginRespond(munit, ur);
 
     // 退出登陆请求
     case MsgType::MSG_TYPE_LOGOUT_REQUEST:
@@ -604,6 +647,14 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     // 取消上传请求
     case MsgType::MSG_TYPE_UPLOADFILE_CANCEL_REQUEST:
         return uploadFileCancelRespond(munit, ur);
+
+    // 暂停上传请求
+    case MsgType::MSG_TYPE_UPLOADFILE_PAUSE_REQUEST:
+        return uploadFilePauseRespond(munit, ur);
+    
+    // 继续上传请求
+    case MsgType::MSG_TYPE_UPLOADFILE_PAUSE_RESPOND:
+        return uploadFileContinueRespond(munit, ur);
 
     // 创建下载任务请求
     case MsgType::MSG_TYPE_DOWNLOADFILE_START_REQUEST:

@@ -108,6 +108,17 @@ MsgUnit *MsgTools::generateUploadFileCancelRequest()
     return MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_CANCEL_REQUEST, 0, "/0");
 }
 
+MsgUnit *MsgTools::generateUploadFilePauseRequest()
+{
+    return MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_PAUSE_REQUEST, 0, "/0");
+}
+
+MsgUnit *MsgTools::generateUploadFileContinueRequest(QString filename, QString path)
+{
+    QString str = QString("%1\r\n%2\r\n").arg(filename).arg(path);
+    return msgHandler(str, MsgType::MSG_TYPE_UPLOADFILE_CONTINUE_REQUEST);
+}
+
 MsgUnit *MsgTools::generateDownloadFileStartRequest(QString filePath)
 {
     QString str = filePath + "\r\n";

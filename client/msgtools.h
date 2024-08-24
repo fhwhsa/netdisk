@@ -127,6 +127,20 @@ public:
     static MsgUnit* generateUploadFileCancelRequest();
 
     /**
+     * @brief 生成暂停上传任务请求
+     * @return
+     */
+    static MsgUnit* generateUploadFilePauseRequest();
+
+    /**
+     * @brief 生成继续上传任务请求
+     * @param filename 文件名
+     * @param path 文件路径
+     * @return
+     */
+    static MsgUnit* generateUploadFileContinueRequest(QString filename, QString path);
+
+    /**
      * @brief 生成文件下载创建请求
      * @param filePath 下载文件的网盘路径
      * @return

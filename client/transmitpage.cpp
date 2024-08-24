@@ -61,6 +61,7 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath)
     UploadWorker* uw = new UploadWorker(tid, filepath, diskPath);
     uploadWorkerList.insert(tid, uw);
     connect(piw, &ProgressItemWidget::cancel, uw, &UploadWorker::cancel);
+    connect(piw, &ProgressItemWidget::pause, uw, &UploadWorker::pause);
     connect(uw, &UploadWorker::updateProgress, this, [piw](qint64 val){
         QMetaObject::invokeMethod(piw, [piw, val](){
                 piw->updateFinshSize(val);
@@ -94,6 +95,10 @@ void TransmitPage::addUploadTask(QString filepath, QString diskPath)
         else if (2 == status) // 取消
         {
             ui->uploadList->takeItem(row);
+        }
+        else if (1 == status) // 暂停
+        {
+//            qDebug() << "erase uploadworker";
         }
         uploadWorkerList.erase(uploadWorkerList.find(taskId));
     });
@@ -225,9 +230,14 @@ UploadWorker::UploadWorker(int _tid, QString _filepath, QString _diskPath)
     : filepath(_filepath),
     diskpath(_diskPath),
     isCancel(false),
+    isPause(false),
     tid(_tid)
 {
     filename = filepath.mid(filepath.lastIndexOf('/') + 1);
+}
+
+UploadWorker::~UploadWorker()
+{
 }
 
 bool UploadWorker::initFile()
@@ -248,7 +258,7 @@ bool UploadWorker::initFile()
 void UploadWorker::run()
 {
     QTcpSocket* socket = nullptr;
-    QMetaObject::Connection conn1, conn2;
+    QMetaObject::Connection conn1, conn2, conn3;
     do
     {
         // 打开文件
@@ -277,8 +287,9 @@ void UploadWorker::run()
         });
         conn2 = connect(this, &UploadWorker::cancel, [this, socket](){
             isCancel = true;
-//            if (socket->bytesAvailable() == 0)
-//                upload(socket);
+        });
+        conn3 = connect(this, &UploadWorker::pause, [this](){
+            isPause = true;
         });
 
         // 发送start指令，并等待响应
@@ -299,12 +310,15 @@ void UploadWorker::run()
 
     disconnect(conn1);
     disconnect(conn2);
+    disconnect(conn3);
     if (nullptr != socket && socket->state() == QAbstractSocket::ConnectedState)
     {
         socket->close();
         delete socket;
         socket = nullptr;
     }
+
+    deleteLater();
 }
 
 void UploadWorker::upload(QTcpSocket* socket)
@@ -330,6 +344,18 @@ void UploadWorker::upload(QTcpSocket* socket)
         free(req);
         isCancel = false; // 让其接下来能正常接收取消任务的响应
     }
+    else if (isPause)
+    {
+        // 发送暂停任务请求
+        MsgUnit* req = MsgTools::generateUploadFilePauseRequest();
+        socket->write((char*)req, req->totalLen);
+        if (!socket->waitForBytesWritten(5000))
+        {
+            qDebug() << "请重试暂停";
+        }
+        free(req);
+        isPause = false;
+    }
     else if (munit->msgType == MsgType::MSG_TYPE_UPLOADFILE_FINSH_RESPOND)
     {
         if ("recv" == recvList[0])
@@ -349,17 +375,75 @@ void UploadWorker::upload(QTcpSocket* socket)
         {
             emit workFinsh(-1, tid, "数据传输错误");
         }
+        else if ("failure" == recvList[0])
+        {
+            emit workFinsh(-1, tid, getStatusCodeString(recvList[1].mid(7)));
+        }
+        else
+        {
+            qint64 serverRecv = recvList[1].toLong();
+
+            // 更新进度
+            uploadSize += serverRecv;
+            emit updateProgress(serverRecv);
+
+            // 发送数据
+            if (uploadSize < fileSize)
+            {
+                char buffer[blockSize];
+                qint64 res = file.read(buffer, blockSize);
+                MsgUnit* req = MsgTools::generateUploadFileDataRequest(res, buffer);
+                socket->write((char*)req, req->totalLen);
+                if (!socket->waitForBytesWritten(5000))
+                {
+                    emit workFinsh(-1, tid, socket->errorString());
+                }
+            }
+            else
+            {
+                file.close();
+                MsgUnit* req = MsgTools::generateUploadFileFinshRequest();
+                socket->write((char*)req, req->totalLen);
+                if (!socket->waitForBytesWritten(5000))
+                {
+                    emit workFinsh(-1, tid, socket->errorString());
+                }
+            }
+        }
+    }
+
+    else if (munit->msgType == MsgType::MSG_TYPE_UPLOADFILE_CANCEL_RESPOND)
+    {
+        if (recvList[0] == "recv")
+        {
+            emit workFinsh(2, tid);
+        }
+        else
+            BubbleTips::showBubbleTips("请重试(" + getStatusCodeString(recvList[1].mid(7)) + "）", 2);
+    }
+
+    else if (munit->msgType == MsgType::MSG_TYPE_UPLOADFILE_PAUSE_RESPOND)
+    {
+        emit workFinsh(1, tid);
+    }
+
+    else if (munit->msgType == MsgType::MSG_TYPE_UPLOADFILE_CONTINUE_RESPOND)
+    {
+        // 获取服务器读取的字节数
+        if (3 != recvList.size())
+        {
+            emit workFinsh(-1, tid, "数据传输错误");
+        }
         if ("failure" == recvList[0])
         {
             emit workFinsh(-1, tid, getStatusCodeString(recvList[1].mid(7)));
         }
-        qint64 serverRecv = recvList[1].toLong();
 
-        // 更新进度
-        uploadSize += serverRecv;
-        emit updateProgress(serverRecv);
+        qint64 alreadyUploadSize = recvList[1].toLongLong();
+        emit updateProgress(alreadyUploadSize);
+        uploadSize = alreadyUploadSize;
 
-        // 发送数据
+        // 继续上传
         if (uploadSize < fileSize)
         {
             char buffer[blockSize];
@@ -381,16 +465,6 @@ void UploadWorker::upload(QTcpSocket* socket)
                 emit workFinsh(-1, tid, socket->errorString());
             }
         }
-    }
-
-    else if (munit->msgType == MsgType::MSG_TYPE_UPLOADFILE_CANCEL_RESPOND)
-    {
-        if (recvList[0] == "recv")
-        {
-            emit workFinsh(2, tid);
-        }
-        else
-            BubbleTips::showBubbleTips("请重试(" + getStatusCodeString(recvList[1].mid(7)) + "）", 2);
     }
 
     free(munit);

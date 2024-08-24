@@ -105,10 +105,7 @@ void respondToClient(MsgUnit* munit, my_bev* mbev)
     {
         // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
         //         << (char*)respond->msg << std::endl;
-        
-        // 记录登陆id
-        if (MsgType::MSG_TYPE_LOGIN_RESPOND == respond->msgType)
-            mbev->ur.setUserId(MsgParsing::getRow(respond, 1).substr(3));
+                    
         bufferevent_write(mbev->bev, (char*)respond, respond->totalLen);
 
         delete respond;

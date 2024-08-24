@@ -216,6 +216,49 @@ int IFileFolder::openFile(std::string path, off_t offset, int &statusCode)
     return -1;
 }
 
+int IFileFolder::openFile(std::string path, int &statusCode,  long* fileSize)
+{
+    using namespace std;
+    using namespace filesystem;
+
+    path = basePath + path;
+
+    if (!exists(path))
+    {
+        statusCode = FILEORFOLDERNOTEXIST;
+        return -1;
+    }
+    try
+    {
+        statusCode = SUCCESS;
+        int fd = open(path.c_str(), O_WRONLY | O_APPEND);
+        if (-1 == fd)
+        {
+            statusCode = FILEOPENFAILURE;
+            perror("open");
+            return -1;
+        }
+        if (nullptr != fileSize)
+        {
+            struct stat st;
+            if (-1 == fstat(fd, &st))
+            {
+                statusCode = GETFILESTATFAILURE;
+                perror("fstat");
+                return -1;
+            }
+            (*fileSize) = st.st_size;
+        }
+        return fd;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        statusCode = EXCEPTION;
+    }
+    return -1;
+}
+
 long IFileFolder::getFileSize(std::string path)
 {
     path = basePath + path;

@@ -25,7 +25,7 @@ private:
     /// @brief 处理登陆请求
     /// @param munit 通信消息
     /// @return 返回登陆响应
-    static MsgUnit* loginRespond(const MsgUnit* munit);
+    static MsgUnit* loginRespond(const MsgUnit* munit, ConnResources& ur);
 
     /// @brief 处理退出登陆请求
     /// @param munit 通信消息
@@ -100,6 +100,18 @@ private:
     /// @param ur 连接资源
     /// @return 返回处理响应
     static MsgUnit* uploadFileCancelRespond(const MsgUnit* munit, ConnResources& ur);
+
+    /// @brief 处理暂停上传请求
+    /// @param munit 通信信息
+    /// @param ur 连接资源
+    /// @return 返回处理响应
+    static MsgUnit* uploadFilePauseRespond(const MsgUnit* munit, ConnResources& ur);
+
+    /// @brief 处理继续上传请求
+    /// @param munit 通信信息
+    /// @param ur 连接资源
+    /// @return 返回处理响应
+    static MsgUnit* uploadFileContinueRespond(const MsgUnit* munit, ConnResources& ur);
 
     /// @brief 处理下载文件任务创建请求
     /// @param munit 通信信息

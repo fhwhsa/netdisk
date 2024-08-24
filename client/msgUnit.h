@@ -67,6 +67,14 @@ enum MsgType {
     MSG_TYPE_UPLOADFILE_CANCEL_REQUEST,
     /// @brief 取消上传响应
     MSG_TYPE_UPLOADFILE_CANCEL_RESPOND,
+    /// @brief 暂停上传请求
+    MSG_TYPE_UPLOADFILE_PAUSE_REQUEST,
+    /// @brief 暂停上传响应
+    MSG_TYPE_UPLOADFILE_PAUSE_RESPOND,
+    /// @brief 继续上传请求
+    MSG_TYPE_UPLOADFILE_CONTINUE_REQUEST,
+    /// @brief 继续上传响应
+    MSG_TYPE_UPLOADFILE_CONTINUE_RESPOND,
     /// @brief 创建文件下载任务请求
     MSG_TYPE_DOWNLOADFILE_START_REQUEST,
     /// @brief 创建文件下载任务响应

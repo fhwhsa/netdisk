@@ -76,7 +76,7 @@ class UploadWorker : public QThread
 
 public:
     explicit UploadWorker(int _tid, QString _filepath, QString _diskPath);
-
+    ~UploadWorker();
 
 private:
     QFile file;
@@ -86,6 +86,7 @@ private:
     int tid;
     const int blockSize = 1024;
     bool isCancel;
+    bool isPause;
 
     bool initFile();
     void upload(QTcpSocket* socket);
@@ -95,6 +96,7 @@ protected:
 
 signals:
     void cancel();
+    void pause();
     void updateProgress(qint64 value);
     /**
      * @brief workFinsh 工作线程结束时发出
