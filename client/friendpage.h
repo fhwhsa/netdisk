@@ -29,6 +29,11 @@ private:
 
     void init();
     void iniSignalSlots();
+
+    /**
+     * @brief 刷新好友列表
+     * @param sptr
+     */
     void flushFriendList(std::shared_ptr<MsgUnit> sptr);
 
 private slots:

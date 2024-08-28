@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+/// @brief 文件信息
 struct FileInfo
 {
     /// @brief 文件类型，0代表文件夹，1代表文件 
@@ -23,7 +24,7 @@ struct FileInfo
     }
 };
 
-/// @brief 文件或文件夹操作接口
+/// @brief 文件或文件夹操作API
 class IFileFolder
 {
 

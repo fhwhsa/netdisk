@@ -144,6 +144,7 @@ private:
         }
     }
 
+    /// @brief 加载配置文件
     void loadConfig()
     {
         std::ifstream ifs;

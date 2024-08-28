@@ -121,7 +121,7 @@ bool IFileFolder::renameFileOrFolder(std::string path, std::string newName, int&
     using namespace filesystem;
     
     path = basePath + path;
-    newName = basePath + newName;
+    newName = path.substr(0, path.rfind('/') + 1) + newName;
 
     if (!exists(path))
     {

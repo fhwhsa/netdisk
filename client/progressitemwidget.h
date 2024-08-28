@@ -10,6 +10,9 @@ namespace Ui {
 class progressItems;
 }
 
+/**
+ * @brief 进度项
+ */
 class ProgressItemWidget : public QWidget
 {
     Q_OBJECT

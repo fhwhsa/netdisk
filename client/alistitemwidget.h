@@ -7,6 +7,9 @@ namespace Ui {
 class ItemWIdget;
 }
 
+/**
+ * @brief 用户信息项
+ */
 class AListItemWidget : public QWidget
 {
     Q_OBJECT

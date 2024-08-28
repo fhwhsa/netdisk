@@ -7,6 +7,9 @@ namespace Ui {
 class SettingDialog;
 }
 
+/**
+ * @brief 设置对话框
+ */
 class SettingDialog : public QDialog
 {
     Q_OBJECT

@@ -8,6 +8,9 @@ namespace Ui {
 class FListItemWidget;
 }
 
+/**
+ * @brief 好友列表项
+ */
 class FriendListItemWidget : public QWidget
 {
     Q_OBJECT

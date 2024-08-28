@@ -45,23 +45,23 @@ private:
     explicit BubbleTips(QString showStr, QPoint pos, bool flag, int sec = 1, QObject* father = nullptr);
     ~BubbleTips();
 
-    void initTimer();//初始化窗体的布局和部件
-    QTimer *closeTimer;
+    void initTimer(); ///< 初始化窗体的布局和部件
+    QTimer *closeTimer; ///< 气泡关闭计时器
     QTimer *singleShotTimer;
     QHBoxLayout *hBoxlayout;
     QLabel *mText;
     QString showStr;
 
-    double opacityValue;//窗体初始化透明度
+    double opacityValue; ///< 窗体初始化透明度
 
-    QColor  backgroundColor;//窗体的背景色
-    QColor  frameColor;//边框颜色
-    int     frameSize;//边框粗细大小
+    QColor backgroundColor; ///< 窗体的背景色
+    QColor frameColor; ///< 边框颜色
+    int frameSize; ///< 边框粗细大小
 
-    int     showTime;//显示时间
+    int showTime; ///< 显示时间
 
-    int     closeTime;//关闭需要时间
-    double  closeSpeed;//窗体消失的平滑度，大小0~1
+    int closeTime; ///< 改变透明度间隔时间
+    double closeSpeed; ///< 窗体消失的平滑度，大小0~1
 
 signals:
 };

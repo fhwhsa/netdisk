@@ -29,6 +29,9 @@ enum WorkType
     CONTINUE_WORK
 };
 
+/**
+ * @brief 传输页面
+ */
 class TransmitPage : public QWidget
 {
     Q_OBJECT
@@ -40,15 +43,21 @@ public:
 private:
     Ui::TransmitPage *ui;
 
-    QListWidget* currListWidget;
+    QListWidget* currListWidget; ///< 维护当前展示的QListWidget对象
 
-    QHash<int, UploadWorker*> uploadWorkerList;
-    const int maxUploadTaskNum = 2;
+    QHash<int, UploadWorker*> uploadWorkerList; ///< 存储正在进行的上传任务对象
+    const int maxUploadTaskNum = 2; ///< 最大同时进行的上传任务数
+    /**
+     * @brief uploadWorkFinshHandler
+     * @param status 任务完成状态
+     * @param taskId 任务id
+     * @param errorMsg 错误信息，任务正常完成则为空字符串
+     */
     void uploadWorkFinshHandler(int status, int taskId, QString errorMsg);
 
     QHash<int, DownloadWorker*> downloadWorkerList;
     const int maxDownloadTaskNum = 2;
-    void downloadWorkFinshHandler(int status, int taskId, QString errorMsg);
+    void downloadWorkFinshHandler(int status, int taskId, QString msg);
 
     void init();
     void iniSignalSlots();
@@ -59,10 +68,25 @@ public slots:
      * @param sptr 接收到的消息单元
      */
     void getMsg(std::shared_ptr<MsgUnit> sptr);
+
+    /**
+     * @brief 添加上传任务
+     * @param filepath 上传文件路径
+     * @param diskPath 网盘存储路径
+     * @param wt 任务启动状态（新任务/继续）
+     */
     void addUploadTask(QString filepath, QString diskPath, WorkType wt = WorkType::NEW_WORK);
+
+    /**
+     * @brief 添加下载任务
+     * @param filepath 下载文件的网盘路径
+     * @param filesize 文件大小（字节）
+     * @param wt 任务启动状态（新任务/继续）
+     */
     void addDownloadTask(QString filepath, qint64 filesize, WorkType wt = WorkType::NEW_WORK);
 
 private slots:
+    /* 按钮槽函数 */
     void clickUploadListBtn();
     void clickDownloadListBtn();
     void clickFinshListBtn();
@@ -74,7 +98,7 @@ signals:
      */
     void _sendMsg(MsgUnit* munit);
 
-    void getUploadFileStartRespond(std::shared_ptr<MsgUnit> sptr);
+//    void getUploadFileStartRespond(std::shared_ptr<MsgUnit> sptr);
 };
 
 class UploadWorker : public QThread
@@ -86,17 +110,26 @@ public:
     ~UploadWorker();
 
 private:
-    QFile file;
-    qint64 uploadSize;
-    qint64 fileSize;
+    QFile file; ///< 打开的上传文件
+    qint64 uploadSize; ///< 已上传的大小（byte）
+    qint64 fileSize; ///< 文件总大小（byte）
     QString filename, filepath, diskpath;
-    int tid;
+    int tid; ///< 任务id
     const int blockSize = 1024;
-    bool isCancel;
-    bool isPause;
+    bool isCancel; ///< 是否取消任务
+    bool isPause; ///< 是否暂停任务
     WorkType wt;
 
+    /**
+     * @brief 初始化文件
+     * @return
+     */
     bool initFile();
+
+    /**
+     * @brief socket可读时调用
+     * @param socket
+     */
     void upload(QTcpSocket* socket);
 
 protected:
@@ -105,12 +138,18 @@ protected:
 signals:
     void cancel();
     void pause();
+
+    /**
+     * @brief 更新上传进度
+     * @param value 变化值（byte）
+     */
     void updateProgress(qint64 value);
+
     /**
      * @brief workFinsh 工作线程结束时发出
      * @param status -1代表出错，0代表上传完成，1代表暂停，2代表取消
-     * @param taskId
-     * @param errorMsg
+     * @param taskId 任务id
+     * @param errorMsg 携带错误信息
      */
     void workFinsh(int status, int taskId, QString errorMsg = "");
 };
@@ -141,11 +180,12 @@ signals:
     void cancel();
     void pause();
     void updateProgress(qint64 value);
+
     /**
      * @brief workFinsh 工作线程结束时发出
      * @param status -1代表出错，0代表下载完成，1代表暂停，2代表取消
-     * @param taskId
-     * @param msg
+     * @param taskId 任务id
+     * @param msg 携带信息
      */
     void workFinsh(int status, int taskId, QString msg = "");
 

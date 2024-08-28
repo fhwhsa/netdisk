@@ -55,11 +55,12 @@ private:
     QString userId;
     QString userEmail;
 
-    QByteArray buffer;      // 存储socket读到的数据
-    uint waitSize;          // 等待字节数
+    QByteArray buffer;      ///< 存储socket读到的数据
+    uint waitSize;          ///< 等待字节数
     MsgUnit* revMunit;
 
 private slots:
+    /* 按钮槽函数 */
     void clickTbfolder();
     void clickTbtransmit();
     void clickTbfriend();

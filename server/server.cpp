@@ -87,26 +87,46 @@ void listener_cb(struct evconnlistener *evlistener, evutil_socket_t fd, struct s
         return ;
     }
 
-    // 设置读取水位
+    // 设置读取低水位为消息的固定字节数
     bufferevent_setwatermark(bev, EV_READ, sizeof(struct MsgUnit), 0);
 
     my_bev* mbev = new my_bev();
     mbev->bev = bev;
+    mbev->isRunningReadCb = false;
 
     bufferevent_set_timeouts(bev, &connSustainTime, nullptr);
     bufferevent_setcb(bev, read_cb, NULL, event_cb, mbev);
     bufferevent_enable(bev, EV_READ | EV_WRITE);
 }
 
-void respondToClient(MsgUnit* munit, my_bev* mbev)
+void respondToClient(my_bev* mbev)
 {
+    mbev->isRunningReadCb = true;
+
+    uint totalLen;
+    struct evbuffer* input = bufferevent_get_input(mbev->bev);
+
+    // 因为设置了读取低水位，可以确保数据可读
+    evbuffer_copyout(input, &totalLen, sizeof(uint));
+    if (static_cast<ulong>(totalLen) > evbuffer_get_length(input))  // 缓冲区数据不足则退出
+    {
+        mbev->isRunningReadCb = false;
+        return;
+    }
+    
+    MsgUnit* munit = (MsgUnit*)malloc(totalLen);
+    evbuffer_remove(input, munit, totalLen);
+    mbev->isRunningReadCb = false;
+
     MsgUnit* respond = MsgParsing::parsing(munit, mbev->ur);
     if (nullptr != respond)
     {
         // std::cout << respond->totalLen << "," << respond->msgType << "," << respond->msgLen << ","
         //         << (char*)respond->msg << std::endl;
-                    
+        
+        mbev->isRunningReadCb = true;
         bufferevent_write(mbev->bev, (char*)respond, respond->totalLen);
+        mbev->isRunningReadCb = false;
 
         delete respond;
         respond = nullptr;
@@ -118,20 +138,10 @@ void respondToClient(MsgUnit* munit, my_bev* mbev)
 
 void read_cb(struct bufferevent *bev, void *ctx)
 {
-    int res = 0;
     my_bev* mbev = (my_bev*)ctx;
-
-    // 读取总大小
-    uint totalLen;
-    res = bufferevent_read(bev, &totalLen, sizeof(uint)); 
-    MsgUnit* munit = (MsgUnit*)malloc(totalLen);
-    munit->totalLen = totalLen;
-    res = bufferevent_read(bev, &munit->msgType, sizeof(uint));
-    res = bufferevent_read(bev, &munit->msgLen, sizeof(uint));
-    res = bufferevent_read(bev, munit->msg, munit->msgLen);
-    // std::cout << (char*)munit->msg << std::endl;
-
-    ThreadPool::getInstance().enqueue(respondToClient, munit, mbev);
+    if (mbev->isRunningReadCb)
+        return;
+    ThreadPool::getInstance().enqueue(respondToClient, mbev);
 }
 
 void event_cb(struct bufferevent *bev, short what, void *ctx)

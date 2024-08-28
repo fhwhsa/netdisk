@@ -25,6 +25,7 @@ void BubbleTips::showBubbleTips(QString showStr, QPoint pos, int sec, QObject *f
 
 BubbleTips::~BubbleTips()
 {
+//    qDebug() << "delete";
     if (nullptr != closeTimer)
     {
         closeTimer->stop();
@@ -111,6 +112,7 @@ BubbleTips::BubbleTips(QString showStr, QPoint pos, bool flag, int sec, QObject*
 
 void BubbleTips::initTimer()
 {
+    // 逐渐提高透明度，提供视觉上逐渐消失的感觉
     closeTimer = new QTimer(this);
     closeTimer->setTimerType(Qt::PreciseTimer);
     connect(closeTimer,&QTimer::timeout,this,[=](){
@@ -123,8 +125,9 @@ void BubbleTips::initTimer()
         this->setWindowOpacity(opacityValue);
     });
 
-    //执行延时自动关闭
+    // 执行延时自动关闭
     singleShotTimer = new QTimer(this);
+    singleShotTimer->setSingleShot(true);
     connect(singleShotTimer, &QTimer::timeout, this, [=](){
         closeTimer->start(closeTime);
     });

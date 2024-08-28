@@ -388,7 +388,8 @@ MsgUnit *MsgParsing::uploadFileFinshRespond(const MsgUnit *munit, ConnResources 
     int statusCode;
 
     string path = ur.getFilePath();
-    string nameTo = path.substr(0, path.size() - 4);
+    string nameTo = path.substr(path.rfind('/'));
+    nameTo = nameTo.substr(0, nameTo.rfind(".tmp"));
     if (!IFileFolder::renameFileOrFolder(path, nameTo, statusCode))
     {
         content = "failure\r\nstatus:" + to_string(statusCode) + "\r\n";

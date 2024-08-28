@@ -16,6 +16,9 @@ namespace Ui {
 class FriendApplicationList;
 }
 
+/**
+ * @brief 好友申请列表
+ */
 class FriendApplicationList : public QDialog
 {
     Q_OBJECT

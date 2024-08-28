@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <string>
 #include <iostream>
+#include <atomic>
 
 /// @brief 封装bufferevent作为参数传递给回调函数
 struct my_bev
@@ -20,10 +21,8 @@ struct my_bev
     struct bufferevent* bev;
     /// @brief 登陆用户的id
     ConnResources ur;
-    ~my_bev()
-    {
-        // std::cout << "delete" << std::endl;
-    }
+    /// @brief 控制同一连接在同一时刻只有一个线程在执行回调，确保线程安全
+    std::atomic<bool> isRunningReadCb;
 };
 
 /// @brief 运行服务器
@@ -37,9 +36,8 @@ int run(std::string host, uint port, struct timeval _connSustainTime = {60 * 5, 
 void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
 
 /// @brief 根据不同的munit作出响应
-/// @param munit 从客户端接收到的消息
 /// @param mbev 
-void respondToClient(MsgUnit* munit, my_bev* mbev);
+void respondToClient(my_bev* mbev);
 
 /// @brief 读回调函数
 void read_cb(struct bufferevent *, void *);

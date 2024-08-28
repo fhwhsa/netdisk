@@ -15,6 +15,10 @@
 #define FAILURE                 209     /*失败*/
 #define FRIENDSHIPS             210     /*好友关系*/
 #define FILEEXIST               211     /*文件已存在*/
+#define FILEOPENFAILURE         212     /*文件打开失败*/
+#define GETFILESTATFAILURE      213     /*获取文件信息失败*/
+#define WRITEFILEFAILURE        214     /*写文件失败*/
+#define READFILEFAILURE         215     /*读文件失败*/
 
 // 数据库错误
 #define DATABASEBUSY            301     /*数据库繁忙*/
@@ -56,9 +60,17 @@ static QString getStatusCodeString(QString status)
         return "已添加为好友";
     case FILEEXIST:
         return "文件已存在";
+    case FILEOPENFAILURE:
+        return "文件打开失败";
+    case GETFILESTATFAILURE:
+        return "获取文件信息失败";
+    case WRITEFILEFAILURE:
+        return "写文件失败";
+    case READFILEFAILURE:
+        return "读文件失败";
 
     case DATABASEBUSY:
-        return "数据库繁忙，请稍后再试";
+        return "数据库繁忙";
     case DATABASEERROR:
         return "数据库错误";
 

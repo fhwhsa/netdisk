@@ -8,6 +8,9 @@ namespace Ui {
 class FolderListItemWidget;
 }
 
+/**
+ * @brief 文件/文件夹列表项
+ */
 class FolderListItemWidget : public QWidget
 {
     Q_OBJECT
