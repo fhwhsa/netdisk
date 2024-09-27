@@ -171,10 +171,10 @@ void MainPage::sendMsg(MsgUnit *munit)
 
     if (-1 == socket->write((char*)munit, munit->totalLen))
         BubbleTips::showBubbleTips(socket->errorString(), 2, this);
-    if (nullptr != munit)
-    {
-        delete munit;
-        munit = nullptr;
+    try {
+        free(munit);
+    } catch (const std::exception& e) {
+        qDebug() << e.what();
     }
 }
 
@@ -201,7 +201,13 @@ void MainPage::recvMsg()
         buffer.remove(0, waitSize);
         memcpy((char*)revMunit + 4, tmp.constData(), waitSize);
         waitSize = 0;
-        std::shared_ptr<MsgUnit> sptr(revMunit);
+        std::shared_ptr<MsgUnit> sptr(revMunit, [](MsgUnit* munit){
+            try {
+                free(munit);
+            } catch (const std::exception& e) {
+                qDebug() << e.what();
+            }
+        });
         emit newMunit(sptr);
         revMunit = nullptr;
     }

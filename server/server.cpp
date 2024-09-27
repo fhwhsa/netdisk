@@ -127,13 +127,27 @@ void respondToClient(my_bev* mbev)
         mbev->isRunningReadCb = true;
         bufferevent_write(mbev->bev, (char*)respond, respond->totalLen);
         mbev->isRunningReadCb = false;
-
-        delete respond;
-        respond = nullptr;
+        try
+        {
+            free(respond);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
     }
     // std::cout << "write" << std::endl;
-    delete munit;
-    munit = nullptr;
+    try
+    {
+        /* code */
+        free(munit);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
 }
 
 void read_cb(struct bufferevent *bev, void *ctx)
