@@ -1,6 +1,6 @@
 {
     "connection-pool" : {
-        "ip": "127.0.0.1",      // 数据库服务器ip
+        "ip": "localhost",      // 数据库服务器ip
         "port": 3306,           // 数据库服务器端口
         "userName": "root",     // 用户名
         "passwd": "123456",     // 密码
@@ -20,7 +20,7 @@
     },
 
     "server-setting" : {
-        "ip": "127.0.0.1",         // 服务器ip
+        "ip": "0.0.0.0",         // 服务器ip
         "port": 9999,              // 监听端口
         "connSustainTime": 300      // 连接最大空闲时间（s）
     }

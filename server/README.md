@@ -22,5 +22,15 @@
 * 依赖库：  
     - libevent 2.1.12-stable
     - libmysqlclient-dev 8.0.37-0ubuntu0.22.04.3
+* docker
+    ```shell
+    docker pull ghcr.io/fhwhsa/netdisk/netdiskserverenv:latest
+    ```
+    * 项目路径：`/opt/netdisk/server`
+    * 注意事项：
+        * 数据库
+            * 启动：`service mysql start`
+            * 用户名及密码：root，123456
+        * 数据库用户信息为空
 
 [<--](../README.md)
