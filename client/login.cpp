@@ -46,6 +46,8 @@ bool Login::init()
     this->setMinimumSize(QSize(1100, 700));
     this->setWindowTitle(" ");
     loadconfig();
+    socket = nullptr;
+    mainPage = nullptr;
     return true;
 }
 
@@ -66,6 +68,11 @@ void Login::loadconfig()
 
 bool Login::connectServer()
 {
+    if (nullptr != socket)
+    {
+        delete socket;
+        socket = nullptr;
+    }
     socket = new QTcpSocket(this);
     socket->connectToHost(QHostAddress(ip), port.toUInt());
     return socket->waitForConnected();
@@ -97,8 +104,11 @@ bool Login::tryConnect()
 
 void Login::login()
 {
-    if (nullptr == socket && !tryConnect())
+    // if ((nullptr == socket || socket->state() != QAbstractSocket::ConnectedState) && !tryConnect())
+    //     return;
+    if (!tryConnect())
         return;
+
     QString email = ui->userName->text();
     QString passwd = ui->passwd->text();
 
