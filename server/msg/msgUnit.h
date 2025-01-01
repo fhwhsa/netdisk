@@ -1,6 +1,11 @@
 #ifndef _MSGUNIT_T_
 #define _MSGUNIT_T_
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+
 typedef unsigned int uint;
 
 /// @brief 

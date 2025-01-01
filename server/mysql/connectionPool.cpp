@@ -1,11 +1,6 @@
 #include "connectionPool.h"
-#include "../json/json.h"
 
-#include <fstream>
-#include <thread>
-#include <stdexcept>
-
-std::atomic<int> stopFlag;
+std::atomic<int> stopFlag; // 作为两个分离线程的桥梁使用
 
 _MysqlConn::_MysqlConn()
 {
@@ -25,10 +20,10 @@ void _MysqlConn::initLastIdlePoint()
     this->lastIdlePoint = std::chrono::system_clock::now();
 }
 
-ConnectionPool* ConnectionPool::getConnectionPool()
+ConnectionPool& ConnectionPool::getInstance()
 {
     static ConnectionPool pool;
-    return &pool;
+    return pool;
 }
 
 std::shared_ptr<_MysqlConn> ConnectionPool::getConnection()
@@ -57,73 +52,24 @@ std::shared_ptr<_MysqlConn> ConnectionPool::getConnection()
     return ptr;
 }
 
-ConnectionPool::~ConnectionPool()
+void ConnectionPool::init(std::string _ip, uint _port, std::string _userName, std::string _passwd, std::string _dbName, uint _minConnSize, uint _maxConnSize, ulong _maxIdleTime, ulong _maxWaitTime)
 {
-    // 关闭生产连接和回收连接这两个线程
-    stopFlag.store(0);
-    cond_put.notify_all();
-    while (stopFlag.load() < 2)
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    
-    while (!connQueue.empty())
-    {
-        _MysqlConn* conn = connQueue.front();
-        connQueue.pop();
-        delete conn;
-    }
+    ip = _ip;
+    port = _port;
+    userName = _userName;
+    passwd = _passwd;
+    dbName = _dbName;
+    minConnSize = _minConnSize;
+    maxConnSize = _maxConnSize;
+    maxIdleTime = _maxIdleTime;
+    maxWaitTime = _maxWaitTime;
+
+    createConnection();
+    LogFunc::info("The database connection pool is initialized.");
 }
 
-ConnectionPool::ConnectionPool()
+void ConnectionPool::initFromConfig(const Json::Value &root)
 {
-    // 加载配置文件，创建数据库连接
-    loadConfig();
-
-    this->totalConnSize = 0;
-    // 先创建一个连接设置Mysql最大连接数
-    {
-        _MysqlConn* conn = new _MysqlConn();
-        if (conn->connect(this->ip, this->userName, this->passwd, this->dbName, this->port))
-        {
-            std::string sql = "set global max_connections = ";
-            sql = sql + std::to_string(this->maxConnSize + 10) + ";";
-            conn->update(sql);   
-            conn->initLastIdlePoint();
-            connQueue.push(conn);
-            ++totalConnSize;
-        }
-        if (0 == totalConnSize)
-            throw std::runtime_error("Failed to set the maximum number of MySQL connections!");
-    }
-    for (int i = 1; i < minConnSize; ++i)
-        addConnection();
-
-    // 设置线程终止标志为否
-    stopFlag.store(-1);
-
-    std::thread producer(&ConnectionPool::produceConnection, this);
-    std::thread recycler(&ConnectionPool::recycleConnection, this);
-
-    producer.detach();
-    recycler.detach();
-}
-
-void ConnectionPool::loadConfig()
-{
-    std::ifstream ifs;
-    ifs.open("config.json");
-    if (!ifs.is_open())
-        throw std::runtime_error("Failed to open the configuration file!");
-
-    // utf8支持
-    Json::CharReaderBuilder ReaderBuilder;
-    ReaderBuilder["emitUTF8"] = true;
-
-    Json::Value root;
-    std::string strerr;
-    bool ok = Json::parseFromStream(ReaderBuilder, ifs, &root, &strerr);
-    if (!ok)
-        throw std::runtime_error("Failed to read the configuration file!");
-    
     if (!root.isMember("connection-pool"))
         throw std::runtime_error("Profile is missing value 'connection-pool'!");
     
@@ -145,6 +91,46 @@ void ConnectionPool::loadConfig()
     this->maxConnSize = root["connection-pool"]["maxConnSize"].asUInt();
     this->maxIdleTime = root["connection-pool"]["maxIdleTime"].asUInt64();
     this->maxWaitTime = root["connection-pool"]["maxWaitTime"].asUInt64();
+
+    createConnection();
+    LogFunc::info("The database connection pool initialization is complete.");
+}
+
+void ConnectionPool::close()
+{
+    LogFunc::info("Start cleaning up database connection pool resources.");
+    // 关闭生产连接和回收连接这两个线程
+    stopFlag.store(0);
+    cond_put.notify_all();
+    while (stopFlag.load() < 2)
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    
+    while (!connQueue.empty())
+    {
+        _MysqlConn* conn = connQueue.front();
+        connQueue.pop();
+        delete conn;
+    }
+    LogFunc::info("Database connection pool  resource cleanup is complete.");
+}
+
+ConnectionPool::~ConnectionPool()
+{
+    if (-1 == stopFlag.load())
+        close();
+}
+
+ConnectionPool::ConnectionPool()
+{
+    ip = "";
+    port = 0;
+    userName = "";
+    passwd = "";
+    dbName = "";
+    minConnSize = 0;
+    maxConnSize = 0;
+    maxIdleTime = 0;
+    maxWaitTime = 0;
 }
 
 void ConnectionPool::addConnection()
@@ -170,6 +156,7 @@ void ConnectionPool::produceConnection()
             break;
 
         addConnection();
+        LogFunc::info("Database connection pool has adjust the number of connection to %ld", totalConnSize);
 
         // 唤醒取连接线程
         cond_take.notify_all();
@@ -194,9 +181,50 @@ void ConnectionPool::recycleConnection()
                 connQueue.pop();
                 --totalConnSize;
                 delete conn;
+                LogFunc::info("Database connection pool has adjust the number of connection to %ld", totalConnSize);
             }
         }
     }
     stopFlag++;
 }
 
+void ConnectionPool::createConnection()
+{
+    assert(ip != "");
+    assert(port > 0);
+    assert(userName != "");
+    assert(passwd != "");
+    assert(dbName != "");
+    assert(minConnSize > 0);
+    assert(maxConnSize > 0);
+    assert(maxIdleTime > 0);
+    assert(maxWaitTime > 0);
+
+    this->totalConnSize = 0;
+    // 先创建一个连接设置Mysql最大连接数
+    {
+        _MysqlConn* conn = new _MysqlConn();
+        if (conn->connect(this->ip, this->userName, this->passwd, this->dbName, this->port))
+        {
+            std::string sql = "set global max_connections = ";
+            sql = sql + std::to_string(this->maxConnSize + 10) + ";";
+            conn->update(sql);   
+            conn->initLastIdlePoint();
+            connQueue.push(conn);
+            ++totalConnSize;
+        }
+        if (0 == totalConnSize)
+            throw std::runtime_error("Failed to set the maximum number of MySQL connections!");
+    }
+    for (uint i = 1; i < minConnSize; ++i)
+        addConnection();
+
+    // 设置线程终止标志为否
+    stopFlag.store(-1);
+
+    std::thread producer(&ConnectionPool::produceConnection, this);
+    std::thread recycler(&ConnectionPool::recycleConnection, this);
+
+    producer.detach();
+    recycler.detach();
+}

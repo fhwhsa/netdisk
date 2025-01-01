@@ -1,8 +1,18 @@
 #ifndef _IDATABASE_H_
 #define _IDATABASE_H_
 
+#include "../mysql/mysqlConn.h"
+#include "../mysql/connectionPool.h"
+#include "../statusCode/statusCode.hpp"
+
 #include <string>
 #include <vector>
+#include <memory>
+#include <iostream>
+#include <algorithm>
+#include <cctype>
+#include <chrono>
+#include <iomanip>
 
 /// @brief 数据库交互接口
 class IDatabase

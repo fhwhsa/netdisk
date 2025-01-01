@@ -1,8 +1,19 @@
 #ifndef _IFILEFOLDER_H_
 #define _IFILEFOLDER_H_
 
+#include "../statusCode/statusCode.hpp"
+
 #include <string>
 #include <vector>
+#include <iostream>
+#include <filesystem>
+#include <algorithm>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 /// @brief 文件信息
 struct FileInfo

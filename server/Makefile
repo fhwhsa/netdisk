@@ -1,17 +1,17 @@
 .PHONY: debug run clean
 
 SOURCES := \
+	buffer/buffer.cpp \
+	connResources/connResources.cpp \
 	idatabase/idatabase.cpp	\
 	ifilefolder/ifilefolder.cpp \
 	json/jsoncpp.cpp \
+	log/log.cpp \
 	msg/msgUnit.cpp \
 	msg/msgParsing.cpp \
 	mysql/mysqlConn.cpp \
 	mysql/connectionPool.cpp \
-	wrap/wrap.cpp \
-	connResources/connResources.cpp \
-	statusCode/statusCode.h \
-	server.cpp \
+	server/server.cpp \
 	run.cpp
 
 SLIB := event mysqlclient

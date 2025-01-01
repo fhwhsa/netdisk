@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <fstream>
 
+#include <unistd.h>
+
 /// @brief 用户系统资源
 class ConnResources
 {

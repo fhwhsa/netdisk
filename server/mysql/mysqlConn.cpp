@@ -1,5 +1,4 @@
 #include "mysqlConn.h"
-#include <stdexcept>
 
 MysqlConn::MysqlConn()
 {
@@ -60,7 +59,7 @@ unsigned int MysqlConn::getColNum()
     return num;
 }
 
-std::string MysqlConn::value(int index)
+std::string MysqlConn::value(unsigned int index)
 {
     if (index >= num || nullptr == mysqlrow || index < 0)
         throw std::runtime_error("The over-access or result set is empty!");
@@ -71,7 +70,7 @@ std::string MysqlConn::value(std::string item)
 {
     if (stoindex.empty())
     {
-        for (int i = 0; i < num; ++i)
+        for (unsigned int i = 0; i < num; ++i)
             stoindex[std::string(mysqlfield[i].name)] = i;
     }
     if (stoindex.end() == stoindex.find(item))

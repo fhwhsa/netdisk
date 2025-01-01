@@ -8,6 +8,7 @@
 #include <mysql/mysql.h>
 #include <string>
 #include <unordered_map>
+#include <stdexcept>
 
 /// @brief C API封装的数据库连接
 class MysqlConn
@@ -52,7 +53,7 @@ public:
     /// @param index 根据下标取值
     /// @exception 下标越界抛出异常
     /// @return 对应字段值
-    std::string value(int index);
+    std::string value(unsigned int index);
 
     /// @brief 获取结果中的字段值
     /// @param index 根据字段名取值

@@ -2,6 +2,7 @@
 #define _THREADPOOL_H_
 
 #include "../json/json.h"
+#include "../log/log.h"
 
 #include <iostream>
 #include <vector>
@@ -15,6 +16,8 @@
 #include <memory>
 #include <unordered_set>
 #include <fstream>
+#include <atomic>
+#include <assert.h>
 
 class ThreadPool {
 public:
@@ -43,12 +46,66 @@ public:
         std::future<return_type> res = task->get_future();
         {
             std::unique_lock<std::mutex> lock(queue_mutex);
-            if (stop)
-                throw std::runtime_error("线程池已销毁");
             tasks.emplace([task]() { (*task)(); });
         }
         condition.notify_one();
         return res;
+    }
+
+    /// @brief 初始化线程池
+    /// @param _maxIdleTime 最长空闲时间（ms）
+    /// @param _maxThreads 最大工作线程数
+    /// @param _minThreads 最小工作线程数
+    /// @param _adjustAddThreads 单次调整增加工作线程数的最大值
+    /// @param _adjustDuration 执行调整函数的间隔时间(ms)
+    void init(ulong _maxIdleTime, int _maxThreads, int _minThreads, int _adjustAddThreads, int _adjustDuration)
+    {
+        maxIdleTime = _maxIdleTime;
+        maxThreads = _maxThreads;
+        minThreads = _minThreads;
+        adjustAddThreads = _adjustAddThreads;
+        adjustDuration = _adjustDuration;
+
+        createThread();
+
+        LogFunc::info("The thread pool initialization is complete.");
+    }
+
+    void initFromConfig(const Json::Value& root)
+    {
+        if (!root.isMember("thread-pool"))
+            throw std::runtime_error("Profile is missing value 'thread-pool'!");
+        
+        auto check = [&](const std::string& key) {
+            if (!root["thread-pool"].isMember(key))
+                throw std::runtime_error("The thread-pool configuration is missing the value '" + key + "'");
+        };
+        
+        for (const std::string& key : {"maxIdleTime", "maxThreads", "minThreads", "adjustAddThreads", "adjustDuration"})
+            check(key);
+        
+        maxIdleTime = root["thread-pool"]["maxIdleTime"].asUInt() * 1000;
+        maxThreads = root["thread-pool"]["maxThreads"].asInt();
+        minThreads = root["thread-pool"]["minThreads"].asInt();
+        adjustAddThreads = root["thread-pool"]["adjustAddThreads"].asInt();
+        adjustDuration = root["thread-pool"]["adjustDuration"].asUInt() * 1000;
+
+        createThread();   
+
+        LogFunc::info("The thread pool initialization is complete.");
+    }
+
+    void close()
+    {
+        LogFunc::info("Start cleaning up thread pool resources.");
+        stop = true;
+        condition.notify_all();
+        for (std::thread& worker : workers)
+            if (worker.joinable())
+                worker.join();
+        if (adjustThread.joinable())
+            adjustThread.join();
+        LogFunc::info("Thread pool resource cleanup is complete.");
     }
 
 private:
@@ -56,23 +113,28 @@ private:
     ThreadPool& operator=(const ThreadPool&);
 
     ~ThreadPool() {
-        {
-            std::unique_lock<std::mutex> lock(queue_mutex);
-            stop = true;
-        }   
-        condition.notify_all();
-        for (std::thread& worker : workers)
-            if (worker.joinable())
-                worker.join();
-        if (adjustThread.joinable())
-            adjustThread.join();
+        if (!stop)
+            close();
     }
 
     ThreadPool() : stop(false) {
-        // 加载配置文件
-        loadConfig();
+        maxIdleTime = -1;
+        maxThreads = -1;
+        minThreads = -1;
+        adjustAddThreads = -1;
+        adjustDuration = -1;
+    }
+
+    void createThread()
+    {
+        assert(maxIdleTime > 0);
+        assert(maxThreads > 0);
+        assert(minThreads > 0);
+        assert(adjustAddThreads > 0);
+        assert(adjustDuration > 0);
+
         // 初始化工作线程数量
-        for (size_t i = 0; i < minThreads; ++i)
+        for (int i = 0; i < minThreads; ++i)
             workers.emplace_back([this] { worker_thread(); });
         // 启动定时器动态调整工作线程数量
         adjustThread = std::thread([this] {
@@ -114,7 +176,7 @@ private:
         const auto now = std::chrono::steady_clock::now();
 
         // 增加工作线程
-        if (tasks.size() * 2 > workers.size() && workers.size() < maxThreads) {
+        if (tasks.size() * 2 > workers.size() && workers.size() < static_cast<size_t>(maxThreads)) {
             lock.unlock();  // 提前解锁，增加工作线程不影响现有工作线程
             int n = maxThreads - workers.size();
             n = n > adjustAddThreads ? adjustAddThreads : n;
@@ -125,7 +187,7 @@ private:
         }
 
         // 减少长时间空闲的工作线程
-        else if (workers.size() > minThreads) 
+        else if (workers.size() > static_cast<size_t>(minThreads)) 
         {
             // lock.unlock(); 减少工作线程影响现有工作线程
             auto it = std::remove_if(workers.begin(), workers.end(), [&](std::thread& t) {
@@ -142,42 +204,8 @@ private:
             workers.erase(it, workers.end());
             condition.notify_all();
         }
-    }
 
-    /// @brief 加载配置文件
-    void loadConfig()
-    {
-        std::ifstream ifs;
-        ifs.open("config.json");
-        if (!ifs.is_open())
-            throw std::runtime_error("Failed to open the configuration file!");
-
-        // utf8支持
-        Json::CharReaderBuilder ReaderBuilder;
-        ReaderBuilder["emitUTF8"] = true;
-
-        Json::Value root;
-        std::string strerr;
-        bool ok = Json::parseFromStream(ReaderBuilder, ifs, &root, &strerr);
-        if (!ok)
-            throw std::runtime_error("Failed to read the configuration file!");
-        
-        if (!root.isMember("thread-pool"))
-            throw std::runtime_error("Profile is missing value 'thread-pool'!");
-        
-        auto check = [&](const std::string& key) {
-            if (!root["thread-pool"].isMember(key))
-                throw std::runtime_error("The thread-pool configuration is missing the value '" + key + "'");
-        };
-        
-        for (const std::string& key : {"maxIdleTime", "maxThreads", "minThreads", "adjustAddThreads", "adjustDuration"})
-            check(key);
-        
-        maxIdleTime = root["thread-pool"]["maxIdleTime"].asUInt() * 1000;
-        maxThreads = root["thread-pool"]["maxThreads"].asInt();
-        minThreads = root["thread-pool"]["minThreads"].asInt();
-        adjustAddThreads = root["thread-pool"]["adjustAddThreads"].asInt();
-        adjustDuration = root["thread-pool"]["adjustDuration"].asUInt() * 1000;
+        LogFunc::info("Thread pool has adjust the number of work thread to %ld", workers.size());
     }
 
     /// @brief 工作线程列表
@@ -189,7 +217,7 @@ private:
     /// @brief 任务队列条件变量
     std::condition_variable condition;
     /// @brief 线程池状态，true为运行中
-    bool stop;
+    std::atomic<bool> stop;
     /// @brief 记录每个工作线程上一个活跃时间点，用于动态调整工作线程数量
     std::unordered_map<std::thread::id, std::chrono::steady_clock::time_point> lastActive;
     /// @brief 动态控制工作线程销毁

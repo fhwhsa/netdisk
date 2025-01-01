@@ -1,15 +1,4 @@
 #include "ifilefolder.h"
-#include "../statusCode/statusCode.h"
-
-#include <iostream>
-#include <filesystem>
-#include <algorithm>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/stat.h>
 
 const std::string basePath = "./virtualDisks";
 

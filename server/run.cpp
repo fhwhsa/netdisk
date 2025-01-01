@@ -1,5 +1,6 @@
-#include "server.h"
+#include "server/server.h"
 #include "json/json.h"
+#include "log/log.h"
 using namespace std;
 
 int main()
@@ -19,9 +20,13 @@ int main()
     if (!ok)
         throw std::runtime_error("Failed to read the configuration file!");
     
-    if (!root.isMember("server-setting"))
+    // 初始化日志系统
+    Log::getInstance().initFromConfig(root);
+    Log::getInstance().enableWriteErrorStream();
+
+    if (!root.isMember("server-setting"))   
         throw std::runtime_error("Profile is missing value 'server-setting'!");
-    
+
     auto check = [&](const std::string& key) {
         if (!root["server-setting"].isMember(key))
             throw std::runtime_error("The server-setting configuration is missing the value '" + key + "'");
@@ -33,5 +38,6 @@ int main()
     string ip = root["server-setting"]["ip"].asString();
     uint port = root["server-setting"]["port"].asUInt();
     uint connSustainTime = root["server-setting"]["connSustainTime"].asUInt();
-    run(ip, port, {connSustainTime, 0});
+    run(ip, port, root, {connSustainTime, 0});
+    return 0;
 }

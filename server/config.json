@@ -19,6 +19,13 @@
         "adjustDuration": 60    // 执行调整函数的间隔时间（s)
     },
 
+    "log" : {
+        "level": 0,
+        "path": "./logfile",
+        "mode": 1,
+        "maxQueueSize": 1024
+    },
+
     "server-setting" : {
         "ip": "0.0.0.0",         // 服务器ip
         "port": 9999,              // 监听端口

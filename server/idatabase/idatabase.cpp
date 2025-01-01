@@ -1,14 +1,4 @@
 #include "idatabase.h"
-#include "../mysql/mysqlConn.h"
-#include "../mysql/connectionPool.h"
-#include "../statusCode/statusCode.h"
-
-#include <memory>
-#include <iostream>
-#include <algorithm>
-#include <cctype>
-#include <chrono>
-#include <iomanip>
 
 std::string IDatabase::getDateTime()
 {
@@ -25,8 +15,8 @@ void IDatabase::serverOffline()
 {
     using namespace std;
     string sql("update user set status =0;");
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
-    shared_ptr<MysqlConn> ptr = pool->getConnection(); 
+    ConnectionPool& pool = ConnectionPool::getInstance();
+    shared_ptr<MysqlConn> ptr = pool.getConnection(); 
     if (nullptr != ptr)
         ptr->update(sql);
 }
@@ -35,10 +25,10 @@ int IDatabase::authentication(std::string email, std::string passwd, int& status
 {
     using namespace std;
     string sql("select * from user where email='" + email + "';");
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    ConnectionPool& pool = ConnectionPool::getInstance();
     do
     {
-        shared_ptr<MysqlConn> ptr = pool->getConnection();
+        shared_ptr<MysqlConn> ptr = pool.getConnection();
         if (nullptr == ptr)
         {
             statusCode = DATABASEBUSY;
@@ -122,8 +112,8 @@ bool IDatabase::logout(std::string id)
 {
     using namespace std;
     string sql("update user set status=0 where id=" + id + ";");
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
-    return pool->getConnection()->update(sql);
+    ConnectionPool& pool = ConnectionPool::getInstance();
+    return pool.getConnection()->update(sql);
 }
 
 std::pair<std::string, std::string> IDatabase::searchUser(std::string key, int& statusCode)
@@ -136,10 +126,10 @@ std::pair<std::string, std::string> IDatabase::searchUser(std::string key, int& 
         sql = string("select id, email from user where email = '" + key + "';");
 
     // cout << sql << endl;
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    ConnectionPool& pool = ConnectionPool::getInstance();
     do
     {
-        shared_ptr<MysqlConn> ptr = pool->getConnection();
+        shared_ptr<MysqlConn> ptr = pool.getConnection();
         if (nullptr == ptr) 
         {
             statusCode = DATABASEBUSY;
@@ -182,10 +172,10 @@ int IDatabase::addFriendApplication(std::string from, std::string to, int& statu
 {
     using namespace std;
 
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    ConnectionPool& pool = ConnectionPool::getInstance();
     do
     {
-        shared_ptr<MysqlConn> sptr = pool->getConnection();
+        shared_ptr<MysqlConn> sptr = pool.getConnection();
         if (nullptr == sptr)
         {
             statusCode = DATABASEBUSY;
@@ -286,10 +276,10 @@ std::vector<std::string> IDatabase::getFriendApplicationList(std::string from, i
 {
     using namespace std;
 
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    ConnectionPool& pool = ConnectionPool::getInstance();
     do
     {
-        shared_ptr<MysqlConn> sptr = pool->getConnection();
+        shared_ptr<MysqlConn> sptr = pool.getConnection();
         if (nullptr == sptr)
         {
             statusCode = DATABASEBUSY;
@@ -353,10 +343,10 @@ bool IDatabase::friendVerification(std::string regId, bool flag, int& statusCode
     string status = flag ? "0" : "2";
     string sql = "update friend set status =" + status + ", lastUpdateTime = '" + getDateTime() + "' where id = " + regId + ";";
     // cout << sql << endl;
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    ConnectionPool& pool = ConnectionPool::getInstance();
     do
     {
-        shared_ptr<MysqlConn> sptr = pool->getConnection();
+        shared_ptr<MysqlConn> sptr = pool.getConnection();
         if (nullptr == sptr)
         {
             statusCode = DATABASEBUSY;
@@ -382,10 +372,10 @@ std::vector<std::string> IDatabase::getFriendList(std::string from, int& statusC
     string sql = "select uid_2 id, email from friend f, user u where f.status = 0 and uid_1 = " + from + " and uid_2 = u.id" + 
                  " union " +
                  "select uid_1 id, email from friend f, user u where f.status = 0 and uid_2 = " + from + " and uid_1 = u.id;";
-    ConnectionPool* pool = ConnectionPool::getConnectionPool();
+    ConnectionPool& pool = ConnectionPool::getInstance();
     do
     {
-        shared_ptr<MysqlConn> sptr = pool->getConnection();
+        shared_ptr<MysqlConn> sptr = pool.getConnection();
         if (nullptr == sptr) 
         {
             statusCode = DATABASEBUSY;

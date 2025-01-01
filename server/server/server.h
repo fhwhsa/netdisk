@@ -5,32 +5,34 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-#include "connResources/connResources.h"
-#include "msg/msgUnit.h"
+#include "../msg/msgUnit.h"
+#include "../wrap/wrap.h"
+#include "../msg/msgUnit.h"
+#include "../msg/msgParsing.h"
+#include "../idatabase/idatabase.h"
+#include "../mysql/connectionPool.h"
+#include "../threadpool/threadpool.hpp"
+#include "../log/log.h"
+#include "mybev.hpp"
 
+#include <iostream>
+#include <thread>
 #include <string>
+#include <stdlib.h>
+#include <signal.h>
+#include <event.h>
+#include <event2/listener.h>
+#include <arpa/inet.h>
 #include <event.h>
 #include <sys/types.h>
-#include <string>
-#include <iostream>
-#include <atomic>
-
-/// @brief 封装bufferevent作为参数传递给回调函数
-struct my_bev
-{
-    struct bufferevent* bev;
-    /// @brief 登陆用户的id
-    ConnResources ur;
-    /// @brief 控制同一连接在同一时刻只有一个线程在执行回调，确保线程安全
-    std::atomic<bool> isRunningReadCb;
-};
 
 /// @brief 运行服务器
 /// @param host 监听ip
 /// @param port 监听端口
 /// @param _connSustainTime 连接维持时间
+/// @param 配置文件的Json::Value对象
 /// @return 如果失败函数立即结束返回1，否则函数进入循环监听状态
-int run(std::string host, uint port, struct timeval _connSustainTime = {60 * 5, 0});
+int run(std::string host, uint port, const Json::Value& root, struct timeval _connSustainTime = {60 * 5, 0});
 
 /// @brief 监听套接字回调函数
 void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);

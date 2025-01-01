@@ -1,10 +1,9 @@
 #include "connResources.h"
 
-#include <unistd.h>
-
 ConnResources::ConnResources()
 {
     fd = -1;
+    userId = "null";
 }
 
 ConnResources::ConnResources(std::string _userId) : userId(_userId)

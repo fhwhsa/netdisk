@@ -1,15 +1,4 @@
-#include "msgUnit.h"
 #include "msgParsing.h"
-#include "../wrap/wrap.h"
-#include "../idatabase/idatabase.h"
-#include "../ifilefolder/ifilefolder.h"
-
-#include <regex>
-#include <iostream>
-#include <string.h>
-#include <filesystem>
-#include <unistd.h>
-// #include <iostream>
 
 std::vector<std::string> MsgParsing::split_string(const std::string &str, std::string reg)
 {
@@ -437,7 +426,7 @@ MsgUnit *MsgParsing::uploadFilePauseRespond(const MsgUnit *munit, ConnResources 
     int fd = ur.getFd();
     close(fd);
 
-    char* content = "recv\r\n";
+    const char content[] = "recv\r\n";
     MsgUnit* respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_UPLOADFILE_PAUSE_RESPOND, strlen(content), content);
     return respond;
 }
@@ -528,7 +517,7 @@ MsgUnit *MsgParsing::downloadFileDataRequestRespond(const MsgUnit *munit, ConnRe
     long readBytes = read(ur.getFd(), buf, 1024);
     if (-1 == readBytes)
     {
-        char* content = "status:215\r\n";
+        const char content[] = "status:215\r\n";
         respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_FAILURE_RESPOND, strlen(content), content);
     }
     else 
@@ -552,7 +541,7 @@ MsgUnit *MsgParsing::downloadFileCancelRespond(const MsgUnit *munit, ConnResourc
     MsgUnit* respond = nullptr;
     if (IFileFolder::deleteFileOrFolder(ur.getFilePath(), statusCode))
     {
-        char* content = "recv\r\n";
+        const char content[] = "recv\r\n";
         respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_RESPOND, strlen(content), content);
     }
     else 
@@ -589,7 +578,7 @@ MsgUnit *MsgParsing::downloadFileContinueRespond(const MsgUnit *munit, ConnResou
     {
         ur.setFd(fd);
         ur.setFilePath(fileinfo[0]);
-        char* content = "recv\r\n";
+        const char content[] = "recv\r\n";
         respond = MsgUnit::make_dataunit(MsgType::MSG_TYPE_DOWNLOADFILE_CONTINUE_RESPOND, strlen(content), content);
     }
     else 
@@ -618,7 +607,7 @@ bool MsgParsing::checkNumString(const std::string &str)
 
     return true;
 }
-
+/*
 MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
 {
     // std::cout << (char*)munit->msg << std::endl;
@@ -626,6 +615,7 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
     {
     // 登陆请求
     case MsgType::MSG_TYPE_LOGIN_REQUEST:
+        // LogFunc::info("Started processing login requests from user %s.")
         return loginRespond(munit, ur);
 
     // 退出登陆请求
@@ -721,12 +711,176 @@ MsgUnit *MsgParsing::parsing(const MsgUnit *munit, ConnResources& ur)
 
     return nullptr;
 }
+*/
+
+MsgUnit *MsgParsing::parsing(const MsgUnit *munit, my_bev* mbev)
+{
+    switch (munit->msgType)
+    {
+    // 登陆请求
+    case MsgType::MSG_TYPE_LOGIN_REQUEST:
+    {   
+        LogFunc::info("Started processing login requests from user %s.", mbev->getConnectionInfo().c_str());
+        return loginRespond(munit, mbev->ur);
+    }
+
+    // 退出登陆请求
+    case MsgType::MSG_TYPE_LOGOUT_REQUEST:
+    {
+        LogFunc::info("Started processing logout requests from user %s.", mbev->getConnectionInfo().c_str());
+        logoutHandler(munit);
+        return nullptr;
+    }
+
+    // 查找用户请求
+    case MsgType::MSG_TYPE_SEARCHUSER_REQUEST:
+    {
+        LogFunc::info("Started processing search user requests from user %s.", mbev->getConnectionInfo().c_str());
+        return searchUserRespond(munit);
+    }
+
+    // 添加好友请求
+    case MsgType::MSG_TYPE_ADDFRIEND_REQUEST:
+    {
+        LogFunc::info("Started processing add friend requests from user %s.", mbev->getConnectionInfo().c_str());
+        return addFriendRespond(munit);
+    }
+
+    // 获取好友申请记录请求
+    case MsgType::MSG_TYPE_GETFRIENDAPPLICATIONLIST_REQUEST:
+    {
+        LogFunc::info("Started processing get friend application list requests from user %s.", mbev->getConnectionInfo().c_str());
+        return getFriendApplicationListRespond(munit);
+    }
+
+    // 验证好友请求
+    case MsgType::MSG_TYPE_FRIENDVERIFICATION_REQUEST:
+    {
+        LogFunc::info("Started processing friend verification requests from user %s.", mbev->getConnectionInfo().c_str());
+        return verifyFriendApplication(munit);
+    }
+
+    // 获取好友列表请求
+    case MsgType::MSG_TYPE_GETFRIENDLIST_REQUEST:
+    {
+        LogFunc::info("Started processing get firend list requests from user %s.", mbev->getConnectionInfo().c_str());
+        return getFriendListRespond(munit);
+    }
+
+    // 获取文件夹内容请求
+    case MsgType::MSG_TYPE_GETFOLDERCONTENT_REQUEST:
+    {
+        LogFunc::info("Started processing get folder content requests from user %s.", mbev->getConnectionInfo().c_str());
+        return getFolderContentRespond(munit);
+    }
+
+    // 创建文件夹请求
+    case MsgType::MSG_TYPE_CREATERFOLDER_REQUEST:
+    {
+        LogFunc::info("Started processing create folder requests from user %s.", mbev->getConnectionInfo().c_str());
+        return createFolderRespond(munit);
+    }
+
+    // 重命名文件/文件夹请求
+    case MsgType::MSG_TYPE_RENAMEFILEFOLDER_REQUEST:
+    {
+        LogFunc::info("Started processing rename file or folder requests from user %s.", mbev->getConnectionInfo().c_str());
+        return renameFileFolderRespond(munit);
+    }
+    
+    // 删除文件/文件夹请求
+    case MsgType::MSG_TYPE_DELETEFILEFOLDER_REQUEST:
+    {
+        LogFunc::info("Started processing delete file or folder requests from user %s.", mbev->getConnectionInfo().c_str());
+        return deleteFileFolderRespond(munit);
+    }
+
+    // 文件上传任务创建请求
+    case MsgType::MSG_TYPE_UPLOADFILE_START_REQUEST:
+    {
+        LogFunc::info("Started processing upload flie start requests from user %s.", mbev->getConnectionInfo().c_str());
+        return uploadFileStartRespond(munit, mbev->ur);
+    }
+
+    // 文件上传数据请求
+    case MsgType::MSG_TYPE_UPLOADFILE_DATA_REQUEST:
+    {
+        LogFunc::debug("Started processing upload file data requests from user %s.", mbev->getConnectionInfo().c_str());
+        return uploadFileDataRespond(munit, mbev->ur);
+    }
+
+    // 文件上传上传完成请求
+    case MsgType::MSG_TYPE_UPLOADFILE_FINSH_REQUEST:
+    {
+        LogFunc::info("Started processing upload file finsh requests from user %s.", mbev->getConnectionInfo().c_str());
+        return uploadFileFinshRespond(munit, mbev->ur);
+    }
+
+    // 取消上传请求
+    case MsgType::MSG_TYPE_UPLOADFILE_CANCEL_REQUEST:
+    {
+        LogFunc::info("Started processing upload file cancel requests from user %s.", mbev->getConnectionInfo().c_str());
+        return uploadFileCancelRespond(munit, mbev->ur);
+    }
+
+    // 暂停上传请求
+    case MsgType::MSG_TYPE_UPLOADFILE_PAUSE_REQUEST:
+    {
+        LogFunc::info("Started processing upload file pause requests from user %s.", mbev->getConnectionInfo().c_str());
+        return uploadFilePauseRespond(munit, mbev->ur);
+    }
+    
+    // 继续上传请求
+    case MsgType::MSG_TYPE_UPLOADFILE_CONTINUE_REQUEST:
+    {
+        LogFunc::info("Started processing upload file continue requests from user %s.", mbev->getConnectionInfo().c_str());
+        return uploadFileContinueRespond(munit, mbev->ur);
+    }
+
+    // 创建下载任务请求
+    case MsgType::MSG_TYPE_DOWNLOADFILE_START_REQUEST:
+    {
+        LogFunc::info("Started processing download file start requests from user %s.", mbev->getConnectionInfo().c_str());
+        return downloadFileStartRespond(munit, mbev->ur);
+    }
+    
+    // 文件下载数据请求
+    case MsgType::MSG_TYPE_DOWNLOADFILE_DATA_REQUEST:
+    {
+        LogFunc::debug("Started processing download file data requests from user %s.", mbev->getConnectionInfo().c_str());
+        return downloadFileDataRequestRespond(munit, mbev->ur);
+    }
+
+    // 取消下载请求
+    case MsgType::MSG_TYPE_DOWNLOADFILE_CANCEL_REQUEST:
+    {
+        LogFunc::info("Started processing download file cancel requests from user %s.", mbev->getConnectionInfo().c_str());
+        return downloadFileCancelRespond(munit, mbev->ur);
+    }
+    
+    // case MsgType::MSG_TYPE_DOWNLOADFILE_PAUSE_REQUEST:
+    //     return nullptr;
+    
+    // 继续下载请求
+    case MsgType::MSG_TYPE_DOWNLOADFILE_CONTINUE_REQUEST:
+    {
+        LogFunc::info("Started processing download file continue requests from user %s.", mbev->getConnectionInfo().c_str());
+        return downloadFileContinueRespond(munit, mbev->ur);
+    }
+
+    // 未知请求
+    default:
+        break;
+    }
+
+    return nullptr;
+}
 
 std::string MsgParsing::getRow(const MsgUnit *munit, int index)
 {
     using namespace std;
     vector<string> res = split_string(std::string((char*)munit->msg), "\r\n");
-    if (index < res.size())
+    if (static_cast<size_t>(index) < res.size())
         return res[index];
     return "";
 }

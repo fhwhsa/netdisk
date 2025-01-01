@@ -5,11 +5,20 @@
 #ifndef _MSGPARSING_H_
 #define _MSGPARSING_H_
 
-#include "../connResources/connResources.h"
+// #include "../connResources/connResources.h"
 #include "msgUnit.h"
+#include "../wrap/wrap.h"
+#include "../server/mybev.hpp"
+#include "../idatabase/idatabase.h"
+#include "../ifilefolder/ifilefolder.h"
 
+#include <regex>
+#include <iostream>
+#include <filesystem>
 #include <vector>
 #include <string>
+#include <unistd.h>
+#include <string.h>
 
 class MsgParsing 
 {
@@ -154,7 +163,8 @@ public:
     /// @param munit 通信消息
     /// @param ur 用户系统资源
     /// @return 对应的响应消息
-    static MsgUnit* parsing(const MsgUnit* munit, ConnResources& ur);
+    // static MsgUnit* parsing(const MsgUnit* munit, ConnResources& ur);
+    static MsgUnit* parsing(const MsgUnit* munit, my_bev* mbev);
 
     /// @brief 获取munit消息内容中第index行内容，index从0开始。建议当仅需要获取其中一行时建议调用该方法，否则调用allValue方法
     /// @param munit 要获取信息的消息单元

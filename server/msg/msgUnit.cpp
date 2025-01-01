@@ -1,8 +1,4 @@
 #include "msgUnit.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <string>
 
 MsgUnit* MsgUnit::make_dataunit(MsgType msgType, uint msgLen, const char *msg)
 {
